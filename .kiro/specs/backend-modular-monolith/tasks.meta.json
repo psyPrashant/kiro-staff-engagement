@@ -1,0 +1,254 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add Flyway Maven dependencies to pom.xml": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309168
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415321933
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415430001
+      }
+    ],
+    "1.2 Configure base application.properties": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309227
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415322691
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415430505
+      }
+    ],
+    "2.1 Create application-local.properties": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309309
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415437472
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415606630
+      }
+    ],
+    "2.2 Create application-dev.properties": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309356
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415438210
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415607049
+      }
+    ],
+    "3.1 Create V1__baseline.sql migration script": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309407
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415439044
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415607861
+      }
+    ],
+    "3.2 Create module package directories with .gitkeep files": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309455
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415323554
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415431326
+      }
+    ],
+    "4. Checkpoint - Verify build compiles and configuration is correct": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309499
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415625778
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415713836
+      }
+    ],
+    "5.1 Add Testcontainers dependency to pom.xml": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309553
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415626713
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415713027
+      }
+    ],
+    "5.2 Create base test configuration with Testcontainers": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309619
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415719617
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415876921
+      }
+    ],
+    "5.3 Write application context load test": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309666
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415883318
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783416137103
+      }
+    ],
+    "5.4 Write health endpoint integration test": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309711
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415884031
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783416137837
+      }
+    ],
+    "5.5 Write Flyway migration integration test": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309761
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415884848
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783416138705
+      }
+    ],
+    "6. Final checkpoint - Ensure all tests pass with `mvn verify`": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415309817
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783416145679
+      },
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783416273877
+      }
+    ],
+    "1. Add Flyway dependencies and configure base application properties": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415430552
+      }
+    ],
+    "2. Configure Spring profiles for local and dev environments": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415607118
+      }
+    ],
+    "3. Create Flyway baseline migration and module package structure": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783415607917
+      }
+    ],
+    "5. Write integration tests": [
+      {
+        "executionId": "f52b11f6-14a3-435d-9464-5d3a24dca6dc",
+        "chatSessionId": "sess_f996e7b5-f186-4d1f-9e7e-79ca1dec4f89",
+        "timestamp": 1783416138761
+      }
+    ]
+  }
+}
