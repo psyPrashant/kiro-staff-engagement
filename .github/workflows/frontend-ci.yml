@@ -1,0 +1,189 @@
+# Frontend CI Pipeline
+#
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │ Branch Protection Setup                                              │
+# ├──────────────────────────────────────────────────────────────────────┤
+# │                                                                      │
+# │ Required status check for this workflow: "lint-build"                │
+# │                                                                      │
+# │ In GitHub repository settings (Settings > Branches > Branch          │
+# │ protection rules for "main"):                                        │
+# │                                                                      │
+# │ 1. Enable "Require status checks to pass before merging"             │
+# │ 2. Add "lint-build" as a required status check                      │
+# │ 3. Enable "Require branches to be up to date before merging"         │
+# │                                                                      │
+# │ Behaviour:                                                           │
+# │ - When the "lint-build" check fails, branch protection prevents      │
+# │   the PR from merging (merge button is disabled).                    │
+# │ - When all required checks pass, the merge is allowed.               │
+# │ - When the workflow is skipped due to path filtering (no frontend    │
+# │   changes), the "lint-build" job reports as "skipped" which          │
+# │   satisfies the required status check (skipped = success).           │
+# │                                                                      │
+# │ Informational jobs (NOT required status checks):                     │
+# │ - "test" — runs Vitest with coverage; not required to avoid          │
+# │   blocking when coverage tooling isn't fully configured.             │
+# │ - "e2e" — runs Playwright e2e tests; not required to avoid           │
+# │   blocking when Playwright isn't installed.                          │
+# │                                                                      │
+# │ Note: The backend workflow uses "build" as its required check.       │
+# │ Both "build" and "lint-build" should be added as required checks.    │
+# └──────────────────────────────────────────────────────────────────────┘
+
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'staff-engagement-frontend/**'
+              - '.github/workflows/frontend-ci.yml'
+
+  lint-build:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: 'staff-engagement-frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: staff-engagement-frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: staff-engagement-frontend
+        run: npm run lint
+
+      - name: Format check
+        working-directory: staff-engagement-frontend
+        run: npm run format:check
+
+      - name: Build
+        working-directory: staff-engagement-frontend
+        run: npm run build
+
+  test:
+    needs: [changes, lint-build]
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: 'staff-engagement-frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: staff-engagement-frontend
+        run: npm ci
+
+      - name: Run tests with coverage
+        id: tests
+        working-directory: staff-engagement-frontend
+        run: npx ng test --no-watch --coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: staff-engagement-frontend/coverage/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Coverage summary
+        if: always() && steps.tests.outcome == 'success'
+        working-directory: staff-engagement-frontend
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "## Frontend Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            LINES=$(jq -r '.total.lines.pct' coverage/coverage-summary.json)
+            BRANCHES=$(jq -r '.total.branches.pct' coverage/coverage-summary.json)
+            FUNCTIONS=$(jq -r '.total.functions.pct' coverage/coverage-summary.json)
+            STATEMENTS=$(jq -r '.total.statements.pct' coverage/coverage-summary.json)
+            echo "| Metric | Coverage |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Lines | ${LINES}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| Branches | ${BRANCHES}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| Functions | ${FUNCTIONS}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| Statements | ${STATEMENTS}% |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "::warning::Coverage summary not found. Coverage generation may have failed."
+          fi
+
+  e2e:
+    needs: [changes, lint-build]
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: 'staff-engagement-frontend/package-lock.json'
+
+      - name: Check for Playwright
+        id: check-playwright
+        working-directory: staff-engagement-frontend
+        run: |
+          if grep -q '"@playwright/test"' package.json; then
+            echo "playwright=true" >> $GITHUB_OUTPUT
+          else
+            echo "playwright=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ @playwright/test not found in package.json — skipping e2e tests."
+          fi
+
+      - name: Install dependencies
+        if: steps.check-playwright.outputs.playwright == 'true'
+        working-directory: staff-engagement-frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: steps.check-playwright.outputs.playwright == 'true'
+        working-directory: staff-engagement-frontend
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright e2e tests
+        if: steps.check-playwright.outputs.playwright == 'true'
+        working-directory: staff-engagement-frontend
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: steps.check-playwright.outputs.playwright == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: staff-engagement-frontend/playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore

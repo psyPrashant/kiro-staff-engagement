@@ -1,5 +1,4 @@
 import { HttpRequest } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 import { throwError } from 'rxjs';
 import * as fc from 'fast-check';
 import { errorInterceptor } from './error.interceptor';
@@ -37,9 +36,7 @@ describe('Feature: frontend-scaffold, Property 3: Error interceptor logs and ret
 
         // Assert console.error was called with the expected format
         expect(consoleSpy).toHaveBeenCalledOnce();
-        expect(consoleSpy).toHaveBeenCalledWith(
-          `HTTP Error ${status} on ${url}: ${message}`,
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(`HTTP Error ${status} on ${url}: ${message}`);
 
         // Assert the original error is rethrown
         expect(caughtError).toBe(errorObj);
