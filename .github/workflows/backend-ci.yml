@@ -67,7 +67,7 @@ jobs:
         working-directory: staff-engagement-backend
         run: |
           chmod +x mvnw
-          ./mvnw package -B
+          ./mvnw verify -B
 
       - name: Check for JaCoCo plugin
         id: jacoco-check
