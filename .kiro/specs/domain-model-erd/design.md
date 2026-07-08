@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design establishes the persistence layer for the Staff Engagement platform. It covers six JPA entities (User, Employee, Company, Project, Interaction, Task), two enumerations (InteractionType, TaskStatus), a Flyway V2 migration script creating all tables, and six Spring Data JPA repositories. The architecture follows a modular monolith approach where entities reside in their respective module packages but reference each other directly via unidirectional `@ManyToOne` associations with `FetchType.LAZY`.
+This design establishes the persistence layer for the Staff Engagement platform. It covers six JPA entities (User, Employee, Company, Project, Interaction, Task), two enumerations (InteractionType, TaskStatus), a Flyway V3 migration script creating all tables, and six Spring Data JPA repositories. The architecture follows a modular monolith approach where entities reside in their respective module packages but reference each other directly via unidirectional `@ManyToOne` associations with `FetchType.LAZY`.
 
 ### Design Decisions
 
@@ -521,10 +521,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
 ## Data Models
 
-### Flyway Migration: V2__create_domain_tables.sql
+### Flyway Migration: V3__create_domain_tables.sql
 
 ```sql
--- V2__create_domain_tables.sql
+-- V3__create_domain_tables.sql
 -- Creates all domain tables for the Staff Engagement platform.
 
 -- 1. Users table
@@ -720,7 +720,7 @@ Each correctness property maps to a property-based test with minimum 100 iterati
 
 #### 3. Migration Smoke Test
 
-- Verify `V2__create_domain_tables.sql` applies cleanly after `V1__baseline.sql`
+- Verify `V3__create_domain_tables.sql` applies cleanly after `V2__create_greeting_table.sql`
 - Verify all expected tables exist
 - Verify all expected indexes exist (query `pg_indexes`)
 - Uses existing `FlywayMigrationIntegrationTest` pattern

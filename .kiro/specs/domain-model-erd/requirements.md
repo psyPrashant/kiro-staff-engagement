@@ -120,10 +120,10 @@ This feature establishes the domain model and database schema for the Staff Enga
 2. THE Migration_Script SHALL create foreign key constraints for: employees.manager_id → employees.id, projects.company_id → companies.id, interactions.employee_id → employees.id, interactions.conducted_by_user_id → users.id, interactions.logged_by_user_id → users.id, interactions.project_id → projects.id, tasks.interaction_id → interactions.id, and tasks.assigned_user_id → users.id.
 3. THE Migration_Script SHALL create unique constraints on users.email and employees.email.
 4. THE Migration_Script SHALL create CHECK constraints for interactions.type (CHECK_IN, MENTORING, CATCH_UP, OTHER) and tasks.status (OPEN, DONE).
-5. THE Migration_Script SHALL be stored as `V2__create_domain_tables.sql` in `src/main/resources/db/migration/`, following the existing V1__baseline.sql.
+5. THE Migration_Script SHALL be stored as `V3__create_domain_tables.sql` in `src/main/resources/db/migration/`, following the existing V1__baseline.sql and V2__create_greeting_table.sql.
 6. THE Migration_Script SHALL create indexes on all foreign key columns: employees.manager_id, projects.company_id, interactions.employee_id, interactions.conducted_by_user_id, interactions.logged_by_user_id, interactions.project_id, tasks.interaction_id, and tasks.assigned_user_id.
 7. THE Migration_Script SHALL define string fields as VARCHAR(255) for name, email, title, and job_title columns, and as TEXT for notes and description columns.
-8. IF the Migration_Script is applied to a database where V1__baseline.sql has already run, THEN the Migration_Script SHALL execute successfully without errors.
+8. IF the Migration_Script is applied to a database where V1__baseline.sql and V2__create_greeting_table.sql have already run, THEN the Migration_Script SHALL execute successfully without errors.
 
 ### Requirement 10: Spring Data JPA Repositories
 

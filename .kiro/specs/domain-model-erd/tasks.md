@@ -2,13 +2,13 @@
 
 ## Overview
 
-This plan implements the persistence layer for the Staff Engagement platform: a Flyway V2 migration script, six JPA entities with two enumerations, six Spring Data JPA repositories, and integration tests (standard + property-based). Tasks are ordered so that foundational schema and entities are built first, then repositories, then tests wire everything together.
+This plan implements the persistence layer for the Staff Engagement platform: a Flyway V3 migration script, six JPA entities with two enumerations, six Spring Data JPA repositories, and integration tests (standard + property-based). Tasks are ordered so that foundational schema and entities are built first, then repositories, then tests wire everything together.
 
 ## Tasks
 
-- [x] 1. Create Flyway V2 migration script and enum classes
-  - [x] 1.1 Create V2__create_domain_tables.sql migration script
-    - Create file `src/main/resources/db/migration/V2__create_domain_tables.sql`
+- [x] 1. Create Flyway V3 migration script and enum classes
+  - [x] 1.1 Create V3__create_domain_tables.sql migration script
+    - Create file `src/main/resources/db/migration/V3__create_domain_tables.sql`
     - Define tables in dependency order: users, employees, companies, projects, interactions, tasks
     - Include all columns with correct data types (BIGSERIAL, VARCHAR(255), TEXT, TIMESTAMP, DATE)
     - Add NOT NULL constraints, UNIQUE constraints on users.email and employees.email
