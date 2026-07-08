@@ -1,0 +1,120 @@
+# Backend CI Pipeline
+#
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │ Branch Protection Setup                                              │
+# ├──────────────────────────────────────────────────────────────────────┤
+# │                                                                      │
+# │ Required status check for this workflow: "build"                     │
+# │                                                                      │
+# │ In GitHub repository settings (Settings > Branches > Branch          │
+# │ protection rules for "main"):                                        │
+# │                                                                      │
+# │ 1. Enable "Require status checks to pass before merging"             │
+# │ 2. Add "build" as a required status check                           │
+# │ 3. Enable "Require branches to be up to date before merging"         │
+# │                                                                      │
+# │ Behaviour:                                                           │
+# │ - When the "build" check fails, branch protection prevents the       │
+# │   PR from merging (merge button is disabled).                        │
+# │ - When all required checks pass, the merge is allowed.               │
+# │ - When the workflow is skipped due to path filtering (no backend      │
+# │   changes), the "build" job reports as "skipped" which satisfies     │
+# │   the required status check (skipped = success).                     │
+# │                                                                      │
+# │ Note: The frontend workflow uses "lint-build" as its required check. │
+# │ Both "build" and "lint-build" should be added as required checks.    │
+# └──────────────────────────────────────────────────────────────────────┘
+
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'staff-engagement-backend/**'
+              - '.github/workflows/backend-ci.yml'
+
+  build:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and test with Maven
+        working-directory: staff-engagement-backend
+        run: ./mvnw package -B
+
+      - name: Check for JaCoCo plugin
+        id: jacoco-check
+        working-directory: staff-engagement-backend
+        run: |
+          if grep -q 'jacoco-maven-plugin' pom.xml; then
+            echo "has_jacoco=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_jacoco=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload JaCoCo coverage report
+        if: steps.jacoco-check.outputs.has_jacoco == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: staff-engagement-backend/target/site/jacoco/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Write coverage summary
+        if: steps.jacoco-check.outputs.has_jacoco == 'true'
+        working-directory: staff-engagement-backend
+        run: |
+          if [ -f target/site/jacoco/index.html ]; then
+            echo "## Backend Coverage Report" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            # Extract line and branch coverage from JaCoCo CSV if available
+            if [ -f target/site/jacoco/jacoco.csv ]; then
+              echo "| Metric | Covered | Missed | Total |" >> "$GITHUB_STEP_SUMMARY"
+              echo "|--------|---------|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+              # Parse CSV to extract coverage metrics
+              tail -n +2 target/site/jacoco/jacoco.csv | awk -F',' '
+                BEGIN { inst_missed=0; inst_covered=0; branch_missed=0; branch_covered=0; line_missed=0; line_covered=0 }
+                {
+                  inst_missed += $4; inst_covered += $5;
+                  branch_missed += $6; branch_covered += $7;
+                  line_missed += $8; line_covered += $9;
+                }
+                END {
+                  inst_total = inst_missed + inst_covered;
+                  branch_total = branch_missed + branch_covered;
+                  line_total = line_missed + line_covered;
+                  if (inst_total > 0) printf "| Instructions | %d | %d | %.1f%% |\n", inst_covered, inst_missed, (inst_covered/inst_total)*100;
+                  if (branch_total > 0) printf "| Branches | %d | %d | %.1f%% |\n", branch_covered, branch_missed, (branch_covered/branch_total)*100;
+                  if (line_total > 0) printf "| Lines | %d | %d | %.1f%% |\n", line_covered, line_missed, (line_covered/line_total)*100;
+                }
+              ' >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "JaCoCo coverage report generated. See uploaded artifact for details." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
