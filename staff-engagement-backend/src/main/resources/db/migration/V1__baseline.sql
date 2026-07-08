@@ -1,0 +1,2 @@
+-- Flyway baseline migration: proves the migration pipeline is operational.
+-- No tables, sequences, or other database objects are created.
