@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
@@ -10,7 +10,7 @@ export interface GreetingResponse {
   providedIn: 'root',
 })
 export class GreetingService {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   getGreeting(name: string): Observable<string> {
     return this.http
