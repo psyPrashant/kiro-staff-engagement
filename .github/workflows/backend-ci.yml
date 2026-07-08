@@ -65,7 +65,9 @@ jobs:
 
       - name: Build and test with Maven
         working-directory: staff-engagement-backend
-        run: ./mvnw package -B
+        run: |
+          chmod +x mvnw
+          ./mvnw package -B
 
       - name: Check for JaCoCo plugin
         id: jacoco-check
