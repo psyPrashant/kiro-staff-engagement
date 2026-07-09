@@ -30,9 +30,7 @@ describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () =
 
   describe('Property 9: Auth guard redirects unauthenticated users with returnUrl', () => {
     it('for arbitrary route paths with null user, returns UrlTree to /login with truncated returnUrl', () => {
-      const pathCharArb = fc.constantFrom(
-        ...'abcdefghijklmnopqrstuvwxyz0123456789/-_~.'.split('')
-      );
+      const pathCharArb = fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz0123456789/-_~.'.split(''));
       const pathArb = fc
         .string({ unit: pathCharArb, minLength: 1, maxLength: 4096 })
         .map((s: string) => '/' + s);
@@ -56,7 +54,7 @@ describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () =
           expect(returnUrl.length).toBeLessThanOrEqual(2048);
           expect(returnUrl).toBe(path.substring(0, 2048));
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -71,9 +69,7 @@ describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () =
         email: fc.string({ minLength: 1 }),
       });
 
-      const pathCharArb = fc.constantFrom(
-        ...'abcdefghijklmnopqrstuvwxyz0123456789/-_~.'.split('')
-      );
+      const pathCharArb = fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz0123456789/-_~.'.split(''));
       const pathArb = fc
         .string({ unit: pathCharArb, minLength: 1, maxLength: 200 })
         .map((s: string) => '/' + s);
@@ -89,7 +85,7 @@ describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () =
 
           expect(result).toBe(true);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 

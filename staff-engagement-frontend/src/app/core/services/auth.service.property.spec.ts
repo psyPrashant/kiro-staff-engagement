@@ -31,7 +31,7 @@ describe('Feature: frontend-login-auth-guard — AuthService Property Tests', ()
 
           req.flush({ id: 1, name: 'Test', email });
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -56,7 +56,7 @@ describe('Feature: frontend-login-auth-guard — AuthService Property Tests', ()
 
           expect(service.currentUser()).toEqual(user);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -84,7 +84,7 @@ describe('Feature: frontend-login-auth-guard — AuthService Property Tests', ()
           expect(service.currentUser()).toBeNull();
           expect(errorReceived).toBe(true);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -99,7 +99,7 @@ describe('Feature: frontend-login-auth-guard — AuthService Property Tests', ()
           id: fc.integer({ min: 1 }),
           name: fc.string({ minLength: 1 }),
           email: fc.string({ minLength: 1 }),
-        })
+        }),
       );
 
       fc.assert(
@@ -112,7 +112,7 @@ describe('Feature: frontend-login-auth-guard — AuthService Property Tests', ()
             expect(service.isAuthenticated()).toBe(false);
           }
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 

@@ -42,7 +42,7 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
     it('for arbitrary status codes not in {200, 400, 401}, displays generic message', () => {
       const unexpectedStatusArb = fc.oneof(
         fc.integer({ min: 402, max: 599 }),
-        fc.integer({ min: 300, max: 399 })
+        fc.integer({ min: 300, max: 399 }),
       );
 
       fc.assert(
@@ -57,7 +57,7 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
 
           expect(component.errorMessage()).toBe('Login failed. Please try again later.');
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -106,7 +106,7 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
 
     it('for arbitrary valid relative paths with query/fragments, navigation preserves full URL', () => {
       const segmentCharArb = fc.constantFrom(
-        ...'abcdefghijklmnopqrstuvwxyz0123456789-_~.'.split('')
+        ...'abcdefghijklmnopqrstuvwxyz0123456789-_~.'.split(''),
       );
       const segmentArb = fc.string({ unit: segmentCharArb, minLength: 1, maxLength: 20 });
 
@@ -116,12 +116,12 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
 
       const queryArb = fc.oneof(
         fc.constant(''),
-        segmentArb.map((key) => `?${key}=value`)
+        segmentArb.map((key) => `?${key}=value`),
       );
 
       const fragmentArb = fc.oneof(
         fc.constant(''),
-        segmentArb.map((frag) => `#${frag}`)
+        segmentArb.map((frag) => `#${frag}`),
       );
 
       const validReturnUrlArb = fc
@@ -143,7 +143,7 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
 
           expect(router.navigateByUrl).toHaveBeenCalledWith(returnUrl);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -195,13 +195,9 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
         .string({ minLength: 1, maxLength: 200 })
         .filter((s) => !s.startsWith('/'));
 
-      const doubleSlashArb = fc
-        .string({ minLength: 1, maxLength: 200 })
-        .map((s) => '//' + s);
+      const doubleSlashArb = fc.string({ minLength: 1, maxLength: 200 }).map((s) => '//' + s);
 
-      const tooLongArb = fc
-        .string({ minLength: 2049, maxLength: 2200 })
-        .map((s) => '/' + s);
+      const tooLongArb = fc.string({ minLength: 2049, maxLength: 2200 }).map((s) => '/' + s);
 
       const invalidReturnUrlArb = fc.oneof(noLeadingSlashArb, doubleSlashArb, tooLongArb);
 
@@ -219,7 +215,7 @@ describe('Feature: frontend-login-auth-guard — LoginComponent Redirect Propert
 
           expect(router.navigateByUrl).toHaveBeenCalledWith('/user');
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 

@@ -67,7 +67,7 @@ describe('LoginComponent', () => {
     it('should disable submit button when form is invalid', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       const button = compiled.querySelector(
-        '[data-testid="login-submit-button"]'
+        '[data-testid="login-submit-button"]',
       ) as HTMLButtonElement;
 
       expect(button.disabled).toBe(true);
@@ -80,7 +80,7 @@ describe('LoginComponent', () => {
 
       const compiled = fixture.nativeElement as HTMLElement;
       const button = compiled.querySelector(
-        '[data-testid="login-submit-button"]'
+        '[data-testid="login-submit-button"]',
       ) as HTMLButtonElement;
 
       expect(button.disabled).toBe(true);
@@ -92,7 +92,7 @@ describe('LoginComponent', () => {
 
       const compiled = fixture.nativeElement as HTMLElement;
       const button = compiled.querySelector(
-        '[data-testid="login-submit-button"]'
+        '[data-testid="login-submit-button"]',
       ) as HTMLButtonElement;
 
       expect(button.disabled).toBe(false);
@@ -260,7 +260,7 @@ describe('LoginComponent', () => {
 
       const compiled = fixture.nativeElement as HTMLElement;
       const button = compiled.querySelector(
-        '[data-testid="login-submit-button"]'
+        '[data-testid="login-submit-button"]',
       ) as HTMLButtonElement;
       expect(button.disabled).toBe(false);
     });
@@ -297,7 +297,7 @@ describe('LoginComponent', () => {
       localFixture.detectChanges();
 
       localAuthService.login.mockReturnValue(
-        of({ id: 1, name: 'User', email: 'user@example.com' })
+        of({ id: 1, name: 'User', email: 'user@example.com' }),
       );
       localComponent.loginForm.setValue({ email: 'user@example.com', password: 'secret123' });
       localComponent.onSubmit();
@@ -306,9 +306,7 @@ describe('LoginComponent', () => {
     });
 
     it('should navigate to /user when no returnUrl', () => {
-      authService.login.mockReturnValue(
-        of({ id: 1, name: 'User', email: 'user@example.com' })
-      );
+      authService.login.mockReturnValue(of({ id: 1, name: 'User', email: 'user@example.com' }));
       component.loginForm.setValue({ email: 'user@example.com', password: 'secret123' });
       component.onSubmit();
 
@@ -345,7 +343,7 @@ describe('LoginComponent', () => {
       localFixture.detectChanges();
 
       localAuthService.login.mockReturnValue(
-        of({ id: 1, name: 'User', email: 'user@example.com' })
+        of({ id: 1, name: 'User', email: 'user@example.com' }),
       );
       localComponent.loginForm.setValue({ email: 'user@example.com', password: 'secret123' });
       localComponent.onSubmit();
@@ -383,7 +381,7 @@ describe('LoginComponent', () => {
       localFixture.detectChanges();
 
       localAuthService.login.mockReturnValue(
-        of({ id: 1, name: 'User', email: 'user@example.com' })
+        of({ id: 1, name: 'User', email: 'user@example.com' }),
       );
       localComponent.loginForm.setValue({ email: 'user@example.com', password: 'secret123' });
       localComponent.onSubmit();
@@ -422,7 +420,7 @@ describe('LoginComponent', () => {
       localFixture.detectChanges();
 
       localAuthService.login.mockReturnValue(
-        of({ id: 1, name: 'User', email: 'user@example.com' })
+        of({ id: 1, name: 'User', email: 'user@example.com' }),
       );
       localComponent.loginForm.setValue({ email: 'user@example.com', password: 'secret123' });
       localComponent.onSubmit();

@@ -13,7 +13,7 @@ describe('Feature: frontend-login-auth-guard — AuthInterceptor Property Tests'
       const bodyArb = fc.oneof(
         fc.constant(null),
         fc.string({ minLength: 1 }),
-        fc.dictionary(fc.string({ minLength: 1, maxLength: 10 }), fc.string())
+        fc.dictionary(fc.string({ minLength: 1, maxLength: 10 }), fc.string()),
       );
 
       fc.assert(
@@ -34,7 +34,7 @@ describe('Feature: frontend-login-auth-guard — AuthInterceptor Property Tests'
           expect(capturedReq!.url).toBe(req.url);
           expect(capturedReq!.body).toEqual(req.body);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 

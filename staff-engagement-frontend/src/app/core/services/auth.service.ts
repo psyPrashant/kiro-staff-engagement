@@ -13,9 +13,9 @@ export class AuthService {
   readonly isAuthenticated: Signal<boolean> = computed(() => this.currentUser() !== null);
 
   login(email: string, password: string): Observable<User> {
-    return this.http.post<User>('/api/auth/login', { email, password }).pipe(
-      tap((user) => this.currentUser.set(user))
-    );
+    return this.http
+      .post<User>('/api/auth/login', { email, password })
+      .pipe(tap((user) => this.currentUser.set(user)));
   }
 
   logout(): void {

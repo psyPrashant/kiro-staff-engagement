@@ -14,9 +14,7 @@ describe('Feature: frontend-login-auth-guard — Login Form Property Tests', () 
       // - empty domain part (local@)
       // - strings with multiple @ symbols
 
-      const noAtArb = fc
-        .string({ minLength: 1 })
-        .filter((s) => !s.includes('@'));
+      const noAtArb = fc.string({ minLength: 1 }).filter((s) => !s.includes('@'));
 
       const emptyLocalArb = fc
         .string({ minLength: 1 })
@@ -29,10 +27,7 @@ describe('Feature: frontend-login-auth-guard — Login Form Property Tests', () 
         .map((local) => `${local}@`);
 
       const withSpacesArb = fc
-        .tuple(
-          fc.string({ minLength: 1 }),
-          fc.string({ minLength: 0 }),
-        )
+        .tuple(fc.string({ minLength: 1 }), fc.string({ minLength: 0 }))
         .map(([a, b]) => `${a} ${b}`)
         .filter((s) => s.trim().length > 0);
 
@@ -45,7 +40,7 @@ describe('Feature: frontend-login-auth-guard — Login Form Property Tests', () 
           emailControl.setValue(value);
           expect(emailControl.invalid).toBe(true);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -67,7 +62,7 @@ describe('Feature: frontend-login-auth-guard — Login Form Property Tests', () 
           passwordControl.setValue(value);
           expect(passwordControl.invalid).toBe(true);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -85,7 +80,7 @@ describe('Feature: frontend-login-auth-guard — Login Form Property Tests', () 
           passwordControl.setValue(value);
           expect(passwordControl.invalid).toBe(true);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 
@@ -103,7 +98,7 @@ describe('Feature: frontend-login-auth-guard — Login Form Property Tests', () 
           passwordControl.setValue(value);
           expect(passwordControl.valid).toBe(true);
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
 

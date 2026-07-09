@@ -39,7 +39,7 @@ describe('authGuard', () => {
     (authService.isAuthenticated as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     const result = TestBed.runInInjectionContext(() =>
-      authGuard(mockRoute, { url: '/dashboard' } as RouterStateSnapshot)
+      authGuard(mockRoute, { url: '/dashboard' } as RouterStateSnapshot),
     );
 
     expect(result).toBe(true);
@@ -49,7 +49,7 @@ describe('authGuard', () => {
     (authService.isAuthenticated as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     const result = TestBed.runInInjectionContext(() =>
-      authGuard(mockRoute, { url: '/dashboard' } as RouterStateSnapshot)
+      authGuard(mockRoute, { url: '/dashboard' } as RouterStateSnapshot),
     );
 
     expect(result).toBe(mockUrlTree);
@@ -64,7 +64,7 @@ describe('authGuard', () => {
     const originalPath = '/employees/42/tasks?status=active#details';
 
     TestBed.runInInjectionContext(() =>
-      authGuard(mockRoute, { url: originalPath } as RouterStateSnapshot)
+      authGuard(mockRoute, { url: originalPath } as RouterStateSnapshot),
     );
 
     expect(router.createUrlTree).toHaveBeenCalledWith(['/login'], {
@@ -78,7 +78,7 @@ describe('authGuard', () => {
     const longPath = '/' + 'a'.repeat(3000);
 
     TestBed.runInInjectionContext(() =>
-      authGuard(mockRoute, { url: longPath } as RouterStateSnapshot)
+      authGuard(mockRoute, { url: longPath } as RouterStateSnapshot),
     );
 
     expect(router.createUrlTree).toHaveBeenCalledWith(['/login'], {
