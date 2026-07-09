@@ -1,0 +1,8 @@
+<section class="dashboard" data-testid="dashboard">
+  <h1>Dashboard</h1>
+  <div class="dashboard-cards" data-testid="dashboard-cards">
+    @for (card of skeletonCards; track $index) {
+      <div class="skeleton-card" data-testid="skeleton-card"></div>
+    }
+  </div>
+</section>

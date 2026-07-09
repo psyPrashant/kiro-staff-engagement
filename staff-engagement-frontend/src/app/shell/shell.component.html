@@ -1,0 +1,11 @@
+<nav class="app-nav" data-testid="app-nav">
+  <a routerLink="/user" routerLinkActive="active" data-testid="nav-link-user">User</a>
+  <a routerLink="/employee" routerLinkActive="active" data-testid="nav-link-employee">Employee</a>
+  <a routerLink="/client" routerLinkActive="active" data-testid="nav-link-client">Client</a>
+  <a routerLink="/interaction" routerLinkActive="active" data-testid="nav-link-interaction">Interaction</a>
+  <a routerLink="/task" routerLinkActive="active" data-testid="nav-link-task">Task</a>
+  <button (click)="logout()" data-testid="logout-button">Logout</button>
+</nav>
+<main class="app-content">
+  <router-outlet />
+</main>
