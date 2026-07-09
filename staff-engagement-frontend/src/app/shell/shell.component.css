@@ -13,7 +13,9 @@
   padding: 8px 12px;
   border-radius: 4px;
   font-weight: 500;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .app-nav a:hover {
@@ -36,7 +38,9 @@
   color: #e94560;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .app-nav button:hover {

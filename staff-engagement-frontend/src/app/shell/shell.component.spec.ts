@@ -14,10 +14,7 @@ describe('ShellComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ShellComponent],
-      providers: [
-        { provide: AuthService, useValue: authService },
-        provideRouter([]),
-      ],
+      providers: [{ provide: AuthService, useValue: authService }, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShellComponent);
@@ -29,9 +26,15 @@ describe('ShellComponent', () => {
       const compiled = fixture.nativeElement as HTMLElement;
 
       const userLink = compiled.querySelector('[data-testid="nav-link-user"]') as HTMLAnchorElement;
-      const employeeLink = compiled.querySelector('[data-testid="nav-link-employee"]') as HTMLAnchorElement;
-      const clientLink = compiled.querySelector('[data-testid="nav-link-client"]') as HTMLAnchorElement;
-      const interactionLink = compiled.querySelector('[data-testid="nav-link-interaction"]') as HTMLAnchorElement;
+      const employeeLink = compiled.querySelector(
+        '[data-testid="nav-link-employee"]',
+      ) as HTMLAnchorElement;
+      const clientLink = compiled.querySelector(
+        '[data-testid="nav-link-client"]',
+      ) as HTMLAnchorElement;
+      const interactionLink = compiled.querySelector(
+        '[data-testid="nav-link-interaction"]',
+      ) as HTMLAnchorElement;
       const taskLink = compiled.querySelector('[data-testid="nav-link-task"]') as HTMLAnchorElement;
 
       expect(userLink).toBeTruthy();
@@ -51,7 +54,9 @@ describe('ShellComponent', () => {
   describe('logout button', () => {
     it('should call AuthService.logout() when logout button is clicked', () => {
       const compiled = fixture.nativeElement as HTMLElement;
-      const logoutButton = compiled.querySelector('[data-testid="logout-button"]') as HTMLButtonElement;
+      const logoutButton = compiled.querySelector(
+        '[data-testid="logout-button"]',
+      ) as HTMLButtonElement;
 
       expect(logoutButton).toBeTruthy();
       logoutButton.click();

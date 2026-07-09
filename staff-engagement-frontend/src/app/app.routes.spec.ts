@@ -50,16 +50,14 @@ describe('Route Configuration', () => {
 
   describe('redirects', () => {
     it('should redirect empty path child to dashboard', () => {
-      const emptyChild = shellChildren.find(
-        (r) => r.path === '' && r.redirectTo === 'dashboard'
-      );
+      const emptyChild = shellChildren.find((r) => r.path === '' && r.redirectTo === 'dashboard');
       expect(emptyChild).toBeDefined();
       expect(emptyChild!.pathMatch).toBe('full');
     });
 
     it('should redirect wildcard child to dashboard', () => {
       const wildcardChild = shellChildren.find(
-        (r) => r.path === '**' && r.redirectTo === 'dashboard'
+        (r) => r.path === '**' && r.redirectTo === 'dashboard',
       );
       expect(wildcardChild).toBeDefined();
     });

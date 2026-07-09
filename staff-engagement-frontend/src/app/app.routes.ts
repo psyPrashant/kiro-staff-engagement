@@ -5,8 +5,7 @@ import { ShellComponent } from './shell/shell.component';
 export const routes: Routes = [
   {
     path: 'login',
-    loadComponent: () =>
-      import('./auth/login/login.component').then((m) => m.LoginComponent),
+    loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: '',
