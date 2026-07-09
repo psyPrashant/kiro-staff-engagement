@@ -164,7 +164,7 @@ describe('AuthService', () => {
 
       service.logout();
 
-      const req = httpTesting.expectOne('/api/auth/logout');
+      httpTesting.expectOne('/api/auth/logout');
 
       vi.advanceTimersByTime(10000);
 

@@ -1,8 +1,9 @@
 import '@angular/compiler';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Router, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as fc from 'fast-check';
@@ -10,20 +11,21 @@ import { authGuard } from './auth.guard';
 import { AuthService } from '../services/auth.service';
 import { User } from '../models/user.model';
 
+@Component({ standalone: true, template: '' })
+class DummyComponent {}
+
 describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () => {
   let authService: AuthService;
-  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideRouter([{ path: 'login', component: {} as any }]),
+        provideRouter([{ path: 'login', component: DummyComponent }]),
       ],
     });
     authService = TestBed.inject(AuthService);
-    router = TestBed.inject(Router);
   });
 
   describe('Property 9: Auth guard redirects unauthenticated users with returnUrl', () => {
@@ -39,8 +41,8 @@ describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () =
         fc.property(pathArb, (path: string) => {
           authService.currentUser.set(null);
 
-          const mockRoute = {} as any;
-          const mockState = { url: path } as any;
+          const mockRoute = {} as ActivatedRouteSnapshot;
+          const mockState = { url: path } as RouterStateSnapshot;
 
           const result = TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
 
@@ -80,8 +82,8 @@ describe('Feature: frontend-login-auth-guard — AuthGuard Property Tests', () =
         fc.property(userArb, pathArb, (user: User, path: string) => {
           authService.currentUser.set(user);
 
-          const mockRoute = {} as any;
-          const mockState = { url: path } as any;
+          const mockRoute = {} as ActivatedRouteSnapshot;
+          const mockState = { url: path } as RouterStateSnapshot;
 
           const result = TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
 
