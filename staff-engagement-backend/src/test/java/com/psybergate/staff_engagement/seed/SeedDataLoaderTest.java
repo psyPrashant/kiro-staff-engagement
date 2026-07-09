@@ -19,10 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +47,9 @@ class SeedDataLoaderTest {
 
 	@Mock
 	private TaskRepository taskRepository;
+
+	@Mock
+	private PasswordEncoder passwordEncoder;
 
 	@Mock
 	private ApplicationArguments applicationArguments;
@@ -75,6 +80,9 @@ class SeedDataLoaderTest {
 		// Arrange: findByEmail returns empty → seed data not present
 		when(userRepository.findByEmail("alice.johnson@psybergate.com"))
 				.thenReturn(Optional.empty());
+
+		// Stub passwordEncoder to return a fake hash
+		when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$fakehashvalue");
 
 		// Stub save() to return the argument back (entities need to be returned for FK references)
 		when(userRepository.save(any(User.class)))
