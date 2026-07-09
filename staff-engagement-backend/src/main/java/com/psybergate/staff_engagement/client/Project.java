@@ -1,5 +1,6 @@
 package com.psybergate.staff_engagement.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class Project {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "company_id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Company company;
 
 	@Column(name = "created_at", nullable = false, updatable = false)

@@ -1,5 +1,6 @@
 package com.psybergate.staff_engagement.interaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.psybergate.staff_engagement.client.Project;
 import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.user.User;
@@ -22,18 +23,22 @@ public class Interaction {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "employee_id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Employee employee;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "conducted_by_user_id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User conductedBy;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "logged_by_user_id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User loggedBy;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Project project;
 
 	@Enumerated(EnumType.STRING)

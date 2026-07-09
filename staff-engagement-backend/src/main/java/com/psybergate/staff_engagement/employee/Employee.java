@@ -1,5 +1,6 @@
 package com.psybergate.staff_engagement.employee;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class Employee {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "manager_id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Employee manager;
 
 	@Column(name = "job_title", length = 255)
