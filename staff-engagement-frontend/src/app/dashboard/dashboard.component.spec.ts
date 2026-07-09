@@ -2,7 +2,6 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
 
 describe('DashboardComponent', () => {
-  let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(async () => {
@@ -11,7 +10,6 @@ describe('DashboardComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 

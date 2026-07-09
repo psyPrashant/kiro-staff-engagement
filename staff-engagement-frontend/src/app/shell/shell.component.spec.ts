@@ -4,7 +4,6 @@ import { ShellComponent } from './shell.component';
 import { AuthService } from '../core/services/auth.service';
 
 describe('ShellComponent', () => {
-  let component: ShellComponent;
   let fixture: ComponentFixture<ShellComponent>;
   let authService: { logout: ReturnType<typeof vi.fn> };
 
@@ -22,7 +21,6 @@ describe('ShellComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShellComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
