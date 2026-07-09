@@ -1,5 +1,6 @@
 package com.psybergate.staff_engagement.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,10 @@ public class User {
 
 	@Column(nullable = false, unique = true, length = 255)
 	private String email;
+
+	@Column(name = "password_hash")
+	@JsonIgnore
+	private String passwordHash;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;

@@ -1,11 +1,11 @@
 package com.psybergate.staff_engagement;
 
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import java.util.List;
 import java.util.Set;
@@ -24,9 +24,36 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	private String sessionCookie;
+
+	@BeforeEach
+	void authenticate() {
+		// Login as seed user to get a session cookie
+		HttpHeaders loginHeaders = new HttpHeaders();
+		loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> loginRequest = new HttpEntity<>(
+				"{\"email\":\"alice.johnson@psybergate.com\",\"password\":\"Password1\"}", loginHeaders);
+		ResponseEntity<String> loginResponse = restTemplate.postForEntity("/api/auth/login", loginRequest, String.class);
+		assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		// Extract session cookie
+		List<String> cookies = loginResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
+		assertThat(cookies).isNotNull().isNotEmpty();
+		sessionCookie = cookies.stream()
+				.filter(c -> c.startsWith("JSESSIONID"))
+				.findFirst()
+				.orElseThrow();
+	}
+
+	private ResponseEntity<String> getWithAuth(String url) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.COOKIE, sessionCookie);
+		return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+	}
+
 	@Test
 	void getUsersReturnsAtLeastThreeRecordsWithExpectedFields() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/api/users", String.class);
+		ResponseEntity<String> response = getWithAuth("/api/users");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		String body = response.getBody();
@@ -44,7 +71,7 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void getEmployeesReturnsAtLeastFiveRecordsWithExpectedFields() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/api/employees", String.class);
+		ResponseEntity<String> response = getWithAuth("/api/employees");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		String body = response.getBody();
@@ -62,7 +89,7 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void getCompaniesReturnsAtLeastTwoRecordsWithExpectedFields() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/api/companies", String.class);
+		ResponseEntity<String> response = getWithAuth("/api/companies");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		String body = response.getBody();
@@ -79,7 +106,7 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void getProjectsReturnsAtLeastThreeRecordsWithExpectedFields() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/api/projects", String.class);
+		ResponseEntity<String> response = getWithAuth("/api/projects");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		String body = response.getBody();
@@ -96,7 +123,7 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void getInteractionsReturnsAtLeastThreeRecordsWithAtLeastTwoDistinctTypes() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/api/interactions", String.class);
+		ResponseEntity<String> response = getWithAuth("/api/interactions");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		String body = response.getBody();
@@ -120,7 +147,7 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void getTasksReturnsAtLeastThreeRecordsWithAtLeastOneOpenAndOneDone() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/api/tasks", String.class);
+		ResponseEntity<String> response = getWithAuth("/api/tasks");
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		String body = response.getBody();

@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 public class SeedDataLoader implements ApplicationRunner {
 
 	private static final String SEED_USER_EMAIL = "alice.johnson@psybergate.com";
+	private static final String SEED_PASSWORD = "Password1";
 
 	private final UserRepository userRepository;
 	private final CompanyRepository companyRepository;
@@ -39,6 +41,7 @@ public class SeedDataLoader implements ApplicationRunner {
 	private final ProjectRepository projectRepository;
 	private final InteractionRepository interactionRepository;
 	private final TaskRepository taskRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	@Transactional
@@ -102,6 +105,7 @@ public class SeedDataLoader implements ApplicationRunner {
 		User user = new User();
 		user.setName(name);
 		user.setEmail(email);
+		user.setPasswordHash(passwordEncoder.encode(SEED_PASSWORD));
 		return userRepository.save(user);
 	}
 
