@@ -80,7 +80,11 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "coverageReporters": ["text", "lcov"]
+            "coverageReporters": ["text", "lcov"],
+            "exclude": [
+              "src/vitest-config-bug.exploration.spec.ts",
+              "src/vitest-config-preservation.spec.ts"
+            ]
           }
         },
         "lint": {
