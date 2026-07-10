@@ -121,10 +121,12 @@ describe('Feature: log-interaction-frontend, Property 9: Past due dates are reje
   it('rejects dates before today', () => {
     fc.assert(
       fc.property(
-        fc.date({
-          min: new Date('1970-01-01'),
-          max: new Date(Date.now() - 86400000),
-        }),
+        fc
+          .date({
+            min: new Date('1970-01-01'),
+            max: new Date(Date.now() - 86400000),
+          })
+          .filter((d) => !isNaN(d.getTime())),
         (pastDate) => {
           const formatted = pastDate.toISOString().split('T')[0]; // YYYY-MM-DD
           const control = new FormControl<string | null>(formatted, [futureDateValidator]);
