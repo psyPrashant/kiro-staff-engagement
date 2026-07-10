@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+// This test requires a live backend (login, /api/employees, /api/interactions, /api/tasks).
+// Skip in CI where only the frontend dev server is available.
 test.describe('Log Interaction - Full Flow', () => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(!!process.env['CI'], 'Requires a live backend — skipped in CI');
+
   test.beforeEach(async ({ page }) => {
     // Login with seeded test credentials
     await page.goto('/login');
