@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { execSync } from 'child_process';
 import { readFileSync, existsSync } from 'fs';
@@ -32,7 +31,7 @@ const CURRENTLY_PASSING_FILES: string[] = [
 /**
  * Determines if a test file does NOT satisfy the bug condition.
  * A file is "preservation-safe" if it:
- * 1. Has explicit vitest imports (import { describe, it, expect } from 'vitest')
+ * 1. Uses vitest globals (globals: true in vitest.config.ts provides describe/it/expect)
  * 2. Does NOT use TestBed.configureTestingModule()
  * 3. Either has no Angular deps OR imports @angular/compiler itself
  */
@@ -42,11 +41,11 @@ function isPreservationFile(filePath: string): boolean {
 
   const content = readFileSync(fullPath, 'utf-8');
 
-  const hasExplicitVitestImport =
-    content.includes("from 'vitest'") || content.includes('from "vitest"');
   const usesTestBed = content.includes('TestBed.configureTestingModule');
 
-  return hasExplicitVitestImport && !usesTestBed;
+  // With globals: true, files no longer need explicit vitest imports.
+  // A preservation file is one that doesn't use TestBed (pure logic or self-contained Angular).
+  return !usesTestBed;
 }
 
 /**

@@ -1,6 +1,5 @@
 import '@angular/compiler';
 import { HttpRequest, HttpResponse } from '@angular/common/http';
-import { describe, it, expect } from 'vitest';
 import { of } from 'rxjs';
 import * as fc from 'fast-check';
 import { authInterceptor } from './auth.interceptor';
