@@ -108,30 +108,30 @@ Introduces service-layer architecture, DTOs with Jakarta Bean Validation, and gl
 - [x] 10. Checkpoint
   - Ensure all tests pass (`mvnw test`), ask the user if questions arise.
 
-- [x]* 11. Integration tests (Testcontainers)
-  - [x]* 11.1 Write `InteractionIntegrationTest` extending `BaseIntegrationTest`
+- [x] 11. Integration tests (Testcontainers)
+  - [x] 11.1 Write `InteractionIntegrationTest` extending `BaseIntegrationTest`
     - Use `TestRestTemplate` to POST valid interaction, verify 201 and persisted data
     - POST with non-existent employee, verify 400
     - _Requirements: 1.1, 1.4_
-  - [x]* 11.2 Write `TaskIntegrationTest` extending `BaseIntegrationTest`
+  - [x] 11.2 Write `TaskIntegrationTest` extending `BaseIntegrationTest`
     - POST valid task, verify 201 with status=OPEN
     - POST with non-existent interactionId, verify 400
     - _Requirements: 2.1, 2.4, 2.6_
-  - [x]* 11.3 Write `ProjectFilterIntegrationTest` extending `BaseIntegrationTest`
+  - [x] 11.3 Write `ProjectFilterIntegrationTest` extending `BaseIntegrationTest`
     - Seed projects for multiple companies, GET with companyId filter, verify only matching returned
     - GET without companyId, verify all returned
     - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ]* 12. Property-based tests (jqwik)
-  - [ ]* 12.1 Write property test: Interaction bean validation rejects invalid requests
+- [x] 12. Property-based tests (jqwik)
+  - [x] 12.1 Write property test: Interaction bean validation rejects invalid requests
     - **Property 2: Interaction bean validation rejects invalid requests**
     - Generate requests with random null/blank required fields, verify 400 + fieldErrors contains the invalid field
     - **Validates: Requirements 1.2, 1.8**
-  - [ ]* 12.2 Write property test: Task bean validation rejects invalid requests
+  - [x] 12.2 Write property test: Task bean validation rejects invalid requests
     - **Property 4: Task bean validation rejects invalid requests**
     - Generate blank/oversized titles (whitespace strings, strings >255 chars), verify 400 + fieldErrors contains "title"
     - **Validates: Requirements 2.2, 2.7**
-  - [ ]* 12.3 Write property test: Company filter returns only matching projects
+  - [x] 12.3 Write property test: Company filter returns only matching projects
     - **Property 5: Company filter returns only matching projects**
     - Seed random companies and projects, filter by companyId, verify all returned projects have matching company.id
     - **Validates: Requirements 3.1**
