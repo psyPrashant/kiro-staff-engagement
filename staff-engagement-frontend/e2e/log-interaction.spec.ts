@@ -64,9 +64,7 @@ test.describe('Log Interaction - Full Flow', () => {
     await expect(notesTextarea).toHaveValue('');
 
     // 12. Assert: task section is collapsed (toggle button says "Add Follow-Up Task")
-    await expect(
-      page.getByRole('button', { name: 'Add Follow-Up Task' })
-    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Follow-Up Task' })).toBeVisible();
     await expect(page.locator('#taskTitle')).not.toBeVisible();
   });
 });

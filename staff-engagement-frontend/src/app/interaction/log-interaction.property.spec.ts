@@ -3,10 +3,7 @@ import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { notBlankValidator, futureDateValidator } from './validators/not-blank.validator';
-import {
-  InteractionType,
-  formatInteractionTypeLabel,
-} from './models/interaction-type.enum';
+import { InteractionType, formatInteractionTypeLabel } from './models/interaction-type.enum';
 import { formatDateTimeLocal } from './log-interaction.component';
 
 describe('Feature: log-interaction-frontend, Property 2: Whitespace-only notes are rejected', () => {
@@ -20,32 +17,22 @@ describe('Feature: log-interaction-frontend, Property 2: Whitespace-only notes a
    */
   it('rejects whitespace-only strings', () => {
     fc.assert(
-      fc.property(
-        fc.stringMatching(/^[ \t\n\r]+$/),
-        (whitespaceStr) => {
-          const control = new FormControl<string>(whitespaceStr, [
-            Validators.required,
-            notBlankValidator,
-          ]);
-          expect(control.valid).toBe(false);
-          expect(
-            control.hasError('notBlank') || control.hasError('required')
-          ).toBe(true);
-        }
-      ),
-      { numRuns: 100 }
+      fc.property(fc.stringMatching(/^[ \t\n\r]+$/), (whitespaceStr) => {
+        const control = new FormControl<string>(whitespaceStr, [
+          Validators.required,
+          notBlankValidator,
+        ]);
+        expect(control.valid).toBe(false);
+        expect(control.hasError('notBlank') || control.hasError('required')).toBe(true);
+      }),
+      { numRuns: 100 },
     );
   });
 
   it('rejects the empty string', () => {
-    const control = new FormControl<string>('', [
-      Validators.required,
-      notBlankValidator,
-    ]);
+    const control = new FormControl<string>('', [Validators.required, notBlankValidator]);
     expect(control.valid).toBe(false);
-    expect(
-      control.hasError('notBlank') || control.hasError('required')
-    ).toBe(true);
+    expect(control.hasError('notBlank') || control.hasError('required')).toBe(true);
   });
 });
 
@@ -90,9 +77,9 @@ describe('Feature: log-interaction-frontend, Property 3: Valid required fields e
           });
 
           expect(form.valid).toBe(true);
-        }
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });
@@ -108,22 +95,17 @@ describe('Feature: log-interaction-frontend, Property 6: Task title required whe
    */
   it('rejects empty or whitespace-only task titles when section is expanded', () => {
     fc.assert(
-      fc.property(
-        fc.stringMatching(/^[ \t\n\r]*$/),
-        (whitespaceStr) => {
-          const taskTitle = new FormControl<string>(whitespaceStr, [
-            Validators.required,
-            Validators.maxLength(255),
-            notBlankValidator,
-          ]);
+      fc.property(fc.stringMatching(/^[ \t\n\r]*$/), (whitespaceStr) => {
+        const taskTitle = new FormControl<string>(whitespaceStr, [
+          Validators.required,
+          Validators.maxLength(255),
+          notBlankValidator,
+        ]);
 
-          expect(taskTitle.valid).toBe(false);
-          expect(
-            taskTitle.hasError('required') || taskTitle.hasError('notBlank')
-          ).toBe(true);
-        }
-      ),
-      { numRuns: 100 }
+        expect(taskTitle.valid).toBe(false);
+        expect(taskTitle.hasError('required') || taskTitle.hasError('notBlank')).toBe(true);
+      }),
+      { numRuns: 100 },
     );
   });
 });
@@ -149,9 +131,9 @@ describe('Feature: log-interaction-frontend, Property 9: Past due dates are reje
 
           expect(control.valid).toBe(false);
           expect(control.hasError('futureDate')).toBe(true);
-        }
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });
@@ -166,17 +148,14 @@ describe('Feature: log-interaction-frontend, Property 10: Interaction type label
    */
   it('formats each interaction type as Title Case', () => {
     fc.assert(
-      fc.property(
-        fc.constantFrom(...Object.values(InteractionType)),
-        (type) => {
-          const expected = type
-            .split('_')
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-            .join(' ');
-          expect(formatInteractionTypeLabel(type)).toBe(expected);
-        }
-      ),
-      { numRuns: 100 }
+      fc.property(fc.constantFrom(...Object.values(InteractionType)), (type) => {
+        const expected = type
+          .split('_')
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join(' ');
+        expect(formatInteractionTypeLabel(type)).toBe(expected);
+      }),
+      { numRuns: 100 },
     );
   });
 });

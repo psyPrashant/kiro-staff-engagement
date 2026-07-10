@@ -81,10 +81,9 @@ export class LogInteractionComponent implements OnInit {
   ngOnInit(): void {
     this.form = new FormGroup({
       employeeId: new FormControl<number | null>(null, [Validators.required]),
-      conductedByUserId: new FormControl<number | null>(
-        this.currentUser()?.id ?? null,
-        [Validators.required]
-      ),
+      conductedByUserId: new FormControl<number | null>(this.currentUser()?.id ?? null, [
+        Validators.required,
+      ]),
       type: new FormControl<InteractionType | null>(null, [Validators.required]),
       notes: new FormControl<string>('', [Validators.required, notBlankValidator]),
       occurredAt: new FormControl<string>(formatDateTimeLocal(new Date()), [Validators.required]),

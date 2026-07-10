@@ -53,7 +53,9 @@
         <option [ngValue]="user.id">{{ user.name }}</option>
       }
     </select>
-    @if (form.get('conductedByUserId')?.touched && form.get('conductedByUserId')?.hasError('required')) {
+    @if (
+      form.get('conductedByUserId')?.touched && form.get('conductedByUserId')?.hasError('required')
+    ) {
       <span class="validation-error">Conducted-by selection is required.</span>
     }
     @if (serverFieldErrors()['conductedByUserId']) {
@@ -82,7 +84,10 @@
   <div class="form-group">
     <label for="notes">Notes</label>
     <textarea id="notes" formControlName="notes" rows="4"></textarea>
-    @if (form.get('notes')?.touched && (form.get('notes')?.hasError('required') || form.get('notes')?.hasError('notBlank'))) {
+    @if (
+      form.get('notes')?.touched &&
+      (form.get('notes')?.hasError('required') || form.get('notes')?.hasError('notBlank'))
+    ) {
       <span class="validation-error">Notes content is required.</span>
     }
     @if (serverFieldErrors()['notes']) {
@@ -135,7 +140,11 @@
         <div class="form-group">
           <label for="taskTitle">Task Title</label>
           <input id="taskTitle" type="text" formControlName="taskTitle" maxlength="255" />
-          @if (form.get('taskTitle')?.touched && (form.get('taskTitle')?.hasError('required') || form.get('taskTitle')?.hasError('notBlank'))) {
+          @if (
+            form.get('taskTitle')?.touched &&
+            (form.get('taskTitle')?.hasError('required') ||
+              form.get('taskTitle')?.hasError('notBlank'))
+          ) {
             <span class="validation-error">Task title is required.</span>
           }
           @if (form.get('taskTitle')?.touched && form.get('taskTitle')?.hasError('maxlength')) {
@@ -146,14 +155,21 @@
         <!-- Task Description -->
         <div class="form-group">
           <label for="taskDescription">Task Description (optional)</label>
-          <textarea id="taskDescription" formControlName="taskDescription" rows="3" maxlength="2000"></textarea>
+          <textarea
+            id="taskDescription"
+            formControlName="taskDescription"
+            rows="3"
+            maxlength="2000"
+          ></textarea>
         </div>
 
         <!-- Task Due Date -->
         <div class="form-group">
           <label for="taskDueDate">Due Date (optional)</label>
           <input id="taskDueDate" type="date" formControlName="taskDueDate" />
-          @if (form.get('taskDueDate')?.touched && form.get('taskDueDate')?.hasError('futureDate')) {
+          @if (
+            form.get('taskDueDate')?.touched && form.get('taskDueDate')?.hasError('futureDate')
+          ) {
             <span class="validation-error">Due date must be today or a future date.</span>
           }
         </div>
@@ -161,7 +177,11 @@
         <!-- Task Assigned User -->
         <div class="form-group">
           <label for="taskAssignedUserId">Assigned To (optional)</label>
-          <select id="taskAssignedUserId" formControlName="taskAssignedUserId" [disabled]="usersLoading()">
+          <select
+            id="taskAssignedUserId"
+            formControlName="taskAssignedUserId"
+            [disabled]="usersLoading()"
+          >
             <option [ngValue]="null">-- None --</option>
             @for (user of users(); track user.id) {
               <option [ngValue]="user.id">{{ user.name }}</option>
@@ -173,11 +193,7 @@
   </div>
 
   <!-- Submit Button -->
-  <button
-    type="submit"
-    class="submit-btn"
-    [disabled]="form.invalid || submitting()"
-  >
+  <button type="submit" class="submit-btn" [disabled]="form.invalid || submitting()">
     {{ submitting() ? 'Submitting...' : 'Submit' }}
   </button>
 </form>

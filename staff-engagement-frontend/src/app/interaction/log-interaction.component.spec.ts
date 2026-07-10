@@ -1,5 +1,5 @@
 import '@angular/compiler';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
@@ -188,9 +188,9 @@ describe('LogInteractionComponent - Form Validation', () => {
       component.onSubmit();
 
       const taskTitleControl = component.form.get('taskTitle')!;
-      expect(
-        taskTitleControl.hasError('required') || taskTitleControl.hasError('notBlank')
-      ).toBe(true);
+      expect(taskTitleControl.hasError('required') || taskTitleControl.hasError('notBlank')).toBe(
+        true,
+      );
     });
 
     it('should not produce task validation errors when section is collapsed', () => {
@@ -296,7 +296,7 @@ describe('LogInteractionComponent - Submission Flows', () => {
     const req = httpMock.expectOne('/api/interactions');
     req.flush(
       { message: 'Validation failed', fieldErrors: { notes: 'Too short' } },
-      { status: 400, statusText: 'Bad Request' }
+      { status: 400, statusText: 'Bad Request' },
     );
 
     expect(component.errorMessage()).toBe('Validation failed');
@@ -334,7 +334,7 @@ describe('LogInteractionComponent - Submission Flows', () => {
     const taskReq = httpMock.expectOne('/api/tasks');
     taskReq.flush(
       { message: 'Task validation failed' },
-      { status: 400, statusText: 'Bad Request' }
+      { status: 400, statusText: 'Bad Request' },
     );
 
     expect(component.successMessage()).toBe('Interaction created successfully.');

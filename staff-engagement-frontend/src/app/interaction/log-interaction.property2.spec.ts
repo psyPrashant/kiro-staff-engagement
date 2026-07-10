@@ -17,7 +17,7 @@ import { User } from '../core/models/user.model';
 
 function flushInitialGets(
   httpTesting: HttpTestingController,
-  options?: { employees?: unknown[]; users?: unknown[]; projects?: unknown[] }
+  options?: { employees?: unknown[]; users?: unknown[]; projects?: unknown[] },
 ) {
   const employees = options?.employees ?? [
     { id: 1, name: 'Emp1', email: 'e@e.com', jobTitle: 'Dev' },
@@ -79,9 +79,9 @@ describe('Feature: log-interaction-frontend, Property 1: Form defaults match cur
           expect(diff).toBeLessThan(62000);
 
           httpTesting.verify();
-        }
+        },
       ),
-      { numRuns: 20 }
+      { numRuns: 20 },
     );
   });
 });
@@ -116,7 +116,10 @@ describe('Feature: log-interaction-frontend, Property 4: Submission payload corr
           conductedByUserId: fc.nat().map((n) => n + 1),
           type: fc.constantFrom(...Object.values(InteractionType)),
           notes: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-          projectId: fc.option(fc.nat().map((n) => n + 1), { nil: null }),
+          projectId: fc.option(
+            fc.nat().map((n) => n + 1),
+            { nil: null },
+          ),
         }),
         (values) => {
           const fixture = TestBed.createComponent(LogInteractionComponent);
@@ -158,13 +161,13 @@ describe('Feature: log-interaction-frontend, Property 4: Submission payload corr
               occurredAt: '2025-01-01T10:00:00Z',
               createdAt: '2025-01-01T10:00:00Z',
             },
-            { status: 201, statusText: 'Created' }
+            { status: 201, statusText: 'Created' },
           );
 
           httpTesting.verify();
-        }
+        },
       ),
-      { numRuns: 20 }
+      { numRuns: 20 },
     );
   });
 });
@@ -196,7 +199,7 @@ describe('Feature: log-interaction-frontend, Property 5: Server field errors are
       'conductedByUserId',
       'type',
       'notes',
-      'occurredAt'
+      'occurredAt',
     );
 
     fc.assert(
@@ -228,15 +231,15 @@ describe('Feature: log-interaction-frontend, Property 5: Server field errors are
           const req = httpTesting.expectOne('/api/interactions');
           req.flush(
             { message: 'Validation failed', fieldErrors },
-            { status: 400, statusText: 'Bad Request' }
+            { status: 400, statusText: 'Bad Request' },
           );
 
           expect(component.serverFieldErrors()).toEqual(fieldErrors);
 
           httpTesting.verify();
-        }
+        },
       ),
-      { numRuns: 20 }
+      { numRuns: 20 },
     );
   });
 });
@@ -303,7 +306,7 @@ describe('Feature: log-interaction-frontend, Property 7: Task POST uses interact
               occurredAt: '2025-01-01T10:00:00Z',
               createdAt: '2025-01-01T10:00:00Z',
             },
-            { status: 201, statusText: 'Created' }
+            { status: 201, statusText: 'Created' },
           );
 
           // Capture task POST
@@ -321,13 +324,13 @@ describe('Feature: log-interaction-frontend, Property 7: Task POST uses interact
               interaction: { id: interactionId },
               createdAt: '2025-01-01T10:00:00Z',
             },
-            { status: 201, statusText: 'Created' }
+            { status: 201, statusText: 'Created' },
           );
 
           httpTesting.verify();
-        }
+        },
       ),
-      { numRuns: 20 }
+      { numRuns: 20 },
     );
   });
 });
@@ -395,15 +398,15 @@ describe('Feature: log-interaction-frontend, Property 8: Collapsed task section 
               occurredAt: '2025-01-01T10:00:00Z',
               createdAt: '2025-01-01T10:00:00Z',
             },
-            { status: 201, statusText: 'Created' }
+            { status: 201, statusText: 'Created' },
           );
 
           // Verify no task request was made
           httpTesting.expectNone('/api/tasks');
           httpTesting.verify();
-        }
+        },
       ),
-      { numRuns: 20 }
+      { numRuns: 20 },
     );
   });
 });
@@ -437,7 +440,7 @@ describe('Feature: log-interaction-frontend, Property 11: User picker displays f
             name: fc.string({ minLength: 1 }),
             email: fc.emailAddress(),
           }),
-          { minLength: 1, maxLength: 5 }
+          { minLength: 1, maxLength: 5 },
         ),
         (generatedUsers: User[]) => {
           const fixture = TestBed.createComponent(LogInteractionComponent);
@@ -447,9 +450,7 @@ describe('Feature: log-interaction-frontend, Property 11: User picker displays f
           // Flush employees and projects with defaults
           httpTesting
             .match('/api/employees')
-            .forEach((req) =>
-              req.flush([{ id: 1, name: 'E', email: 'e@e.com', jobTitle: 'Dev' }])
-            );
+            .forEach((req) => req.flush([{ id: 1, name: 'E', email: 'e@e.com', jobTitle: 'Dev' }]));
           httpTesting.match('/api/projects').forEach((req) => req.flush([{ id: 1, name: 'P' }]));
 
           // Flush users with generated array
@@ -458,9 +459,9 @@ describe('Feature: log-interaction-frontend, Property 11: User picker displays f
           expect(component.users()).toEqual(generatedUsers);
 
           httpTesting.verify();
-        }
+        },
       ),
-      { numRuns: 20 }
+      { numRuns: 20 },
     );
   });
 });
