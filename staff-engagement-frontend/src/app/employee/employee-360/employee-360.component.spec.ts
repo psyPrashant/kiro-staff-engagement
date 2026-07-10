@@ -12,7 +12,7 @@ const mockEmployee360Service = {
 const mockActivatedRoute = {
   snapshot: {
     paramMap: {
-      get: (key: string) => '1',
+      get: (_key: string) => '1',
     },
   },
 };
@@ -43,7 +43,6 @@ const mockResponse: Employee360Response = {
 
 describe('Employee360Component', () => {
   let fixture: ComponentFixture<Employee360Component>;
-  let component: Employee360Component;
 
   beforeEach(async () => {
     mockEmployee360Service.getEmployee360.mockReset();
@@ -59,7 +58,6 @@ describe('Employee360Component', () => {
 
   function createComponent(): void {
     fixture = TestBed.createComponent(Employee360Component);
-    component = fixture.componentInstance;
   }
 
   describe('profile rendering', () => {
