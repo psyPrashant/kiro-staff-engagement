@@ -17,6 +17,17 @@ function sortTasksByDueDate(tasks: TaskDto[]): TaskDto[] {
 }
 
 /**
+ * Generates an ISO date string (YYYY-MM-DD) from integer components
+ * to avoid RangeError from invalid Date objects.
+ */
+function toDateString(year: number, month: number, day: number): string {
+  const y = String(year).padStart(4, '0');
+  const m = String(month).padStart(2, '0');
+  const d = String(day).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
  * Arbitrary that generates a TaskDto with either a null dueDate
  * or an ISO date string (YYYY-MM-DD format).
  */
@@ -26,8 +37,12 @@ const taskArbitrary: fc.Arbitrary<TaskDto> = fc.record({
   dueDate: fc.oneof(
     fc.constant(null),
     fc
-      .date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') })
-      .map((d) => d.toISOString().split('T')[0]),
+      .tuple(
+        fc.integer({ min: 2020, max: 2030 }),
+        fc.integer({ min: 1, max: 12 }),
+        fc.integer({ min: 1, max: 28 }),
+      )
+      .map(([y, m, d]) => toDateString(y, m, d)),
   ),
   assignedUserName: fc.string({ minLength: 1, maxLength: 30 }),
 });
