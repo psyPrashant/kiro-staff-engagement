@@ -2,7 +2,6 @@ import '@angular/compiler';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { describe, it, expect, beforeEach } from 'vitest';
 import * as fc from 'fast-check';
 import { LogInteractionComponent } from './log-interaction.component';
 import { AuthService } from '../core/services/auth.service';

@@ -3,7 +3,6 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter, Router, ActivatedRoute } from '@angular/router';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as fc from 'fast-check';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../core/services/auth.service';

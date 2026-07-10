@@ -1,0 +1,80 @@
+@if (loading()) {
+  <div class="loading-container" data-testid="loading-indicator">
+    <div class="spinner"></div>
+    <p>Loading employee data...</p>
+  </div>
+}
+
+@if (error()) {
+  <div class="error-container" data-testid="error-message">
+    <p class="error-text">{{ error() }}</p>
+    <button class="retry-button" (click)="retry()">Retry</button>
+  </div>
+}
+
+@if (data()) {
+  <div class="employee-360">
+    <section class="profile-summary" data-testid="profile-summary">
+      <h2 data-testid="employee-name">{{ data()!.profile.name || 'Information unavailable' }}</h2>
+      <p class="profile-field">
+        <span class="label">Email:</span>
+        <span>{{ data()!.profile.email || 'Information unavailable' }}</span>
+      </p>
+      <p class="profile-field">
+        <span class="label">Job Title:</span>
+        <span>{{ data()!.profile.jobTitle || 'Information unavailable' }}</span>
+      </p>
+      @if (data()!.profile.managerName) {
+        <p class="profile-field">
+          <span class="label">Manager:</span>
+          <span>{{ data()!.profile.managerName }}</span>
+        </p>
+      }
+    </section>
+
+    <section class="interaction-history" data-testid="interaction-history">
+      <h3>Interaction History</h3>
+      @if (data()!.interactions.length === 0) {
+        <p class="empty-state" data-testid="empty-interactions">No interaction history found</p>
+      } @else {
+        <ul class="interaction-list">
+          @for (interaction of data()!.interactions; track interaction.id) {
+            <li class="interaction-item">
+              <div class="interaction-header">
+                <span class="interaction-type">{{ interaction.type }}</span>
+                <span class="interaction-date">{{ interaction.occurredAt | date }}</span>
+              </div>
+              <p class="interaction-conducted-by">Conducted by: {{ interaction.conductedByName }}</p>
+              @if (interaction.projectContext) {
+                <p class="interaction-project-context">
+                  Project: {{ interaction.projectContext.projectName }}
+                  ({{ interaction.projectContext.companyName }})
+                </p>
+              }
+              <p class="interaction-notes">{{ truncateNotes(interaction.notes) }}</p>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="open-tasks" data-testid="open-tasks">
+      <h3>Open Tasks</h3>
+      @if (data()!.openTasks.length === 0) {
+        <p class="empty-state" data-testid="empty-tasks">No open tasks</p>
+      } @else {
+        <ul class="task-list">
+          @for (task of data()!.openTasks; track task.id) {
+            <li class="task-row" data-testid="task-row" [class.overdue]="isOverdue(task.dueDate)">
+              <span class="task-title">{{ task.title }}</span>
+              @if (task.dueDate) {
+                <span class="task-due-date">Due: {{ task.dueDate | date }}</span>
+              }
+              <span class="task-assigned">Assigned to: {{ task.assignedUserName }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+}

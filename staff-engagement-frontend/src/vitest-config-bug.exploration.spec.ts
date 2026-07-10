@@ -9,7 +9,6 @@
  *
  * **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5**
  */
-import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { execSync } from 'child_process';
 import * as path from 'path';
