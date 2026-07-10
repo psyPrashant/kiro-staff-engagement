@@ -54,7 +54,7 @@ class AuthLoginIntegrationTest extends BaseIntegrationTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBody))
 				.andExpect(status().isUnauthorized())
-				.andExpect(jsonPath("$.error").value("Invalid credentials"));
+				.andExpect(jsonPath("$.message").value("Invalid credentials"));
 	}
 
 	@Test
@@ -67,7 +67,7 @@ class AuthLoginIntegrationTest extends BaseIntegrationTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBody))
 				.andExpect(status().isUnauthorized())
-				.andExpect(jsonPath("$.error").value("Invalid credentials"));
+				.andExpect(jsonPath("$.message").value("Invalid credentials"));
 	}
 
 	@Test
@@ -80,7 +80,7 @@ class AuthLoginIntegrationTest extends BaseIntegrationTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBody))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.error").value("Validation failed"))
+				.andExpect(jsonPath("$.message").value("Validation failed"))
 				.andExpect(jsonPath("$.fieldErrors.email").exists())
 				.andExpect(jsonPath("$.fieldErrors.password").exists());
 	}

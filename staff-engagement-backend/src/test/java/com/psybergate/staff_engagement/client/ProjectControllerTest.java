@@ -24,7 +24,30 @@ class ProjectControllerTest {
 	private ProjectRepository projectRepository;
 
 	@Test
-	void getProjects_returnsOkWithJsonArray() throws Exception {
+	void getProjects_withCompanyId_returnsFilteredProjects() throws Exception {
+		Company company = new Company();
+		company.setId(1L);
+		company.setName("Acme Corp");
+		company.setCreatedAt(Instant.now());
+
+		Project project1 = new Project();
+		project1.setId(1L);
+		project1.setName("Project Alpha");
+		project1.setCompany(company);
+		project1.setCreatedAt(Instant.now());
+
+		org.mockito.Mockito.when(projectRepository.findByCompanyId(1L)).thenReturn(List.of(project1));
+
+		mockMvc.perform(get("/api/projects").param("companyId", "1"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$.length()").value(1))
+				.andExpect(jsonPath("$[0].name").value("Project Alpha"));
+	}
+
+	@Test
+	void getProjects_withoutCompanyId_returnsAllProjects() throws Exception {
 		Company company = new Company();
 		company.setId(1L);
 		company.setName("Acme Corp");

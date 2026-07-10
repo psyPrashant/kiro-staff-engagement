@@ -1,8 +1,12 @@
 package com.psybergate.staff_engagement.task;
 
+import com.psybergate.staff_engagement.common.exception.GlobalExceptionHandler;
+import com.psybergate.staff_engagement.task.dto.CreateTaskRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -11,10 +15,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
+@Import(GlobalExceptionHandler.class)
 @WithMockUser
 class TaskControllerTest {
 
@@ -23,6 +32,9 @@ class TaskControllerTest {
 
 	@MockitoBean
 	private TaskRepository taskRepository;
+
+	@MockitoBean
+	private TaskService taskService;
 
 	@Test
 	void getAllTasks_returnsOkWithJsonArray() throws Exception {
@@ -50,5 +62,87 @@ class TaskControllerTest {
 				.andExpect(jsonPath("$.length()").value(2))
 				.andExpect(jsonPath("$[0].title").value("Follow up on sprint goals"))
 				.andExpect(jsonPath("$[1].status").value("DONE"));
+	}
+
+	@Test
+	void createTask_validRequest_returns201WithBody() throws Exception {
+		Task savedTask = new Task();
+		savedTask.setId(7L);
+		savedTask.setTitle("Follow up on career development plan");
+		savedTask.setStatus(TaskStatus.OPEN);
+		savedTask.setCreatedAt(Instant.now());
+
+		when(taskService.create(any(CreateTaskRequest.class))).thenReturn(savedTask);
+
+		String requestBody = """
+				{
+					"title": "Follow up on career development plan"
+				}
+				""";
+
+		mockMvc.perform(post("/api/tasks")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isCreated())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$.id").value(7))
+				.andExpect(jsonPath("$.title").value("Follow up on career development plan"))
+				.andExpect(jsonPath("$.status").value("OPEN"));
+	}
+
+	@Test
+	void createTask_blankTitle_returns400WithFieldErrors() throws Exception {
+		String requestBody = """
+				{
+					"title": ""
+				}
+				""";
+
+		mockMvc.perform(post("/api/tasks")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Validation failed"))
+				.andExpect(jsonPath("$.fieldErrors.title").exists());
+	}
+
+	@Test
+	void createTask_titleTooLong_returns400WithFieldErrors() throws Exception {
+		String longTitle = "a".repeat(256);
+		String requestBody = """
+				{
+					"title": "%s"
+				}
+				""".formatted(longTitle);
+
+		mockMvc.perform(post("/api/tasks")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Validation failed"))
+				.andExpect(jsonPath("$.fieldErrors.title").exists());
+	}
+
+	@Test
+	void createTask_serviceThrowsIllegalArgument_returns400WithMessage() throws Exception {
+		when(taskService.create(any(CreateTaskRequest.class)))
+				.thenThrow(new IllegalArgumentException("Interaction not found with id: 999"));
+
+		String requestBody = """
+				{
+					"title": "Some task",
+					"interactionId": 999
+				}
+				""";
+
+		mockMvc.perform(post("/api/tasks")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Interaction not found with id: 999"));
 	}
 }
