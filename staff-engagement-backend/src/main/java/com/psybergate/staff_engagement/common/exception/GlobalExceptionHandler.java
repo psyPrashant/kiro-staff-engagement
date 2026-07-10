@@ -1,0 +1,43 @@
+package com.psybergate.staff_engagement.common.exception;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
+		Map<String, String> fieldErrors = new HashMap<>();
+		ex.getBindingResult().getFieldErrors().forEach(fe ->
+			fieldErrors.putIfAbsent(fe.getField(), fe.getDefaultMessage()));
+		return new ErrorResponse("Validation failed", fieldErrors);
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleIllegalArgument(IllegalArgumentException ex) {
+		return new ErrorResponse(ex.getMessage(), null);
+	}
+
+	@ExceptionHandler(BadCredentialsException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ErrorResponse handleBadCredentials(BadCredentialsException ex) {
+		return new ErrorResponse("Invalid credentials", null);
+	}
+
+	@ExceptionHandler(UsernameNotFoundException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ErrorResponse handleUsernameNotFound(UsernameNotFoundException ex) {
+		return new ErrorResponse("Invalid credentials", null);
+	}
+}
