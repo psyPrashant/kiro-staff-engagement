@@ -3,6 +3,7 @@ package com.psybergate.staff_engagement.common.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,5 +40,11 @@ public class GlobalExceptionHandler {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public ErrorResponse handleUsernameNotFound(UsernameNotFoundException ex) {
 		return new ErrorResponse("Invalid credentials", null);
+	}
+
+	@ExceptionHandler(DataAccessException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ErrorResponse handleDataAccessException(DataAccessException ex) {
+		return new ErrorResponse("Unable to compute engagement matrix due to a data access failure", null);
 	}
 }
