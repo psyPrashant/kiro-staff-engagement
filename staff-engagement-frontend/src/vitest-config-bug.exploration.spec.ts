@@ -158,16 +158,16 @@ describe('Bug Condition Exploration: Standalone Vitest Execution', () => {
      * On FIXED code this property PASSES — confirming the fix works.
      */
     fc.assert(
-      fc.property(
-        fc.constantFrom(...ALL_BUG_CONDITION_FILES),
-        (testFile: string) => {
-          const result = runTestFile(testFile);
-          const categories = getBugCategory(testFile);
+      fc.property(fc.constantFrom(...ALL_BUG_CONDITION_FILES), (testFile: string) => {
+        const result = runTestFile(testFile);
+        const categories = getBugCategory(testFile);
 
-          // The property: vitest should execute successfully
-          expect(result.exitCode, `File "${testFile}" (categories: ${categories.join(', ')}) failed with:\n${result.output.slice(0, 500)}`).toBe(0);
-        },
-      ),
+        // The property: vitest should execute successfully
+        expect(
+          result.exitCode,
+          `File "${testFile}" (categories: ${categories.join(', ')}) failed with:\n${result.output.slice(0, 500)}`,
+        ).toBe(0);
+      }),
       {
         numRuns: 5, // Sample 5 files from the set to keep execution time reasonable
         seed: 42, // Deterministic for reproducibility
