@@ -25,9 +25,9 @@ const taskArbitrary: fc.Arbitrary<TaskDto> = fc.record({
   title: fc.string({ minLength: 1, maxLength: 50 }),
   dueDate: fc.oneof(
     fc.constant(null),
-    fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(
-      (d) => d.toISOString().split('T')[0]
-    ),
+    fc
+      .date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') })
+      .map((d) => d.toISOString().split('T')[0]),
   ),
   assignedUserName: fc.string({ minLength: 1, maxLength: 30 }),
 });

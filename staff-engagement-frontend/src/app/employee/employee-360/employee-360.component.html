@@ -44,11 +44,14 @@
                 <span class="interaction-type">{{ interaction.type }}</span>
                 <span class="interaction-date">{{ interaction.occurredAt | date }}</span>
               </div>
-              <p class="interaction-conducted-by">Conducted by: {{ interaction.conductedByName }}</p>
+              <p class="interaction-conducted-by">
+                Conducted by: {{ interaction.conductedByName }}
+              </p>
               @if (interaction.projectContext) {
                 <p class="interaction-project-context">
-                  Project: {{ interaction.projectContext.projectName }}
-                  ({{ interaction.projectContext.companyName }})
+                  Project: {{ interaction.projectContext.projectName }} ({{
+                    interaction.projectContext.companyName
+                  }})
                 </p>
               }
               <p class="interaction-notes">{{ truncateNotes(interaction.notes) }}</p>

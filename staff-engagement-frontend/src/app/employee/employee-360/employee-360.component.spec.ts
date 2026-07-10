@@ -87,9 +87,7 @@ describe('Employee360Component', () => {
 
   describe('error state', () => {
     it('should display error message on API failure', () => {
-      mockEmployee360Service.getEmployee360.mockReturnValue(
-        throwError(() => ({ status: 500 }))
-      );
+      mockEmployee360Service.getEmployee360.mockReturnValue(throwError(() => ({ status: 500 })));
       createComponent();
       fixture.detectChanges();
 
@@ -103,9 +101,7 @@ describe('Employee360Component', () => {
     });
 
     it('should re-fetch data when retry button is clicked', () => {
-      mockEmployee360Service.getEmployee360.mockReturnValue(
-        throwError(() => ({ status: 500 }))
-      );
+      mockEmployee360Service.getEmployee360.mockReturnValue(throwError(() => ({ status: 500 })));
       createComponent();
       fixture.detectChanges();
 
