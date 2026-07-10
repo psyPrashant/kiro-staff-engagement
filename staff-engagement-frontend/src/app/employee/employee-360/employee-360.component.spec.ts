@@ -12,7 +12,7 @@ const mockEmployee360Service = {
 const mockActivatedRoute = {
   snapshot: {
     paramMap: {
-      get: (_key: string) => '1',
+      get: () => '1',
     },
   },
 };
