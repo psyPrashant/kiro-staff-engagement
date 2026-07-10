@@ -1,4 +1,4 @@
 import { Routes } from '@angular/router';
-import { Interaction } from './interaction';
+import { LogInteractionComponent } from './log-interaction.component';
 
-export const routes: Routes = [{ path: '', component: Interaction }];
+export const routes: Routes = [{ path: '', component: LogInteractionComponent }];
