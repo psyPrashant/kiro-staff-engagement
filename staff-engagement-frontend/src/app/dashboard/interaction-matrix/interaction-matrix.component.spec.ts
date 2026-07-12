@@ -346,7 +346,7 @@ describe('InteractionMatrixComponent', () => {
 
 function arbitraryMatrixEntry(): fc.Arbitrary<MatrixEntry> {
   return fc.record({
-    employeeId: fc.nat({ min: 1 }),
+    employeeId: fc.integer({ min: 1 }),
     employeeName: fc.string({ minLength: 1, maxLength: 50 }),
     employeeEmail: fc.emailAddress(),
     recency: fc.option(fc.nat(), { nil: null }),
@@ -484,7 +484,7 @@ describe('InteractionMatrixComponent - Property 4: Drill-through link correctnes
    */
   it('should navigate to correct employee and interaction paths for any employeeId', () => {
     fc.assert(
-      fc.property(fc.nat({ min: 1 }), (employeeId) => {
+      fc.property(fc.integer({ min: 1 }), (employeeId) => {
         const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
         component.navigateToEmployee(employeeId);
