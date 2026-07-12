@@ -352,7 +352,7 @@ function arbitraryMatrixEntry(): fc.Arbitrary<MatrixEntry> {
     recency: fc.option(fc.nat(), { nil: null }),
     frequency: fc.nat(),
     lastInteractionDate: fc.option(
-      fc.date().map((d) => d.toISOString()),
+      fc.date({ noInvalidDate: true }).map((d) => d.toISOString()),
       { nil: null },
     ),
     engagementStatus: fc.constantFrom(
@@ -534,7 +534,7 @@ describe('InteractionMatrixComponent - Property 5: Recency and date display form
         fc.record({
           recency: fc.option(fc.nat(), { nil: null }),
           lastInteractionDate: fc.option(
-            fc.date().map((d) => d.toISOString()),
+            fc.date({ noInvalidDate: true }).map((d) => d.toISOString()),
             { nil: null },
           ),
         }),
