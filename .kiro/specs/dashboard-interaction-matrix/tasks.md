@@ -21,7 +21,7 @@ Replace the placeholder skeleton cards on the dashboard with a fully functional 
     - Conditionally construct query parameters: no params when absent, `?status=X` when status provided, `?sort=X` when sort provided, both when both provided
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-  - [x]* 1.3 Write unit tests for EngagementService
+  - [x] 1.3 Write unit tests for EngagementService
     - Create `src/app/dashboard/services/engagement.service.spec.ts`
     - Verify GET to `/api/engagement/matrix` with no params
     - Verify GET with `?status=OVERDUE` when status filter provided
@@ -29,7 +29,7 @@ Replace the placeholder skeleton cards on the dashboard with a fully functional 
     - Verify GET with both `?status=AT_RISK&sort=recency` when both provided
     - _Requirements: 8.1_
 
-  - [x]* 1.4 Write property test for service URL construction
+  - [x] 1.4 Write property test for service URL construction
     - **Property 1: Service URL construction**
     - Use fast-check to generate all combinations of optional status and sort values
     - Assert constructed URL matches `/api/engagement/matrix` with only non-undefined params as query params
@@ -123,7 +123,7 @@ Replace the placeholder skeleton cards on the dashboard with a fully functional 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 7. Write unit and property tests
-  - [x]* 7.1 Write unit tests for InteractionMatrixComponent
+  - [x] 7.1 Write unit tests for InteractionMatrixComponent
     - Create `src/app/dashboard/interaction-matrix/interaction-matrix.component.spec.ts`
     - Test rows rendered per entry count
     - Test loading indicator shown while fetching, hidden once data arrives
@@ -137,25 +137,25 @@ Replace the placeholder skeleton cards on the dashboard with a fully functional 
     - Test aria-busy/aria-live region present during loading
     - _Requirements: 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9_
 
-  - [x]* 7.2 Write property test for follow-up filtering correctness
+  - [x] 7.2 Write property test for follow-up filtering correctness
     - **Property 2: Follow-up filtering correctness**
     - Use fast-check to generate arrays of MatrixEntry with random `followUpRequired` booleans
     - Assert filtered result equals `entries.filter(e => e.followUpRequired)` — same items, same order
     - **Validates: Requirements 2.4, 4.1**
 
-  - [x]* 7.3 Write property test for status indicator mapping
+  - [x] 7.3 Write property test for status indicator mapping
     - **Property 3: Status indicator mapping**
     - Use fast-check with `fc.constantFrom('OVERDUE', 'AT_RISK', 'ON_TRACK')`
     - Assert mapping function returns correct CSS class AND aria-label for every status
     - **Validates: Requirements 2.3, 7.3, 8.5**
 
-  - [x]* 7.4 Write property test for drill-through link correctness
+  - [x] 7.4 Write property test for drill-through link correctness
     - **Property 4: Drill-through link correctness**
     - Use fast-check with `fc.nat({ min: 1 })` for employeeId
     - Assert Employee 360 path is `/employee/{id}` and log-interaction path is `/interaction` with `employeeId={id}` query param
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 4.3**
 
-  - [x]* 7.5 Write property test for recency and date display formatting
+  - [x] 7.5 Write property test for recency and date display formatting
     - **Property 5: Recency and date display formatting**
     - Use fast-check to generate optional recency (null or nat) and optional lastInteractionDate (null or ISO string)
     - Assert null recency → "No interactions", number → "{n} days"; null date → "Never", non-null → formatted date
