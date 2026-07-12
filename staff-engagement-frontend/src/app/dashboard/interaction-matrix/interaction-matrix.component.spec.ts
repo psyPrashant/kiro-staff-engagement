@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter, Router, RouterLink } from '@angular/router';
@@ -11,30 +11,27 @@ import { EngagementStatus, MatrixEntry, SortOption } from '../models/engagement.
   selector: 'app-status-filter',
   standalone: true,
   template: '',
-  inputs: ['activeFilter'],
 })
 class MockStatusFilterComponent {
-  activeFilter: EngagementStatus | null = null;
+  @Input() activeFilter: EngagementStatus | null = null;
 }
 
 @Component({
   selector: 'app-sort-control',
   standalone: true,
   template: '',
-  inputs: ['activeSort'],
 })
 class MockSortControlComponent {
-  activeSort: SortOption = 'name';
+  @Input() activeSort: SortOption = 'name';
 }
 
 @Component({
   selector: 'app-follow-up-section',
   standalone: true,
   template: '<div data-testid="follow-up-mock"></div>',
-  inputs: ['entries'],
 })
 class MockFollowUpSectionComponent {
-  entries: MatrixEntry[] = [];
+  @Input() entries: MatrixEntry[] = [];
 }
 
 function createMockEntry(overrides: Partial<MatrixEntry> = {}): MatrixEntry {

@@ -1,7 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { DashboardComponent } from './dashboard.component';
-import { InteractionMatrixComponent } from './interaction-matrix/interaction-matrix.component';
 
 // Mock the InteractionMatrixComponent to avoid deep rendering in shallow tests
 @Component({
