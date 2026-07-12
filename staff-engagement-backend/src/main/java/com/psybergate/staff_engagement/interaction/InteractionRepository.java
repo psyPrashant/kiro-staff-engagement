@@ -13,4 +13,6 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
 			GROUP BY i.employee.id
 			""")
 	List<Object[]> findInteractionAggregatesByEmployee();
+
+	List<Interaction> findByEmployeeIdOrderByOccurredAtDesc(Long employeeId);
 }
