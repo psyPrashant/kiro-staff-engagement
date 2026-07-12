@@ -51,21 +51,30 @@ describe('futureDateValidator', () => {
 
   it('should return null for today', () => {
     const today = new Date();
-    const control = new FormControl(today.toISOString().split('T')[0]);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const control = new FormControl(`${year}-${month}-${day}`);
     expect(futureDateValidator(control)).toBeNull();
   });
 
   it('should return null for a future date', () => {
     const future = new Date();
     future.setDate(future.getDate() + 7);
-    const control = new FormControl(future.toISOString().split('T')[0]);
+    const year = future.getFullYear();
+    const month = String(future.getMonth() + 1).padStart(2, '0');
+    const day = String(future.getDate()).padStart(2, '0');
+    const control = new FormControl(`${year}-${month}-${day}`);
     expect(futureDateValidator(control)).toBeNull();
   });
 
   it('should return futureDate error for a past date', () => {
     const past = new Date();
     past.setDate(past.getDate() - 1);
-    const control = new FormControl(past.toISOString().split('T')[0]);
+    const year = past.getFullYear();
+    const month = String(past.getMonth() + 1).padStart(2, '0');
+    const day = String(past.getDate()).padStart(2, '0');
+    const control = new FormControl(`${year}-${month}-${day}`);
     expect(futureDateValidator(control)).toEqual({ futureDate: true });
   });
 

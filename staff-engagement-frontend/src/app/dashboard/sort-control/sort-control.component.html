@@ -1,0 +1,18 @@
+<div class="sort-control" role="group" aria-label="Sort options">
+  <button
+    type="button"
+    class="sort-button"
+    [class.active]="activeSort() === 'name'"
+    (click)="selectSort('name')"
+    [attr.aria-pressed]="activeSort() === 'name'">
+    Name (A-Z)
+  </button>
+  <button
+    type="button"
+    class="sort-button"
+    [class.active]="activeSort() === 'recency'"
+    (click)="selectSort('recency')"
+    [attr.aria-pressed]="activeSort() === 'recency'">
+    Recency (longest gap first)
+  </button>
+</div>
