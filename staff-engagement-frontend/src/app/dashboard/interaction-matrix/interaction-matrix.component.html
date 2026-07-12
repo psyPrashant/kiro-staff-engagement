@@ -2,14 +2,8 @@
   <h2>Engagement Matrix</h2>
 
   <div class="controls">
-    <app-status-filter
-      [activeFilter]="activeFilter()"
-      (filterChange)="onFilterChange($event)"
-    />
-    <app-sort-control
-      [activeSort]="activeSort()"
-      (sortChange)="onSortChange($event)"
-    />
+    <app-status-filter [activeFilter]="activeFilter()" (filterChange)="onFilterChange($event)" />
+    <app-sort-control [activeSort]="activeSort()" (sortChange)="onSortChange($event)" />
   </div>
 
   <div class="matrix-content" [attr.aria-busy]="loading()">
@@ -64,10 +58,7 @@
                     }
                   </td>
                   <td class="actions-cell">
-                    <a
-                      [routerLink]="['/employee', entry.employeeId]"
-                      class="action-link"
-                    >
+                    <a [routerLink]="['/employee', entry.employeeId]" class="action-link">
                       View Profile
                     </a>
                     <a

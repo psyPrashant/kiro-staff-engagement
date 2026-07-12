@@ -18,9 +18,7 @@
             <span class="recency">{{ formatRecency(entry.recency) }}</span>
           </div>
           <div class="entry-actions">
-            <a [routerLink]="['/employee', entry.employeeId]" class="action-link">
-              View Profile
-            </a>
+            <a [routerLink]="['/employee', entry.employeeId]" class="action-link"> View Profile </a>
             <a
               [routerLink]="['/interaction']"
               [queryParams]="{ employeeId: entry.employeeId }"

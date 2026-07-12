@@ -92,9 +92,7 @@ describe('EngagementService', () => {
 
   it('should GET with ?status=AT_RISK&sort=recency when both provided', () => {
     let result: MatrixEntry[] | undefined;
-    service
-      .getMatrix({ status: 'AT_RISK', sort: 'recency' })
-      .subscribe((res) => (result = res));
+    service.getMatrix({ status: 'AT_RISK', sort: 'recency' }).subscribe((res) => (result = res));
 
     const req = httpTesting.expectOne(
       (r) =>

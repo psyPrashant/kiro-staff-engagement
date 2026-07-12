@@ -56,11 +56,7 @@ describe('InteractionMatrixComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [InteractionMatrixComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     })
       .overrideComponent(InteractionMatrixComponent, {
         set: {
@@ -144,7 +140,7 @@ describe('InteractionMatrixComponent', () => {
       const errorState = fixture.nativeElement.querySelector('.error-state');
       expect(errorState).toBeTruthy();
       expect(errorState.textContent).toContain(
-        'Unable to load the engagement matrix. Please try again.'
+        'Unable to load the engagement matrix. Please try again.',
       );
     });
 
@@ -209,7 +205,7 @@ describe('InteractionMatrixComponent', () => {
       triggerInitialLoad([createMockEntry({ employeeId: 42 })]);
 
       const links: HTMLAnchorElement[] = Array.from(
-        fixture.nativeElement.querySelectorAll('.action-link')
+        fixture.nativeElement.querySelectorAll('.action-link'),
       );
       const profileLink = links.find((l) => l.textContent?.includes('View Profile'));
       expect(profileLink).toBeTruthy();
@@ -220,7 +216,7 @@ describe('InteractionMatrixComponent', () => {
       triggerInitialLoad([createMockEntry({ employeeId: 42 })]);
 
       const links: HTMLAnchorElement[] = Array.from(
-        fixture.nativeElement.querySelectorAll('.action-link')
+        fixture.nativeElement.querySelectorAll('.action-link'),
       );
       const logLink = links.find((l) => l.textContent?.includes('Log Interaction'));
       expect(logLink).toBeTruthy();
@@ -268,8 +264,7 @@ describe('InteractionMatrixComponent', () => {
       fixture.detectChanges();
 
       const filterReq = httpTesting.expectOne(
-        (req) =>
-          req.url === '/api/engagement/matrix' && req.params.get('status') === 'OVERDUE'
+        (req) => req.url === '/api/engagement/matrix' && req.params.get('status') === 'OVERDUE',
       );
       expect(filterReq).toBeTruthy();
       filterReq.flush([]);
@@ -285,7 +280,7 @@ describe('InteractionMatrixComponent', () => {
       fixture.detectChanges();
 
       const req = httpTesting.expectOne(
-        (req) => req.url === '/api/engagement/matrix' && !req.params.has('status')
+        (req) => req.url === '/api/engagement/matrix' && !req.params.has('status'),
       );
       expect(req).toBeTruthy();
       req.flush([]);
@@ -376,11 +371,7 @@ describe('InteractionMatrixComponent - Property 2: Follow-up filtering correctne
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [InteractionMatrixComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     const fixture = TestBed.createComponent(InteractionMatrixComponent);
     component = fixture.componentInstance;
@@ -418,11 +409,7 @@ describe('InteractionMatrixComponent - Property 3: Status indicator mapping', ()
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [InteractionMatrixComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     const fixture = TestBed.createComponent(InteractionMatrixComponent);
     component = fixture.componentInstance;
@@ -479,11 +466,7 @@ describe('InteractionMatrixComponent - Property 4: Drill-through link correctnes
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [InteractionMatrixComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     const fixture = TestBed.createComponent(InteractionMatrixComponent);
     component = fixture.componentInstance;
@@ -528,11 +511,7 @@ describe('InteractionMatrixComponent - Property 5: Recency and date display form
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [InteractionMatrixComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     const fixture = TestBed.createComponent(InteractionMatrixComponent);
     component = fixture.componentInstance;

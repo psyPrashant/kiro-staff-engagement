@@ -9,12 +9,7 @@ import { FollowUpSectionComponent } from '../follow-up-section/follow-up-section
 @Component({
   selector: 'app-interaction-matrix',
   standalone: true,
-  imports: [
-    RouterLink,
-    StatusFilterComponent,
-    SortControlComponent,
-    FollowUpSectionComponent,
-  ],
+  imports: [RouterLink, StatusFilterComponent, SortControlComponent, FollowUpSectionComponent],
   templateUrl: './interaction-matrix.component.html',
   styleUrl: './interaction-matrix.component.css',
 })
@@ -29,7 +24,7 @@ export class InteractionMatrixComponent implements OnInit {
   readonly activeSort = signal<SortOption>('name');
 
   readonly followUpEntries = computed(() =>
-    this.entries().filter((entry) => entry.followUpRequired)
+    this.entries().filter((entry) => entry.followUpRequired),
   );
 
   ngOnInit(): void {
