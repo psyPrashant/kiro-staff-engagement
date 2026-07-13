@@ -90,6 +90,10 @@ export class InteractionMatrixComponent implements OnInit {
     this.router.navigate(['/interaction'], { queryParams: { employeeId } });
   }
 
+  navigateToSchedule(employeeId: number): void {
+    this.router.navigate(['/schedule/new'], { queryParams: { employeeId } });
+  }
+
   formatRecency(recency: number | null): string {
     if (recency === null) {
       return 'No interactions';

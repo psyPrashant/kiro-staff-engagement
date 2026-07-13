@@ -3,6 +3,7 @@
 -- The greeting table is from the test harness sample; add real domain tables below.
 TRUNCATE TABLE greeting CASCADE;
 TRUNCATE TABLE tasks CASCADE;
+TRUNCATE TABLE scheduled_interactions CASCADE;
 TRUNCATE TABLE interactions CASCADE;
 TRUNCATE TABLE projects CASCADE;
 TRUNCATE TABLE companies CASCADE;

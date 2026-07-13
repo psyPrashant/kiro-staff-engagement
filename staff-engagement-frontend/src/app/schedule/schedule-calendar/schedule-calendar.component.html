@@ -1,0 +1,73 @@
+@if (loading()) {
+  <div class="loading" data-testid="loading-indicator">
+    <p>Loading schedule...</p>
+  </div>
+}
+
+@if (error()) {
+  <div class="error" data-testid="error-message">
+    <p>{{ error() }}</p>
+    <button (click)="fetchEntries()" data-testid="retry-btn">Retry</button>
+  </div>
+}
+
+@if (!loading() && !error() && entries().length === 0) {
+  <div class="empty-state" data-testid="empty-schedule">
+    <p>No upcoming check-ins scheduled.</p>
+  </div>
+}
+
+@if (!loading() && !error() && entries().length > 0) {
+  <div class="schedule-list">
+    @for (group of groupedEntries() | keyvalue: dateOrder; track group.key) {
+      <div class="date-group">
+        <h3 class="date-heading">{{ group.key }}</h3>
+        @for (entry of group.value; track entry.id) {
+          <div
+            class="schedule-entry"
+            [class.overdue]="isOverdue(entry)"
+            data-testid="schedule-entry"
+            role="button"
+            tabindex="0"
+            [attr.aria-expanded]="expandedId() === entry.id"
+            (click)="toggleExpand(entry.id)"
+            (keydown.enter)="toggleExpand(entry.id)"
+            (keydown.space)="toggleExpand(entry.id); $event.preventDefault()"
+          >
+            <div class="entry-summary">
+              <span class="employee-name">{{ entry.employeeName }}</span>
+              <span class="interaction-type">{{ entry.interactionType }}</span>
+              <span class="scheduled-date">{{ entry.scheduledDate }}</span>
+              @if (expandedId() !== entry.id) {
+                <span class="notes-preview">{{ truncateNotes(entry.notes) }}</span>
+              }
+            </div>
+
+            @if (expandedId() === entry.id) {
+              <div class="entry-details" data-testid="entry-details">
+                <p class="full-notes">{{ entry.notes }}</p>
+                <div class="entry-actions">
+                  <button
+                    (click)="complete(entry.id); $event.stopPropagation()"
+                    data-testid="complete-btn"
+                  >
+                    Complete
+                  </button>
+                  <button
+                    (click)="cancel(entry.id); $event.stopPropagation()"
+                    data-testid="cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                  <button data-testid="reschedule-btn" (click)="$event.stopPropagation()">
+                    Reschedule
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
