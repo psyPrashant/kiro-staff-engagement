@@ -38,6 +38,10 @@ export const routes: Routes = [
         path: 'task',
         loadChildren: () => import('./task/task.routes').then((m) => m.routes),
       },
+      {
+        path: 'schedule',
+        loadChildren: () => import('./schedule/schedule.routes').then((m) => m.routes),
+      },
       { path: '**', redirectTo: 'dashboard' },
     ],
   },

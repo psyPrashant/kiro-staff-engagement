@@ -1,0 +1,81 @@
+<h2>Schedule Interaction</h2>
+
+@if (successNotification()) {
+  <div class="success-notification" data-testid="success-notification">
+    Interaction scheduled successfully!
+  </div>
+}
+
+@if (employeeError()) {
+  <div class="error-alert" data-testid="employee-error">
+    {{ employeeError() }}
+  </div>
+}
+
+@if (!employeeError()) {
+  <div class="employee-display" data-testid="employee-display">
+    <label>Employee</label>
+    <span class="employee-id-value">Employee #{{ employeeId() }}</span>
+  </div>
+
+  @if (apiError()) {
+    <div class="error-alert" role="alert" data-testid="api-error">
+      {{ apiError() }}
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-group">
+      <label for="scheduledDate">Scheduled Date</label>
+      <input
+        id="scheduledDate"
+        type="date"
+        formControlName="scheduledDate"
+        data-testid="scheduled-date-input"
+        (change)="onDateChange()"
+        (input)="onDateChange()"
+      />
+      @if (dateError()) {
+        <span class="validation-error" data-testid="date-validation-error">
+          {{ dateError() }}
+        </span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="interactionType">Interaction Type</label>
+      <select
+        id="interactionType"
+        formControlName="interactionType"
+        data-testid="interaction-type-select"
+      >
+        @for (type of interactionTypes; track type.value) {
+          <option [value]="type.value">{{ type.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notes (optional)</label>
+      <textarea
+        id="notes"
+        formControlName="notes"
+        rows="4"
+        maxlength="2000"
+        data-testid="notes-input"
+      ></textarea>
+      @if (form.controls.notes.hasError('maxlength')) {
+        <span class="validation-error">Notes must be 2000 characters or fewer.</span>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="submit-btn"
+      data-testid="submit-btn"
+      [disabled]="!isFormValid || submitting()"
+    >
+      {{ submitting() ? 'Scheduling...' : 'Schedule' }}
+    </button>
+  </form>
+}
