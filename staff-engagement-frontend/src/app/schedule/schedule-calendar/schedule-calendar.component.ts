@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KeyValuePipe } from '@angular/common';
 
@@ -32,18 +40,19 @@ export class ScheduleCalendarComponent implements OnInit {
   fetchEntries(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.schedulingService.list({ status: 'PENDING' }).pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: (data) => {
-        this.entries.set(data);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set('Failed to load schedule');
-        this.loading.set(false);
-      },
-    });
+    this.schedulingService
+      .list({ status: 'PENDING' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.entries.set(data);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.error.set('Failed to load schedule');
+          this.loading.set(false);
+        },
+      });
   }
 
   toggleExpand(id: number): void {
@@ -51,21 +60,23 @@ export class ScheduleCalendarComponent implements OnInit {
   }
 
   complete(id: number): void {
-    this.schedulingService.update(id, { completionStatus: 'COMPLETED' }).pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: () => this.entries.update((e) => e.filter((i) => i.id !== id)),
-      error: () => this.error.set('Failed to complete interaction'),
-    });
+    this.schedulingService
+      .update(id, { completionStatus: 'COMPLETED' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.entries.update((e) => e.filter((i) => i.id !== id)),
+        error: () => this.error.set('Failed to complete interaction'),
+      });
   }
 
   cancel(id: number): void {
-    this.schedulingService.update(id, { completionStatus: 'CANCELLED' }).pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: () => this.entries.update((e) => e.filter((i) => i.id !== id)),
-      error: () => this.error.set('Failed to cancel interaction'),
-    });
+    this.schedulingService
+      .update(id, { completionStatus: 'CANCELLED' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.entries.update((e) => e.filter((i) => i.id !== id)),
+        error: () => this.error.set('Failed to cancel interaction'),
+      });
   }
 
   isOverdue(entry: ScheduledInteraction): boolean {
@@ -82,9 +93,7 @@ export class ScheduleCalendarComponent implements OnInit {
 
   private groupByDate(entries: ScheduledInteraction[]): Map<string, ScheduledInteraction[]> {
     const map = new Map<string, ScheduledInteraction[]>();
-    const sorted = [...entries].sort(
-      (a, b) => a.scheduledDate.localeCompare(b.scheduledDate)
-    );
+    const sorted = [...entries].sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
     for (const entry of sorted) {
       const group = map.get(entry.scheduledDate) ?? [];
       group.push(entry);

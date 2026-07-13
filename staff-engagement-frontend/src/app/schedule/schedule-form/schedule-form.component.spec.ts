@@ -63,9 +63,7 @@ describe('ScheduleFormComponent', () => {
 
     const mockActivatedRoute = {
       snapshot: {
-        queryParamMap: convertToParamMap(
-          employeeId ? { employeeId } : {}
-        ),
+        queryParamMap: convertToParamMap(employeeId ? { employeeId } : {}),
       },
     };
 
@@ -144,9 +142,7 @@ describe('ScheduleFormComponent', () => {
       fixture.detectChanges();
 
       const compiled = fixture.nativeElement as HTMLElement;
-      const submitBtn = compiled.querySelector(
-        '[data-testid="submit-btn"]'
-      ) as HTMLButtonElement;
+      const submitBtn = compiled.querySelector('[data-testid="submit-btn"]') as HTMLButtonElement;
       expect(submitBtn.disabled).toBe(true);
     });
 
@@ -156,9 +152,7 @@ describe('ScheduleFormComponent', () => {
       fixture.detectChanges();
 
       const compiled = fixture.nativeElement as HTMLElement;
-      const submitBtn = compiled.querySelector(
-        '[data-testid="submit-btn"]'
-      ) as HTMLButtonElement;
+      const submitBtn = compiled.querySelector('[data-testid="submit-btn"]') as HTMLButtonElement;
       expect(submitBtn.disabled).toBe(true);
     });
 
@@ -169,9 +163,7 @@ describe('ScheduleFormComponent', () => {
       fixture.detectChanges();
 
       const compiled = fixture.nativeElement as HTMLElement;
-      const submitBtn = compiled.querySelector(
-        '[data-testid="submit-btn"]'
-      ) as HTMLButtonElement;
+      const submitBtn = compiled.querySelector('[data-testid="submit-btn"]') as HTMLButtonElement;
       expect(submitBtn.disabled).toBe(false);
     });
   });
@@ -209,7 +201,7 @@ describe('ScheduleFormComponent', () => {
       mockSchedulingService.create.mockReturnValue(
         throwError(() => ({
           error: { message: 'Employee not found' },
-        }))
+        })),
       );
 
       component.form.controls.scheduledDate.setValue(futureDateString());
@@ -230,9 +222,7 @@ describe('ScheduleFormComponent', () => {
     });
 
     it('should display fallback error message when API returns no message', () => {
-      mockSchedulingService.create.mockReturnValue(
-        throwError(() => ({ error: {} }))
-      );
+      mockSchedulingService.create.mockReturnValue(throwError(() => ({ error: {} })));
 
       component.form.controls.scheduledDate.setValue(futureDateString());
       component.form.controls.interactionType.setValue('CHECK_IN');

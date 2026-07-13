@@ -5,7 +5,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () =>
       import('./schedule-calendar/schedule-calendar.component').then(
-        (m) => m.ScheduleCalendarComponent
+        (m) => m.ScheduleCalendarComponent,
       ),
   },
   {

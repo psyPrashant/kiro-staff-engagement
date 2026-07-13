@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -109,27 +116,28 @@ export class ScheduleFormComponent implements OnInit {
       notes: this.form.controls.notes.value || undefined,
     };
 
-    this.schedulingService.create(request).pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.successNotification.set(true);
+    this.schedulingService
+      .create(request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.successNotification.set(true);
 
-        this.notificationTimeout = setTimeout(() => {
-          this.successNotification.set(false);
-          this.notificationTimeout = null;
-        }, 3500);
+          this.notificationTimeout = setTimeout(() => {
+            this.successNotification.set(false);
+            this.notificationTimeout = null;
+          }, 3500);
 
-        this.location.back();
-      },
-      error: (err) => {
-        this.submitting.set(false);
-        this.apiError.set(
-          err.error?.message ?? 'Failed to schedule interaction. Please try again.'
-        );
-      },
-    });
+          this.location.back();
+        },
+        error: (err) => {
+          this.submitting.set(false);
+          this.apiError.set(
+            err.error?.message ?? 'Failed to schedule interaction. Please try again.',
+          );
+        },
+      });
   }
 
   private todayString(): string {

@@ -35,7 +35,7 @@ export class SchedulingService {
       completionStatus?: CompletionStatus;
       scheduledDate?: string;
       notes?: string;
-    }
+    },
   ): Observable<ScheduledInteraction> {
     return this.http.patch<ScheduledInteraction>(`${this.baseUrl}/${id}`, body);
   }

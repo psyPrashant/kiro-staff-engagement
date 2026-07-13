@@ -78,7 +78,7 @@ function arbUpdateBody(): fc.Arbitrary<{
       scheduledDate: fc.option(arbDateString(), { nil: undefined }),
       notes: fc.option(fc.string({ minLength: 0, maxLength: 200 }), { nil: undefined }),
     },
-    { requiredKeys: [] }
+    { requiredKeys: [] },
   );
 }
 
@@ -96,7 +96,7 @@ function arbListParams(): fc.Arbitrary<{
       employeeId: fc.option(fc.integer({ min: 1, max: 10000 }), { nil: undefined }),
       overdue: fc.option(fc.boolean(), { nil: undefined }),
     },
-    { requiredKeys: [] }
+    { requiredKeys: [] },
   );
 }
 
@@ -128,7 +128,7 @@ describe('Frontend Service HTTP Method Correctness - Property 10', () => {
 
         req.flush({ id: 1, ...request, completionStatus: 'PENDING', overdue: false });
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -162,7 +162,7 @@ describe('Frontend Service HTTP Method Correctness - Property 10', () => {
 
         req.flush([]);
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -179,7 +179,7 @@ describe('Frontend Service HTTP Method Correctness - Property 10', () => {
 
         req.flush({ id, completionStatus: 'COMPLETED', overdue: false });
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });

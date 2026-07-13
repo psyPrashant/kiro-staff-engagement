@@ -12,10 +12,7 @@ import * as fc from 'fast-check';
  * Uses string comparison on yyyy-MM-dd formatted dates, which produces
  * correct chronological ordering.
  */
-export function validateScheduledDate(
-  dateValue: string | null,
-  today: string
-): string | null {
+export function validateScheduledDate(dateValue: string | null, today: string): string | null {
   if (!dateValue) {
     return null;
   }
@@ -73,7 +70,7 @@ describe('Frontend Date Validation - Property 9', () => {
         expect(result).not.toBeNull();
         expect(result).toBe('Scheduled date must be today or in the future.');
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -100,7 +97,7 @@ describe('Frontend Date Validation - Property 9', () => {
         const result = validateScheduledDate(date, FIXED_TODAY);
         expect(result).toBeNull();
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -114,7 +111,7 @@ describe('Frontend Date Validation - Property 9', () => {
           expect(result).toBeNull();
         }
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 

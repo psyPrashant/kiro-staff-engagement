@@ -12,11 +12,7 @@ type CompletionStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
  * AND its completionStatus is 'PENDING'.
  * String comparison works correctly for yyyy-MM-dd format.
  */
-export function isOverdue(
-  scheduledDate: string,
-  today: string,
-  status: CompletionStatus
-): boolean {
+export function isOverdue(scheduledDate: string, today: string, status: CompletionStatus): boolean {
   return status === 'PENDING' && scheduledDate < today;
 }
 
@@ -57,9 +53,9 @@ describe('Frontend Overdue Classification - Property 7', () => {
           const result = isOverdue(scheduledDate, today, status);
           const expected = scheduledDate < today && status === 'PENDING';
           expect(result).toBe(expected);
-        }
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -69,7 +65,7 @@ describe('Frontend Overdue Classification - Property 7', () => {
         const result = isOverdue(scheduledDate, today, 'COMPLETED');
         expect(result).toBe(false);
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -79,7 +75,7 @@ describe('Frontend Overdue Classification - Property 7', () => {
         const result = isOverdue(scheduledDate, today, 'CANCELLED');
         expect(result).toBe(false);
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -90,7 +86,7 @@ describe('Frontend Overdue Classification - Property 7', () => {
         const result = isOverdue(scheduledDate, scheduledDate, 'PENDING');
         expect(result).toBe(false);
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });
