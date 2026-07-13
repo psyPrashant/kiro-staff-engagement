@@ -112,6 +112,33 @@ describe('AuthService', () => {
     });
   });
 
+  describe('restoreSession', () => {
+    it('should send GET to /api/auth/me and set currentUser on success', () => {
+      const mockUser: User = { id: 7, name: 'Jane Doe', email: 'jane@example.com' };
+
+      service.restoreSession().subscribe();
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      expect(req.request.method).toBe('GET');
+      req.flush(mockUser);
+
+      expect(service.currentUser()).toEqual(mockUser);
+      expect(service.isAuthenticated()).toBe(true);
+    });
+
+    it('should clear currentUser and not throw on 401', () => {
+      let result: User | null | undefined;
+
+      service.restoreSession().subscribe((value) => (result = value));
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+      expect(service.currentUser()).toBeNull();
+      expect(result).toBeNull();
+    });
+  });
+
   describe('logout', () => {
     it('should send POST to /api/auth/logout', () => {
       service.currentUser.set({ id: 1, name: 'Test', email: 'test@example.com' });
