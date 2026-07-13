@@ -6,14 +6,14 @@
   } @else {
     <ul class="follow-up-list">
       @for (entry of entries(); track entry.employeeId) {
-        <li class="follow-up-item">
+        <li class="follow-up-item card">
           <div class="entry-info">
             <span class="employee-name">{{ entry.employeeName }}</span>
             <span
-              class="status-badge {{ getStatusClass(entry.engagementStatus) }}"
+              [class]="getBadgeClass(entry.engagementStatus)"
               [attr.aria-label]="getStatusLabel(entry.engagementStatus)"
             >
-              {{ entry.engagementStatus }}
+              {{ formatStatusLabel(entry.engagementStatus) }}
             </span>
             <span class="recency">{{ formatRecency(entry.recency) }}</span>
           </div>

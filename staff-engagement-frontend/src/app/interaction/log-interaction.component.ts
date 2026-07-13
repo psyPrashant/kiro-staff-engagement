@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -51,6 +51,17 @@ export class LogInteractionComponent implements OnInit {
   employees = signal<Employee[]>([]);
   users = signal<User[]>([]);
   projects = signal<Project[]>([]);
+
+  // Grouped projects by company for optgroup rendering
+  readonly projectsByCompany = computed(() => {
+    const groups = new Map<string, Project[]>();
+    for (const p of this.projects()) {
+      const list = groups.get(p.companyName) ?? [];
+      list.push(p);
+      groups.set(p.companyName, list);
+    }
+    return groups;
+  });
 
   // Loading/error signals per picker
   employeesLoading = signal(false);
@@ -240,6 +251,7 @@ export class LogInteractionComponent implements OnInit {
             interactionId: response.id,
             dueDate: rawValue.taskDueDate || null,
             assignedUserId: rawValue.taskAssignedUserId || null,
+            employeeId: rawValue.employeeId,
           };
 
           this.taskService.create(taskPayload).subscribe({

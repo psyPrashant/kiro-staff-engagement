@@ -1,6 +1,11 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { EngagementStatus, MatrixEntry, SortOption } from '../models/engagement.model';
+import {
+  EngagementStatus,
+  MatrixEntry,
+  SortOption,
+  formatEngagementStatusLabel,
+} from '../models/engagement.model';
 import { EngagementService } from '../services/engagement.service';
 import { StatusFilterComponent } from '../status-filter/status-filter.component';
 import { SortControlComponent } from '../sort-control/sort-control.component';
@@ -22,6 +27,15 @@ export class InteractionMatrixComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly activeFilter = signal<EngagementStatus | null>(null);
   readonly activeSort = signal<SortOption>('name');
+
+  readonly triageStats = computed(() => {
+    const all = this.entries();
+    return {
+      overdue: all.filter((e) => e.engagementStatus === 'OVERDUE').length,
+      atRisk: all.filter((e) => e.engagementStatus === 'AT_RISK').length,
+      onTrack: all.filter((e) => e.engagementStatus === 'ON_TRACK').length,
+    };
+  });
 
   readonly followUpEntries = computed(() =>
     this.entries().filter((entry) => entry.followUpRequired),
@@ -109,6 +123,21 @@ export class InteractionMatrixComponent implements OnInit {
         return 'Status: At Risk';
       case 'ON_TRACK':
         return 'Status: On Track';
+    }
+  }
+
+  formatStatusLabel(status: EngagementStatus): string {
+    return formatEngagementStatusLabel(status);
+  }
+
+  getBadgeClass(status: EngagementStatus): string {
+    switch (status) {
+      case 'OVERDUE':
+        return 'badge badge-danger';
+      case 'AT_RISK':
+        return 'badge badge-warning';
+      case 'ON_TRACK':
+        return 'badge badge-success';
     }
   }
 }

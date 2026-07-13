@@ -1,0 +1,22 @@
+@if (isOpen()) {
+  <div class="dialog-overlay" (click)="onBackdropClick()">
+    <div
+      #dialogPanel
+      class="dialog-panel card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="dialog-title" class="dialog-title">Create Task</h2>
+
+      <app-task-form
+        [employeeId]="employeeId()"
+        [defaultAssigneeId]="defaultAssigneeId()"
+        [interactions]="interactions()"
+        (submitted)="onFormSubmitted($event)"
+        (cancelled)="onFormCancelled()"
+      />
+    </div>
+  </div>
+}

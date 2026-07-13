@@ -1,6 +1,10 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MatrixEntry } from '../models/engagement.model';
+import {
+  EngagementStatus,
+  MatrixEntry,
+  formatEngagementStatusLabel,
+} from '../models/engagement.model';
 
 @Component({
   selector: 'app-follow-up-section',
@@ -12,30 +16,25 @@ import { MatrixEntry } from '../models/engagement.model';
 export class FollowUpSectionComponent {
   readonly entries = input.required<MatrixEntry[]>();
 
-  getStatusClass(status: string): string {
+  getBadgeClass(status: EngagementStatus): string {
     switch (status) {
       case 'OVERDUE':
-        return 'status-overdue';
+        return 'badge badge-danger';
       case 'AT_RISK':
-        return 'status-at-risk';
+        return 'badge badge-warning';
       case 'ON_TRACK':
-        return 'status-on-track';
+        return 'badge badge-success';
       default:
-        return '';
+        return 'badge';
     }
   }
 
-  getStatusLabel(status: string): string {
-    switch (status) {
-      case 'OVERDUE':
-        return 'Status: Overdue';
-      case 'AT_RISK':
-        return 'Status: At Risk';
-      case 'ON_TRACK':
-        return 'Status: On Track';
-      default:
-        return '';
-    }
+  getStatusLabel(status: EngagementStatus): string {
+    return `Status: ${formatEngagementStatusLabel(status)}`;
+  }
+
+  formatStatusLabel(status: EngagementStatus): string {
+    return formatEngagementStatusLabel(status);
   }
 
   formatRecency(recency: number | null): string {

@@ -1,0 +1,104 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="task-form" novalidate>
+  <div class="form-field">
+    <label for="task-employee">Employee <span class="required">*</span></label>
+    @if (employeesLoading()) {
+      <select id="task-employee" disabled>
+        <option>Loading...</option>
+      </select>
+    } @else {
+      <select
+        id="task-employee"
+        formControlName="employeeId"
+        (blur)="onFieldBlur('employeeId')"
+        [attr.aria-invalid]="isFieldInvalid('employeeId')"
+      >
+        <option [ngValue]="null" disabled>Select employee</option>
+        @for (emp of employees(); track emp.id) {
+          <option [ngValue]="emp.id">{{ emp.name }}</option>
+        }
+      </select>
+    }
+    @if (isFieldInvalid('employeeId')) {
+      <span class="field-error" role="alert">{{ getFieldError('employeeId') }}</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="task-assignee">Assignee</label>
+    @if (usersLoading()) {
+      <select id="task-assignee" disabled>
+        <option>Loading...</option>
+      </select>
+    } @else {
+      <select
+        id="task-assignee"
+        formControlName="assignedUserId"
+        (blur)="onFieldBlur('assignedUserId')"
+      >
+        <option [ngValue]="null">None</option>
+        @for (user of users(); track user.id) {
+          <option [ngValue]="user.id">{{ user.name }}</option>
+        }
+      </select>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="task-title">Title <span class="required">*</span></label>
+    <input
+      id="task-title"
+      type="text"
+      formControlName="title"
+      maxlength="255"
+      (blur)="onFieldBlur('title')"
+      [attr.aria-invalid]="isFieldInvalid('title')"
+      placeholder="Enter task title"
+    />
+    @if (isFieldInvalid('title')) {
+      <span class="field-error" role="alert">{{ getFieldError('title') }}</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="task-description">Description</label>
+    <textarea
+      id="task-description"
+      formControlName="description"
+      maxlength="2000"
+      rows="3"
+      (blur)="onFieldBlur('description')"
+      [attr.aria-invalid]="isFieldInvalid('description')"
+      placeholder="Optional description"
+    ></textarea>
+    @if (isFieldInvalid('description')) {
+      <span class="field-error" role="alert">{{ getFieldError('description') }}</span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="task-due-date">Due date</label>
+    <input
+      id="task-due-date"
+      type="date"
+      formControlName="dueDate"
+      (blur)="onFieldBlur('dueDate')"
+    />
+  </div>
+
+  @if (interactions().length > 0) {
+    <div class="form-field">
+      <label for="task-interaction">Link to interaction</label>
+      <select id="task-interaction" formControlName="interactionId">
+        <option [ngValue]="null">None</option>
+        @for (interaction of interactions(); track interaction.id) {
+          <option [ngValue]="interaction.id">{{ interaction.label }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Create task</button>
+    <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+  </div>
+</form>

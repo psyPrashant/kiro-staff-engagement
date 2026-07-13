@@ -1,12 +1,29 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { of, throwError, NEVER } from 'rxjs';
+import { signal } from '@angular/core';
 import { Employee360Component } from './employee-360.component';
 import { Employee360Service } from '../services/employee-360.service';
+import { EngagementService } from '../../dashboard/services/engagement.service';
+import { TaskService } from '../../task/services/task.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Employee360Response } from '../models/employee-360.model';
 
 const mockEmployee360Service = {
   getEmployee360: vi.fn(),
+};
+
+const mockEngagementService = {
+  getMatrix: vi.fn(),
+};
+
+const mockTaskService = {
+  create: vi.fn(),
+};
+
+const mockAuthService = {
+  currentUser: signal({ id: 99, name: 'Test User', email: 'test@example.com' }),
 };
 
 const mockActivatedRoute = {
@@ -46,11 +63,17 @@ describe('Employee360Component', () => {
 
   beforeEach(async () => {
     mockEmployee360Service.getEmployee360.mockReset();
+    mockEngagementService.getMatrix.mockReset();
+    mockEngagementService.getMatrix.mockReturnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [Employee360Component],
       providers: [
+        provideRouter([]),
         { provide: Employee360Service, useValue: mockEmployee360Service },
+        { provide: EngagementService, useValue: mockEngagementService },
+        { provide: TaskService, useValue: mockTaskService },
+        { provide: AuthService, useValue: mockAuthService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     }).compileComponents();

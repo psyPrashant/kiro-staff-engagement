@@ -1,19 +1,19 @@
 .dashboard {
-  padding: 16px;
+  padding: var(--space-4);
 }
 
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  padding: 24px;
+  gap: var(--space-4);
+  padding: var(--space-5);
 }
 
 .skeleton-card {
   width: 100%;
   height: 120px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  border-radius: var(--radius-card);
+  background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

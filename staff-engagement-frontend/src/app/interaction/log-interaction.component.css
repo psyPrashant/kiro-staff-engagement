@@ -1,1 +1,96 @@
-/* Styles will be implemented in task 3.3 */
+/* Log Interaction component-specific styles using design tokens */
+
+:host {
+  display: block;
+}
+
+.success-message {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  background-color: var(--color-success-soft);
+  color: var(--color-success);
+  border-radius: var(--radius-control);
+  font-size: var(--fs-sm);
+}
+
+.error-message {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+  border-radius: var(--radius-control);
+  font-size: var(--fs-sm);
+}
+
+.validation-error {
+  font-size: var(--fs-xs);
+  color: var(--color-danger);
+}
+
+.loading-indicator {
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+}
+
+.picker-error {
+  font-size: var(--fs-sm);
+  color: var(--color-danger);
+}
+
+.retry-btn {
+  font-size: var(--fs-sm);
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  color: var(--color-primary-hover);
+}
+
+.task-section {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.task-toggle-btn {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.task-toggle-btn:hover {
+  color: var(--color-primary-hover);
+}
+
+.task-fields {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+}
+
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-control);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  background-color: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

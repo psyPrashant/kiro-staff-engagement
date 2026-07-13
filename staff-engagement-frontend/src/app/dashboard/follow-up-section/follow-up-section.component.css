@@ -1,0 +1,83 @@
+.follow-up-panel {
+  margin-top: var(--space-5);
+}
+
+.follow-up-panel h3 {
+  margin-bottom: var(--space-4);
+}
+
+.follow-up-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.follow-up-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.entry-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.employee-name {
+  font-weight: var(--fw-medium);
+  color: var(--color-text);
+}
+
+.recency {
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+}
+
+.entry-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.action-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+  color: var(--color-primary-hover);
+}
+
+.action-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.empty-message {
+  color: var(--color-muted);
+  font-style: italic;
+  padding: var(--space-4);
+}
+
+/* Responsive: stack layout below 768px */
+@media (max-width: 768px) {
+  .follow-up-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .entry-actions {
+    margin-top: var(--space-2);
+  }
+}

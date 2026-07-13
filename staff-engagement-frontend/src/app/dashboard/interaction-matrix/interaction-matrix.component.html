@@ -1,6 +1,21 @@
 <section class="interaction-matrix" aria-label="Engagement Interaction Matrix">
   <h2>Engagement Matrix</h2>
 
+  <div class="triage-stats">
+    <div class="card stat-card stat-danger">
+      <span class="stat-count">{{ triageStats().overdue }}</span>
+      <span class="stat-label">Overdue</span>
+    </div>
+    <div class="card stat-card stat-warning">
+      <span class="stat-count">{{ triageStats().atRisk }}</span>
+      <span class="stat-label">At risk</span>
+    </div>
+    <div class="card stat-card stat-success">
+      <span class="stat-count">{{ triageStats().onTrack }}</span>
+      <span class="stat-label">On track</span>
+    </div>
+  </div>
+
   <div class="controls">
     <app-status-filter [activeFilter]="activeFilter()" (filterChange)="onFilterChange($event)" />
     <app-sort-control [activeSort]="activeSort()" (sortChange)="onSortChange($event)" />
@@ -40,24 +55,24 @@
             <tbody>
               @for (entry of entries(); track entry.employeeId) {
                 <tr>
-                  <td>{{ entry.employeeName }}</td>
-                  <td>
+                  <td data-label="Employee">{{ entry.employeeName }}</td>
+                  <td data-label="Status">
                     <span
-                      class="status-badge {{ getStatusClass(entry.engagementStatus) }}"
+                      [class]="getBadgeClass(entry.engagementStatus)"
                       [attr.aria-label]="getStatusLabel(entry.engagementStatus)"
                     >
-                      {{ entry.engagementStatus }}
+                      {{ formatStatusLabel(entry.engagementStatus) }}
                     </span>
                   </td>
-                  <td>{{ formatRecency(entry.recency) }}</td>
-                  <td>{{ entry.frequency }}</td>
-                  <td>{{ formatDate(entry.lastInteractionDate) }}</td>
-                  <td>
+                  <td data-label="Recency">{{ formatRecency(entry.recency) }}</td>
+                  <td data-label="Frequency">{{ entry.frequency }}</td>
+                  <td data-label="Last Interaction">{{ formatDate(entry.lastInteractionDate) }}</td>
+                  <td data-label="Follow-Up">
                     @if (entry.followUpRequired) {
                       <span class="follow-up-indicator" aria-label="Follow-up required">⚠</span>
                     }
                   </td>
-                  <td class="actions-cell">
+                  <td class="actions-cell" data-label="Actions">
                     <a [routerLink]="['/employee', entry.employeeId]" class="action-link">
                       View Profile
                     </a>

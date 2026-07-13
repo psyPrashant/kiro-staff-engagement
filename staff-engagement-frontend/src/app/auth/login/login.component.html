@@ -1,6 +1,7 @@
-<div class="login-container">
-  <div class="login-card">
-    <h1 class="login-title">Sign In</h1>
+<div class="login-wrapper">
+  <div class="card login-card">
+    <h1 class="login-header">Staff Engagement</h1>
+    <p class="login-subheader">Sign in to your account</p>
 
     @if (errorMessage()) {
       <div class="error-message" data-testid="login-error-message">
@@ -53,6 +54,7 @@
 
       <button
         type="submit"
+        class="btn btn-primary login-submit"
         data-testid="login-submit-button"
         [disabled]="loginForm.invalid || isLoading()"
       >
