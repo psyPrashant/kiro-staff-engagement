@@ -4,10 +4,10 @@ import { test, expect } from '@playwright/test';
 // In CI, the backend is started via Docker Compose before this runs.
 test.describe('Log Interaction - Full Flow', () => {
   test.beforeEach(async ({ page }) => {
-    // Login with seeded test credentials
+    // Login with seeded test credentials (see SeedDataLoader)
     await page.goto('/login');
-    await page.getByTestId('login-email-input').fill('admin@example.com');
-    await page.getByTestId('login-password-input').fill('password123');
+    await page.getByTestId('login-email-input').fill('alice.johnson@psybergate.com');
+    await page.getByTestId('login-password-input').fill('Password1');
     await page.getByTestId('login-submit-button').click();
 
     // Wait for redirect after successful login
