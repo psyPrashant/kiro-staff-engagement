@@ -43,6 +43,7 @@ class TaskPropertyTest {
 				title,
 				"Some valid description",
 				null,
+				null,
 				LocalDate.now(),
 				null
 		);
@@ -60,6 +61,7 @@ class TaskPropertyTest {
 		CreateTaskRequest request = new CreateTaskRequest(
 				title,
 				"Some valid description",
+				null,
 				null,
 				LocalDate.now(),
 				null

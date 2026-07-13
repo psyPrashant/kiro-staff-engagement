@@ -1,6 +1,7 @@
 package com.psybergate.staff_engagement.task;
 
 import com.psybergate.staff_engagement.task.dto.CreateTaskRequest;
+import com.psybergate.staff_engagement.task.dto.TaskResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,15 @@ public class TaskController {
 	private final TaskService taskService;
 
 	@GetMapping("/api/tasks")
-	public List<Task> getAllTasks() {
-		return taskRepository.findAll();
+	public List<TaskResponse> getAllTasks() {
+		return taskRepository.findAll().stream()
+			.map(TaskResponse::from)
+			.toList();
 	}
 
 	@PostMapping("/api/tasks")
-	public ResponseEntity<Task> createTask(@RequestBody @Valid CreateTaskRequest request) {
+	public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid CreateTaskRequest request) {
 		Task savedTask = taskService.create(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
+		return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponse.from(savedTask));
 	}
 }

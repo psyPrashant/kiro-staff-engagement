@@ -1,6 +1,7 @@
 package com.psybergate.staff_engagement.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.interaction.Interaction;
 import com.psybergate.staff_engagement.user.User;
 import jakarta.persistence.*;
@@ -38,6 +39,11 @@ public class Task {
 
 	@Column(name = "due_date")
 	private LocalDate dueDate;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "employee_id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private Employee employee;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "assigned_user_id")
