@@ -27,7 +27,12 @@
             class="schedule-entry"
             [class.overdue]="isOverdue(entry)"
             data-testid="schedule-entry"
+            role="button"
+            tabindex="0"
+            [attr.aria-expanded]="expandedId() === entry.id"
             (click)="toggleExpand(entry.id)"
+            (keydown.enter)="toggleExpand(entry.id)"
+            (keydown.space)="toggleExpand(entry.id); $event.preventDefault()"
           >
             <div class="entry-summary">
               <span class="employee-name">{{ entry.employeeName }}</span>

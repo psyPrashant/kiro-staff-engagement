@@ -1,18 +1,20 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule, KeyValuePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { KeyValuePipe } from '@angular/common';
 
 import { ScheduledInteraction } from '../models/scheduled-interaction.model';
 import { SchedulingService } from '../services/scheduling.service';
 
 @Component({
   selector: 'app-schedule-calendar',
-  standalone: true,
-  imports: [CommonModule, KeyValuePipe],
+  imports: [KeyValuePipe],
   templateUrl: './schedule-calendar.component.html',
   styleUrl: './schedule-calendar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleCalendarComponent implements OnInit {
   private readonly schedulingService = inject(SchedulingService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -30,7 +32,9 @@ export class ScheduleCalendarComponent implements OnInit {
   fetchEntries(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.schedulingService.list({ status: 'PENDING' }).subscribe({
+    this.schedulingService.list({ status: 'PENDING' }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: (data) => {
         this.entries.set(data);
         this.loading.set(false);
@@ -47,14 +51,20 @@ export class ScheduleCalendarComponent implements OnInit {
   }
 
   complete(id: number): void {
-    this.schedulingService.update(id, { completionStatus: 'COMPLETED' }).subscribe({
+    this.schedulingService.update(id, { completionStatus: 'COMPLETED' }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: () => this.entries.update((e) => e.filter((i) => i.id !== id)),
+      error: () => this.error.set('Failed to complete interaction'),
     });
   }
 
   cancel(id: number): void {
-    this.schedulingService.update(id, { completionStatus: 'CANCELLED' }).subscribe({
+    this.schedulingService.update(id, { completionStatus: 'CANCELLED' }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: () => this.entries.update((e) => e.filter((i) => i.id !== id)),
+      error: () => this.error.set('Failed to cancel interaction'),
     });
   }
 

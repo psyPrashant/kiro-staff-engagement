@@ -1,5 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Location } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -11,15 +12,17 @@ import {
 
 @Component({
   selector: 'app-schedule-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './schedule-form.component.html',
   styleUrl: './schedule-form.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   private readonly schedulingService = inject(SchedulingService);
+  private readonly destroyRef = inject(DestroyRef);
+  private notificationTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly employeeId = signal<number | null>(null);
   readonly employeeError = signal<string | null>(null);
@@ -27,6 +30,12 @@ export class ScheduleFormComponent implements OnInit {
   readonly apiError = signal<string | null>(null);
   readonly dateError = signal<string | null>(null);
   readonly successNotification = signal(false);
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.notificationTimeout) clearTimeout(this.notificationTimeout);
+    });
+  }
 
   readonly interactionTypes: { value: InteractionType; label: string }[] = [
     { value: 'CHECK_IN', label: 'Check In' },
@@ -100,13 +109,16 @@ export class ScheduleFormComponent implements OnInit {
       notes: this.form.controls.notes.value || undefined,
     };
 
-    this.schedulingService.create(request).subscribe({
+    this.schedulingService.create(request).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: () => {
         this.submitting.set(false);
         this.successNotification.set(true);
 
-        setTimeout(() => {
+        this.notificationTimeout = setTimeout(() => {
           this.successNotification.set(false);
+          this.notificationTimeout = null;
         }, 3500);
 
         this.location.back();
