@@ -1,5 +1,13 @@
 @if (isOpen()) {
-  <div class="dialog-overlay" (click)="onBackdropClick()">
+  <div
+    class="dialog-overlay"
+    role="button"
+    tabindex="-1"
+    aria-label="Close dialog"
+    (click)="onBackdropClick()"
+    (keydown.enter)="onBackdropClick()"
+    (keydown.space)="onBackdropClick()"
+  >
     <div
       #dialogPanel
       class="dialog-panel card"
@@ -7,6 +15,7 @@
       aria-modal="true"
       aria-labelledby="dialog-title"
       (click)="$event.stopPropagation()"
+      (keydown.enter)="$event.stopPropagation()"
     >
       <h2 id="dialog-title" class="dialog-title">Create Task</h2>
 

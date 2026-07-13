@@ -1,7 +1,12 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from './services/task.service';
-import { CreateTaskRequest, TaskResponse, formatTaskStatusLabel, isOverdue } from './models/task.model';
+import {
+  CreateTaskRequest,
+  TaskResponse,
+  formatTaskStatusLabel,
+  isOverdue,
+} from './models/task.model';
 import { TaskFormComponent } from './components/task-form/task-form.component';
 
 @Component({
@@ -57,9 +62,7 @@ export class TaskListComponent implements OnInit {
     const newStatus = task.status === 'OPEN' ? 'DONE' : 'OPEN';
     this.taskService.updateStatus(task.id, newStatus).subscribe({
       next: (updated) => {
-        this.tasks.update((tasks) =>
-          tasks.map((t) => (t.id === updated.id ? updated : t))
-        );
+        this.tasks.update((tasks) => tasks.map((t) => (t.id === updated.id ? updated : t)));
       },
       error: () => {
         // Silently fail — could add error toast in future

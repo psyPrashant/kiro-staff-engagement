@@ -36,7 +36,7 @@ export class EmployeesListComponent implements OnInit {
     const term = this.searchTerm().toLowerCase();
     if (term) {
       result = result.filter(
-        (e) => e.name.toLowerCase().includes(term) || e.jobTitle.toLowerCase().includes(term)
+        (e) => e.name.toLowerCase().includes(term) || e.jobTitle.toLowerCase().includes(term),
       );
     }
     const status = this.statusFilter();

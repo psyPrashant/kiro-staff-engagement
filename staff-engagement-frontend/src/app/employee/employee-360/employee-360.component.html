@@ -17,12 +17,13 @@
     <section class="profile-summary" data-testid="profile-summary">
       <div class="profile-header">
         <div class="profile-header-info">
-          <h2 data-testid="employee-name">{{ data()!.profile.name || 'Information unavailable' }}</h2>
+          <h2 data-testid="employee-name">
+            {{ data()!.profile.name || 'Information unavailable' }}
+          </h2>
           @if (engagementStatus()) {
-            <span
-              [class]="getEngagementBadgeClass()"
-              data-testid="engagement-status-badge"
-            >{{ getEngagementStatusLabel() }}</span>
+            <span [class]="getEngagementBadgeClass()" data-testid="engagement-status-badge">{{
+              getEngagementStatusLabel()
+            }}</span>
           }
         </div>
         <div class="profile-actions">
@@ -31,12 +32,11 @@
             [routerLink]="['/interaction']"
             [queryParams]="{ employeeId: employeeId }"
             data-testid="log-interaction-btn"
-          >Log interaction</a>
-          <button
-            class="btn btn-secondary"
-            (click)="onNewTask()"
-            data-testid="new-task-btn"
-          >New task</button>
+            >Log interaction</a
+          >
+          <button class="btn btn-secondary" (click)="onNewTask()" data-testid="new-task-btn">
+            New task
+          </button>
         </div>
       </div>
       <div class="profile-details">

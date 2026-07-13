@@ -73,7 +73,9 @@
         <tbody>
           @for (emp of filteredEmployees(); track emp.id) {
             <tr (click)="navigateToEmployee(emp.id)" class="clickable-row">
-              <td><span class="avatar">{{ getInitials(emp.name) }}</span></td>
+              <td>
+                <span class="avatar">{{ getInitials(emp.name) }}</span>
+              </td>
               <td>{{ emp.name }}</td>
               <td>{{ emp.jobTitle }}</td>
               <td>{{ emp.managerName || '-' }}</td>

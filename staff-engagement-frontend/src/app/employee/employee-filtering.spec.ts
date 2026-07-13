@@ -11,7 +11,7 @@ function filterBySearchTerm(employees: EmployeeListEntry[], term: string): Emplo
   const lower = term.toLowerCase();
   if (!lower) return employees;
   return employees.filter(
-    (e) => e.name.toLowerCase().includes(lower) || e.jobTitle.toLowerCase().includes(lower)
+    (e) => e.name.toLowerCase().includes(lower) || e.jobTitle.toLowerCase().includes(lower),
   );
 }
 
@@ -21,7 +21,7 @@ function filterBySearchTerm(employees: EmployeeListEntry[], term: string): Emplo
  */
 function filterByStatus(
   employees: EmployeeListEntry[],
-  status: EngagementStatus | null
+  status: EngagementStatus | null,
 ): EmployeeListEntry[] {
   if (!status) return employees;
   return employees.filter((e) => e.engagementStatus === status);
@@ -31,7 +31,7 @@ const engagementStatusArb: fc.Arbitrary<EngagementStatus | null> = fc.constantFr
   'OVERDUE' as EngagementStatus,
   'AT_RISK' as EngagementStatus,
   'ON_TRACK' as EngagementStatus,
-  null
+  null,
 );
 
 const employeeArb: fc.Arbitrary<EmployeeListEntry> = fc.record({
@@ -48,11 +48,11 @@ const employeeArb: fc.Arbitrary<EmployeeListEntry> = fc.record({
         fc.tuple(
           fc.constant(year),
           fc.integer({ min: 1, max: 12 }),
-          fc.integer({ min: 1, max: 28 })
-        )
+          fc.integer({ min: 1, max: 28 }),
+        ),
       )
       .map(([y, m, d]) => `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`),
-    { nil: null }
+    { nil: null },
   ),
 });
 
@@ -67,11 +67,15 @@ describe('Employee list filtering - property tests', () => {
    */
   it('search filtering is monotonic: filtered.length <= unfiltered.length', () => {
     fc.assert(
-      fc.property(employeeListArb, fc.string({ minLength: 0, maxLength: 20 }), (employees, term) => {
-        const filtered = filterBySearchTerm(employees, term);
-        expect(filtered.length).toBeLessThanOrEqual(employees.length);
-      }),
-      { numRuns: 100 }
+      fc.property(
+        employeeListArb,
+        fc.string({ minLength: 0, maxLength: 20 }),
+        (employees, term) => {
+          const filtered = filterBySearchTerm(employees, term);
+          expect(filtered.length).toBeLessThanOrEqual(employees.length);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 
@@ -85,14 +89,18 @@ describe('Employee list filtering - property tests', () => {
     fc.assert(
       fc.property(
         employeeListArb,
-        fc.constantFrom('OVERDUE' as EngagementStatus, 'AT_RISK' as EngagementStatus, 'ON_TRACK' as EngagementStatus),
+        fc.constantFrom(
+          'OVERDUE' as EngagementStatus,
+          'AT_RISK' as EngagementStatus,
+          'ON_TRACK' as EngagementStatus,
+        ),
         (employees, status) => {
           const unfiltered = filterByStatus(employees, null);
           const filtered = filterByStatus(employees, status);
           expect(filtered.length).toBeLessThanOrEqual(unfiltered.length);
-        }
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -107,7 +115,11 @@ describe('Employee list filtering - property tests', () => {
       fc.property(
         employeeListArb,
         fc.string({ minLength: 0, maxLength: 20 }),
-        fc.constantFrom('OVERDUE' as EngagementStatus, 'AT_RISK' as EngagementStatus, 'ON_TRACK' as EngagementStatus),
+        fc.constantFrom(
+          'OVERDUE' as EngagementStatus,
+          'AT_RISK' as EngagementStatus,
+          'ON_TRACK' as EngagementStatus,
+        ),
         (employees, term, status) => {
           const searchOnly = filterBySearchTerm(employees, term);
           const statusOnly = filterByStatus(employees, status);
@@ -116,9 +128,9 @@ describe('Employee list filtering - property tests', () => {
           expect(combined.length).toBeLessThanOrEqual(searchOnly.length);
           expect(combined.length).toBeLessThanOrEqual(statusOnly.length);
           expect(combined.length).toBeLessThanOrEqual(employees.length);
-        }
+        },
       ),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });

@@ -45,7 +45,7 @@ describe('Label helpers - property tests', () => {
         const result = formatEngagementStatusLabel(status);
         return result.length > 0 && result !== status;
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -59,7 +59,7 @@ describe('Label helpers - property tests', () => {
         const result = formatTaskStatusLabel(status);
         return result.length > 0 && result !== status;
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 
@@ -70,7 +70,11 @@ describe('Label helpers - property tests', () => {
     const upperWord = fc
       .integer({ min: 1, max: 10 })
       .chain((len) =>
-        fc.tuple(...Array.from({ length: len }, () => fc.constantFrom(...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''))))
+        fc.tuple(
+          ...Array.from({ length: len }, () =>
+            fc.constantFrom(...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')),
+          ),
+        ),
       )
       .map((chars) => chars.join(''));
 
@@ -83,7 +87,7 @@ describe('Label helpers - property tests', () => {
         const result = formatEnumLabel(input);
         return !result.includes('_') && result.length > 0;
       }),
-      { numRuns: 100 }
+      { numRuns: 100 },
     );
   });
 });

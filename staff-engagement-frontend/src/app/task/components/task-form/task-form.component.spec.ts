@@ -131,7 +131,7 @@ describe('TaskFormComponent', () => {
     const el: HTMLElement = fixture.nativeElement;
     const errors = el.querySelectorAll('.field-error');
     const titleError = Array.from(errors).find((e) =>
-      e.textContent?.includes('at most 255 characters')
+      e.textContent?.includes('at most 255 characters'),
     );
     expect(titleError).toBeTruthy();
   });
@@ -144,7 +144,7 @@ describe('TaskFormComponent', () => {
     const el: HTMLElement = fixture.nativeElement;
     const errors = el.querySelectorAll('.field-error');
     const employeeError = Array.from(errors).find((e) =>
-      e.textContent?.includes('Employee is required')
+      e.textContent?.includes('Employee is required'),
     );
     expect(employeeError).toBeTruthy();
   });

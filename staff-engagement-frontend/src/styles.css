@@ -155,7 +155,9 @@ textarea:focus-visible {
   line-height: 1.5;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 
 .btn-primary {

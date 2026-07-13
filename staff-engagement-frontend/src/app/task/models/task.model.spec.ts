@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it } from 'vitest';
 import * as fc from 'fast-check';
 import { isOverdue } from './task.model';
 
@@ -19,7 +19,7 @@ describe('Task model - property tests', () => {
           const toggled = toggleStatus(toggleStatus(status));
           return toggled === status;
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
   });
@@ -53,7 +53,7 @@ describe('Task model - property tests', () => {
 
           return result === expected;
         }),
-        { numRuns: 100 }
+        { numRuns: 100 },
       );
     });
   });
