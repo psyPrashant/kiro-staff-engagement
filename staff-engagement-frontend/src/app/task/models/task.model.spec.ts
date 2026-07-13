@@ -32,10 +32,18 @@ describe('Task model - property tests', () => {
       const taskStatus = fc.constantFrom('OPEN', 'DONE');
       const now = Date.now();
       const pastDate = fc
-        .date({ min: new Date('2000-01-01T00:00:00.000Z'), max: new Date(now - 86_400_000) })
+        .date({
+          min: new Date('2000-01-01T00:00:00.000Z'),
+          max: new Date(now - 86_400_000),
+          noInvalidDate: true,
+        })
         .map((d) => d.toISOString().split('T')[0]);
       const futureDate = fc
-        .date({ min: new Date(now + 86_400_000), max: new Date('2099-12-31T00:00:00.000Z') })
+        .date({
+          min: new Date(now + 86_400_000),
+          max: new Date('2099-12-31T00:00:00.000Z'),
+          noInvalidDate: true,
+        })
         .map((d) => d.toISOString().split('T')[0]);
       const todayDate = fc.constant(new Date().toISOString().split('T')[0]);
       const nullDate = fc.constant(null as string | null);
