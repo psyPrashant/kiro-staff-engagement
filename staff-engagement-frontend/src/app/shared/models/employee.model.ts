@@ -3,4 +3,5 @@ export interface Employee {
   name: string;
   email: string;
   jobTitle: string;
+  manager?: { id: number; name: string } | null;
 }

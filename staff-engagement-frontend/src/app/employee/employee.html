@@ -1,1 +1,98 @@
-<h1>Employee</h1>
+<div class="page">
+  <h1>Employees</h1>
+
+  @if (loading()) {
+    <p data-testid="employees-loading" aria-live="polite">Loading employees...</p>
+  }
+
+  @if (error(); as errorMsg) {
+    <div class="card error-card" data-testid="employees-error">
+      <p>{{ errorMsg }}</p>
+      <button class="btn btn-primary" (click)="fetchData()">Retry</button>
+    </div>
+  }
+
+  @if (!loading() && !error() && employees().length === 0) {
+    <p data-testid="employees-empty">No employees found.</p>
+  }
+
+  @if (!loading() && !error() && employees().length > 0) {
+    <div class="filters">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by name or job title..."
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        data-testid="employees-search"
+      />
+      <div class="status-filter">
+        <button
+          class="btn"
+          [class.btn-primary]="statusFilter() === null"
+          (click)="statusFilter.set(null)"
+        >
+          All
+        </button>
+        <button
+          class="btn"
+          [class.btn-primary]="statusFilter() === 'OVERDUE'"
+          (click)="statusFilter.set('OVERDUE')"
+        >
+          Overdue
+        </button>
+        <button
+          class="btn"
+          [class.btn-primary]="statusFilter() === 'AT_RISK'"
+          (click)="statusFilter.set('AT_RISK')"
+        >
+          At risk
+        </button>
+        <button
+          class="btn"
+          [class.btn-primary]="statusFilter() === 'ON_TRACK'"
+          (click)="statusFilter.set('ON_TRACK')"
+        >
+          On track
+        </button>
+      </div>
+    </div>
+
+    <div class="table-responsive" data-testid="employees-list">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Job Title</th>
+            <th>Manager</th>
+            <th>Status</th>
+            <th>Last Seen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (emp of filteredEmployees(); track emp.id) {
+            <tr (click)="navigateToEmployee(emp.id)" class="clickable-row">
+              <td>
+                <span class="avatar">{{ getInitials(emp.name) }}</span>
+              </td>
+              <td>{{ emp.name }}</td>
+              <td>{{ emp.jobTitle }}</td>
+              <td>{{ emp.managerName || '-' }}</td>
+              <td>
+                @if (emp.engagementStatus) {
+                  <span [class]="getBadgeClass(emp.engagementStatus)">
+                    {{ formatStatusLabel(emp.engagementStatus) }}
+                  </span>
+                } @else {
+                  <span class="badge">Unknown</span>
+                }
+              </td>
+              <td>{{ emp.lastInteractionDate ? (emp.lastInteractionDate | date) : 'Never' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

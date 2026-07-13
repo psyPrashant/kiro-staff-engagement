@@ -178,25 +178,25 @@ describe('InteractionMatrixComponent', () => {
   });
 
   describe('correct CSS class per EngagementStatus value', () => {
-    it('should apply status-overdue class for OVERDUE status', () => {
+    it('should apply badge-danger class for OVERDUE status', () => {
       triggerInitialLoad([createMockEntry({ engagementStatus: 'OVERDUE' })]);
 
-      const badge = fixture.nativeElement.querySelector('.status-badge');
-      expect(badge.classList.contains('status-overdue')).toBe(true);
+      const badge = fixture.nativeElement.querySelector('.badge');
+      expect(badge.classList.contains('badge-danger')).toBe(true);
     });
 
-    it('should apply status-at-risk class for AT_RISK status', () => {
+    it('should apply badge-warning class for AT_RISK status', () => {
       triggerInitialLoad([createMockEntry({ engagementStatus: 'AT_RISK' })]);
 
-      const badge = fixture.nativeElement.querySelector('.status-badge');
-      expect(badge.classList.contains('status-at-risk')).toBe(true);
+      const badge = fixture.nativeElement.querySelector('.badge');
+      expect(badge.classList.contains('badge-warning')).toBe(true);
     });
 
-    it('should apply status-on-track class for ON_TRACK status', () => {
+    it('should apply badge-success class for ON_TRACK status', () => {
       triggerInitialLoad([createMockEntry({ engagementStatus: 'ON_TRACK' })]);
 
-      const badge = fixture.nativeElement.querySelector('.status-badge');
-      expect(badge.classList.contains('status-on-track')).toBe(true);
+      const badge = fixture.nativeElement.querySelector('.badge');
+      expect(badge.classList.contains('badge-success')).toBe(true);
     });
   });
 

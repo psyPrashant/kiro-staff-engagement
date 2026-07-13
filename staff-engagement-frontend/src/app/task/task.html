@@ -1,1 +1,102 @@
-<h1>Task</h1>
+<div class="page">
+  <h1>Tasks</h1>
+
+  <div class="filter-bar" data-testid="tasks-filter">
+    <button
+      class="btn filter-btn"
+      [class.filter-btn-active]="statusFilter() === 'OPEN'"
+      (click)="setStatusFilter('OPEN')"
+      aria-label="Show open tasks"
+    >
+      Open
+    </button>
+    <button
+      class="btn filter-btn"
+      [class.filter-btn-active]="statusFilter() === 'DONE'"
+      (click)="setStatusFilter('DONE')"
+      aria-label="Show done tasks"
+    >
+      Done
+    </button>
+    <button
+      class="btn filter-btn"
+      [class.filter-btn-active]="statusFilter() === 'ALL'"
+      (click)="setStatusFilter('ALL')"
+      aria-label="Show all tasks"
+    >
+      All
+    </button>
+    <button class="btn btn-primary" (click)="showNewTaskForm.set(!showNewTaskForm())">
+      {{ showNewTaskForm() ? 'Cancel' : 'New task' }}
+    </button>
+  </div>
+
+  @if (showNewTaskForm()) {
+    <div class="card new-task-form-section">
+      <app-task-form
+        (submitted)="onNewTaskSubmitted($event)"
+        (cancelled)="showNewTaskForm.set(false)"
+      />
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="loading-text" data-testid="tasks-loading" aria-live="polite">Loading tasks...</p>
+  }
+
+  @if (error(); as errorMsg) {
+    <div class="card error-card" data-testid="tasks-error">
+      <p>{{ errorMsg }}</p>
+      <button class="btn btn-primary" (click)="fetchTasks()">Retry</button>
+    </div>
+  }
+
+  @if (!loading() && !error() && filteredTasks().length === 0) {
+    <p class="empty-text" data-testid="tasks-empty">No tasks found.</p>
+  }
+
+  @if (!loading() && !error() && filteredTasks().length > 0) {
+    <div class="table-responsive" data-testid="tasks-list">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-toggle"></th>
+            <th>Title</th>
+            <th>Employee</th>
+            <th>Assignee</th>
+            <th>Due Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (task of filteredTasks(); track task.id) {
+            <tr [class.overdue]="isTaskOverdue(task)">
+              <td class="col-toggle">
+                <button
+                  class="btn btn-toggle"
+                  [class.btn-toggle-done]="task.status === 'DONE'"
+                  (click)="toggleStatus(task)"
+                  [attr.aria-label]="
+                    task.status === 'OPEN'
+                      ? 'Mark ' + task.title + ' as done'
+                      : 'Mark ' + task.title + ' as open'
+                  "
+                  [attr.data-testid]="'task-toggle-' + task.id"
+                >
+                  @if (task.status === 'DONE') {
+                    &#10003;
+                  }
+                </button>
+              </td>
+              <td>{{ task.title }}</td>
+              <td>{{ task.employeeName || '-' }}</td>
+              <td>{{ task.assignedUser?.name || '-' }}</td>
+              <td>{{ task.dueDate ? (task.dueDate | date) : '-' }}</td>
+              <td>{{ formatStatus(task.status) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

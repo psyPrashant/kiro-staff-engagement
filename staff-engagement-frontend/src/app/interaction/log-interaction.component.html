@@ -14,7 +14,7 @@
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <!-- Employee Picker -->
-  <div class="form-group">
+  <div class="form-field">
     <label for="employeeId">Employee</label>
     @if (employeesLoading()) {
       <span class="loading-indicator">Loading employees...</span>
@@ -38,7 +38,7 @@
   </div>
 
   <!-- Conducted-By Picker -->
-  <div class="form-group">
+  <div class="form-field">
     <label for="conductedByUserId">Conducted By</label>
     @if (usersLoading()) {
       <span class="loading-indicator">Loading users...</span>
@@ -64,7 +64,7 @@
   </div>
 
   <!-- Type Selector -->
-  <div class="form-group">
+  <div class="form-field">
     <label for="type">Type</label>
     <select id="type" formControlName="type">
       <option [ngValue]="null" disabled>-- Select --</option>
@@ -81,7 +81,7 @@
   </div>
 
   <!-- Notes Textarea -->
-  <div class="form-group">
+  <div class="form-field">
     <label for="notes">Notes</label>
     <textarea id="notes" formControlName="notes" rows="4"></textarea>
     @if (
@@ -96,7 +96,7 @@
   </div>
 
   <!-- Occurred-At DateTime -->
-  <div class="form-group">
+  <div class="form-field">
     <label for="occurredAt">Occurred At</label>
     <input id="occurredAt" type="datetime-local" formControlName="occurredAt" />
     @if (form.get('occurredAt')?.touched && form.get('occurredAt')?.hasError('required')) {
@@ -108,7 +108,7 @@
   </div>
 
   <!-- Project Picker (optional) -->
-  <div class="form-group">
+  <div class="form-field">
     <label for="projectId">Project (optional)</label>
     @if (projectsLoading()) {
       <span class="loading-indicator">Loading projects...</span>
@@ -119,8 +119,12 @@
     }
     <select id="projectId" formControlName="projectId" [disabled]="projectsLoading()">
       <option [ngValue]="null">-- None --</option>
-      @for (project of projects(); track project.id) {
-        <option [ngValue]="project.id">{{ project.name }}</option>
+      @for (group of projectsByCompany() | keyvalue; track group.key) {
+        <optgroup [label]="group.key">
+          @for (project of group.value; track project.id) {
+            <option [ngValue]="project.id">{{ project.name }}</option>
+          }
+        </optgroup>
       }
     </select>
     @if (serverFieldErrors()['projectId']) {
@@ -137,7 +141,7 @@
     @if (taskSectionExpanded()) {
       <div class="task-fields">
         <!-- Task Title -->
-        <div class="form-group">
+        <div class="form-field">
           <label for="taskTitle">Task Title</label>
           <input id="taskTitle" type="text" formControlName="taskTitle" maxlength="255" />
           @if (
@@ -153,7 +157,7 @@
         </div>
 
         <!-- Task Description -->
-        <div class="form-group">
+        <div class="form-field">
           <label for="taskDescription">Task Description (optional)</label>
           <textarea
             id="taskDescription"
@@ -164,7 +168,7 @@
         </div>
 
         <!-- Task Due Date -->
-        <div class="form-group">
+        <div class="form-field">
           <label for="taskDueDate">Due Date (optional)</label>
           <input id="taskDueDate" type="date" formControlName="taskDueDate" />
           @if (
@@ -175,7 +179,7 @@
         </div>
 
         <!-- Task Assigned User -->
-        <div class="form-group">
+        <div class="form-field">
           <label for="taskAssignedUserId">Assigned To (optional)</label>
           <select
             id="taskAssignedUserId"

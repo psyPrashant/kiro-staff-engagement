@@ -15,21 +15,46 @@
 @if (data()) {
   <div class="employee-360">
     <section class="profile-summary" data-testid="profile-summary">
-      <h2 data-testid="employee-name">{{ data()!.profile.name || 'Information unavailable' }}</h2>
-      <p class="profile-field">
-        <span class="label">Email:</span>
-        <span>{{ data()!.profile.email || 'Information unavailable' }}</span>
-      </p>
-      <p class="profile-field">
-        <span class="label">Job Title:</span>
-        <span>{{ data()!.profile.jobTitle || 'Information unavailable' }}</span>
-      </p>
-      @if (data()!.profile.managerName) {
+      <div class="profile-header">
+        <div class="profile-header-info">
+          <h2 data-testid="employee-name">
+            {{ data()!.profile.name || 'Information unavailable' }}
+          </h2>
+          @if (engagementStatus()) {
+            <span [class]="getEngagementBadgeClass()" data-testid="engagement-status-badge">{{
+              getEngagementStatusLabel()
+            }}</span>
+          }
+        </div>
+        <div class="profile-actions">
+          <a
+            class="btn btn-primary"
+            [routerLink]="['/interaction']"
+            [queryParams]="{ employeeId: employeeId }"
+            data-testid="log-interaction-btn"
+            >Log interaction</a
+          >
+          <button class="btn btn-secondary" (click)="onNewTask()" data-testid="new-task-btn">
+            New task
+          </button>
+        </div>
+      </div>
+      <div class="profile-details">
         <p class="profile-field">
-          <span class="label">Manager:</span>
-          <span>{{ data()!.profile.managerName }}</span>
+          <span class="label">Email:</span>
+          <span>{{ data()!.profile.email || 'Information unavailable' }}</span>
         </p>
-      }
+        <p class="profile-field">
+          <span class="label">Job Title:</span>
+          <span>{{ data()!.profile.jobTitle || 'Information unavailable' }}</span>
+        </p>
+        @if (data()!.profile.managerName) {
+          <p class="profile-field">
+            <span class="label">Manager:</span>
+            <span>{{ data()!.profile.managerName }}</span>
+          </p>
+        }
+      </div>
     </section>
 
     <section class="interaction-history" data-testid="interaction-history">
@@ -41,7 +66,7 @@
           @for (interaction of data()!.interactions; track interaction.id) {
             <li class="interaction-item">
               <div class="interaction-header">
-                <span class="interaction-type">{{ interaction.type }}</span>
+                <span class="interaction-type">{{ formatInteractionType(interaction.type) }}</span>
                 <span class="interaction-date">{{ interaction.occurredAt | date }}</span>
               </div>
               <p class="interaction-conducted-by">
@@ -53,6 +78,8 @@
                     interaction.projectContext.companyName
                   }})
                 </p>
+              } @else {
+                <p class="interaction-project-context">No project</p>
               }
               <p class="interaction-notes">{{ truncateNotes(interaction.notes) }}</p>
             </li>
@@ -80,4 +107,13 @@
       }
     </section>
   </div>
+
+  <app-task-create-dialog
+    [open]="dialogOpen()"
+    [employeeId]="employeeId"
+    [defaultAssigneeId]="currentUserId()"
+    [interactions]="interactionsForDialog()"
+    (submitted)="onTaskSubmitted($event)"
+    (closed)="dialogOpen.set(false)"
+  />
 }
