@@ -1,7 +1,9 @@
 package com.psybergate.staff_engagement.task;
 
 import com.psybergate.staff_engagement.common.exception.GlobalExceptionHandler;
+import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.task.dto.CreateTaskRequest;
+import com.psybergate.staff_engagement.task.dto.TaskResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -144,5 +146,91 @@ class TaskControllerTest {
 						.content(requestBody))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value("Interaction not found with id: 999"));
+	}
+
+	@Test
+	void createTask_withEmployeeId_returns201WithEmployeeDetails() throws Exception {
+		Employee employee = new Employee();
+		employee.setId(5L);
+		employee.setName("John Doe");
+		employee.setEmail("john.doe@example.com");
+
+		Task savedTask = new Task();
+		savedTask.setId(10L);
+		savedTask.setTitle("Review employee performance");
+		savedTask.setStatus(TaskStatus.OPEN);
+		savedTask.setEmployee(employee);
+		savedTask.setCreatedAt(Instant.now());
+
+		when(taskService.create(any(CreateTaskRequest.class))).thenReturn(savedTask);
+
+		String requestBody = """
+				{
+					"title": "Review employee performance",
+					"employeeId": 5
+				}
+				""";
+
+		mockMvc.perform(post("/api/tasks")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isCreated())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$.id").value(10))
+				.andExpect(jsonPath("$.title").value("Review employee performance"))
+				.andExpect(jsonPath("$.employeeId").value(5))
+				.andExpect(jsonPath("$.employeeName").value("John Doe"));
+	}
+
+	@Test
+	void createTask_withInvalidEmployeeId_returns400() throws Exception {
+		when(taskService.create(any(CreateTaskRequest.class)))
+				.thenThrow(new IllegalArgumentException("Employee not found with id: 999"));
+
+		String requestBody = """
+				{
+					"title": "Some task",
+					"employeeId": 999
+				}
+				""";
+
+		mockMvc.perform(post("/api/tasks")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Employee not found with id: 999"));
+	}
+
+	@Test
+	void getAllTasks_returnsTasksWithEmployeeFieldsPopulatedAndNull() throws Exception {
+		Employee employee = new Employee();
+		employee.setId(3L);
+		employee.setName("Jane Smith");
+		employee.setEmail("jane.smith@example.com");
+
+		Task taskWithEmployee = new Task();
+		taskWithEmployee.setId(1L);
+		taskWithEmployee.setTitle("Task with employee");
+		taskWithEmployee.setStatus(TaskStatus.OPEN);
+		taskWithEmployee.setEmployee(employee);
+		taskWithEmployee.setCreatedAt(Instant.now());
+
+		Task taskWithoutEmployee = new Task();
+		taskWithoutEmployee.setId(2L);
+		taskWithoutEmployee.setTitle("Task without employee");
+		taskWithoutEmployee.setStatus(TaskStatus.OPEN);
+		taskWithoutEmployee.setCreatedAt(Instant.now());
+
+		when(taskRepository.findAll()).thenReturn(List.of(taskWithEmployee, taskWithoutEmployee));
+
+		mockMvc.perform(get("/api/tasks"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.length()").value(2))
+				.andExpect(jsonPath("$[0].employeeId").value(3))
+				.andExpect(jsonPath("$[0].employeeName").value("Jane Smith"))
+				.andExpect(jsonPath("$[1].employeeId").doesNotExist())
+				.andExpect(jsonPath("$[1].employeeName").doesNotExist());
 	}
 }
