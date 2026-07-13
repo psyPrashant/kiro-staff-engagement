@@ -3,7 +3,6 @@ import { test, expect } from '@playwright/test';
 // This test requires a live backend (login, /api/employees, /api/interactions, /api/tasks).
 // In CI, the backend is started via Docker Compose before this runs.
 test.describe('Log Interaction - Full Flow', () => {
-
   test.beforeEach(async ({ page }) => {
     // Login with seeded test credentials
     await page.goto('/login');
@@ -12,7 +11,10 @@ test.describe('Log Interaction - Full Flow', () => {
     await page.getByTestId('login-submit-button').click();
 
     // Wait for redirect after successful login
-    await page.waitForURL(/(?!.*\/login)/);
+    // (a plain regex like /(?!.*\/login)/ is a no-op with .test() — it matches
+    // any string, including one that still contains "/login" — so this must
+    // be a predicate that actually inspects the resolved URL)
+    await page.waitForURL((url) => !url.pathname.startsWith('/login'));
   });
 
   test('should submit interaction with follow-up task and show success', async ({ page }) => {
