@@ -1,0 +1,13 @@
+<div class="status-filter" role="group" aria-label="Filter by engagement status">
+  @for (filter of filters; track filter.value) {
+    <button
+      type="button"
+      class="filter-btn"
+      [class.active]="activeFilter() === filter.value"
+      [attr.aria-pressed]="activeFilter() === filter.value"
+      (click)="onFilterSelect(filter.value)"
+    >
+      {{ filter.label }}
+    </button>
+  }
+</div>

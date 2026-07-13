@@ -10,7 +10,9 @@ export function notBlankValidator(control: AbstractControl): ValidationErrors | 
 
 export function futureDateValidator(control: AbstractControl): ValidationErrors | null {
   if (!control.value) return null;
-  const selected = new Date(control.value);
+  const parts = control.value.split('-');
+  const selected = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  selected.setHours(0, 0, 0, 0);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   if (selected < today) {

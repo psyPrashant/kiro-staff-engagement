@@ -1,0 +1,82 @@
+<section class="interaction-matrix" aria-label="Engagement Interaction Matrix">
+  <h2>Engagement Matrix</h2>
+
+  <div class="controls">
+    <app-status-filter [activeFilter]="activeFilter()" (filterChange)="onFilterChange($event)" />
+    <app-sort-control [activeSort]="activeSort()" (sortChange)="onSortChange($event)" />
+  </div>
+
+  <div class="matrix-content" [attr.aria-busy]="loading()">
+    @if (loading()) {
+      <div class="loading-indicator" role="status" aria-live="polite">
+        <span>Loading engagement data...</span>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="error-state" role="alert">
+        <p>{{ error() }}</p>
+        <button type="button" (click)="fetchMatrix()">Retry</button>
+      </div>
+    }
+
+    @if (!loading() && !error()) {
+      @if (entries().length === 0) {
+        <p class="empty-state">No engagement data available</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Status</th>
+                <th>Recency</th>
+                <th>Frequency</th>
+                <th>Last Interaction</th>
+                <th>Follow-Up</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of entries(); track entry.employeeId) {
+                <tr>
+                  <td>{{ entry.employeeName }}</td>
+                  <td>
+                    <span
+                      class="status-badge {{ getStatusClass(entry.engagementStatus) }}"
+                      [attr.aria-label]="getStatusLabel(entry.engagementStatus)"
+                    >
+                      {{ entry.engagementStatus }}
+                    </span>
+                  </td>
+                  <td>{{ formatRecency(entry.recency) }}</td>
+                  <td>{{ entry.frequency }}</td>
+                  <td>{{ formatDate(entry.lastInteractionDate) }}</td>
+                  <td>
+                    @if (entry.followUpRequired) {
+                      <span class="follow-up-indicator" aria-label="Follow-up required">⚠</span>
+                    }
+                  </td>
+                  <td class="actions-cell">
+                    <a [routerLink]="['/employee', entry.employeeId]" class="action-link">
+                      View Profile
+                    </a>
+                    <a
+                      [routerLink]="['/interaction']"
+                      [queryParams]="{ employeeId: entry.employeeId }"
+                      class="action-link"
+                    >
+                      Log Interaction
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  <app-follow-up-section [entries]="followUpEntries()" />
+</section>

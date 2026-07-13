@@ -1,0 +1,34 @@
+<section class="follow-up-panel" aria-labelledby="follow-up-heading">
+  <h3 id="follow-up-heading">Suggested Follow-Ups</h3>
+
+  @if (entries().length === 0) {
+    <p class="empty-message">No follow-ups needed at this time</p>
+  } @else {
+    <ul class="follow-up-list">
+      @for (entry of entries(); track entry.employeeId) {
+        <li class="follow-up-item">
+          <div class="entry-info">
+            <span class="employee-name">{{ entry.employeeName }}</span>
+            <span
+              class="status-badge {{ getStatusClass(entry.engagementStatus) }}"
+              [attr.aria-label]="getStatusLabel(entry.engagementStatus)"
+            >
+              {{ entry.engagementStatus }}
+            </span>
+            <span class="recency">{{ formatRecency(entry.recency) }}</span>
+          </div>
+          <div class="entry-actions">
+            <a [routerLink]="['/employee', entry.employeeId]" class="action-link"> View Profile </a>
+            <a
+              [routerLink]="['/interaction']"
+              [queryParams]="{ employeeId: entry.employeeId }"
+              class="action-link"
+            >
+              Log Interaction
+            </a>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

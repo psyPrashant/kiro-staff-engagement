@@ -1,0 +1,39 @@
+.sort-control {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sort-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.sort-button:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.sort-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.sort-button.active {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.sort-button.active:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
