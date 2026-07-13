@@ -68,6 +68,14 @@
                     >
                       Log Interaction
                     </a>
+                    <button
+                      type="button"
+                      data-testid="schedule-next-btn"
+                      class="action-link"
+                      (click)="navigateToSchedule(entry.employeeId)"
+                    >
+                      Schedule Next
+                    </button>
                   </td>
                 </tr>
               }
