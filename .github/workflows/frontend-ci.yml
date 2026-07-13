@@ -22,10 +22,11 @@
 # │   satisfies the required status check (skipped = success).           │
 # │                                                                      │
 # │ Informational jobs (NOT required status checks):                     │
-# │ - "test" — runs Vitest with coverage; not required to avoid          │
-# │   blocking when coverage tooling isn't fully configured.             │
-# │ - "e2e" — runs Playwright e2e tests; not required to avoid           │
-# │   blocking when Playwright isn't installed.                          │
+# │ - "test" — runs Vitest unit tests with coverage; failures here      │
+# │   indicate broken test code, not necessarily broken production code. │
+# │ - "e2e" — runs Playwright e2e tests with a full backend stack       │
+# │   (Postgres + Spring Boot via Docker Compose). Not required to      │
+# │   avoid blocking when Docker build is slow or flaky.                │
 # │                                                                      │
 # │ Note: The backend workflow uses "build" as its required check.       │
 # │ Both "build" and "lint-build" should be added as required checks.    │
@@ -146,13 +147,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          cache-dependency-path: 'staff-engagement-frontend/package-lock.json'
-
       - name: Check for Playwright
         id: check-playwright
         working-directory: staff-engagement-frontend
@@ -163,6 +157,30 @@ jobs:
             echo "playwright=false" >> $GITHUB_OUTPUT
             echo "ℹ️ @playwright/test not found in package.json — skipping e2e tests."
           fi
+
+      - name: Set up Java 21
+        if: steps.check-playwright.outputs.playwright == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Start backend stack (Postgres + API)
+        if: steps.check-playwright.outputs.playwright == 'true'
+        run: |
+          docker compose up -d database backend
+          echo "Waiting for backend to be healthy..."
+          timeout 120 bash -c 'until curl -sf http://localhost:8080/actuator/health; do sleep 5; done'
+          echo "Backend is healthy."
+
+      - name: Set up Node.js
+        if: steps.check-playwright.outputs.playwright == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: 'staff-engagement-frontend/package-lock.json'
 
       - name: Install dependencies
         if: steps.check-playwright.outputs.playwright == 'true'
@@ -178,6 +196,8 @@ jobs:
         if: steps.check-playwright.outputs.playwright == 'true'
         working-directory: staff-engagement-frontend
         run: npx playwright test
+        env:
+          CI: true
 
       - name: Upload Playwright report
         if: steps.check-playwright.outputs.playwright == 'true' && always()
@@ -187,3 +207,7 @@ jobs:
           path: staff-engagement-frontend/playwright-report/
           retention-days: 14
           if-no-files-found: ignore
+
+      - name: Stop backend stack
+        if: always()
+        run: docker compose down -v
