@@ -8,6 +8,7 @@ public record CreateTaskRequest(
 	@NotBlank @Size(max = 255) String title,
 	@Size(max = 2000) String description,
 	Long interactionId,
+	Long employeeId,
 	LocalDate dueDate,
 	Long assignedUserId
 ) {}

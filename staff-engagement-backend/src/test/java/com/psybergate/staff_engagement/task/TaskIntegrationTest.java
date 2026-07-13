@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for Task creation via POST /api/tasks.
  *
- * Validates: Requirements 2.1, 2.4, 2.6
+ * Validates: Requirements 1.5, 2.1, 2.4, 2.6, 3.2, 4.1, 5.1, 5.3
  */
 class TaskIntegrationTest extends BaseIntegrationTest {
 
@@ -115,7 +115,64 @@ class TaskIntegrationTest extends BaseIntegrationTest {
 		assertThat(body).isNotNull();
 
 		assertThat((Object) JsonPath.read(body, "$.id")).isNotNull();
-		assertThat((Integer) JsonPath.read(body, "$.interaction.id")).isEqualTo(interactionId);
+		assertThat((Integer) JsonPath.read(body, "$.interactionId")).isEqualTo(interactionId);
+	}
+
+	@Test
+	void createTask_withEmployeeId_returns201WithEmployeeFields() {
+		// Get an employee to link
+		ResponseEntity<String> employeesResponse = getWithAuth("/api/employees");
+		assertThat(employeesResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		Integer employeeId = JsonPath.read(employeesResponse.getBody(), "$[0].id");
+		String employeeName = JsonPath.read(employeesResponse.getBody(), "$[0].name");
+
+		// Create a task linked directly to the employee
+		String taskBody = """
+				{
+					"title": "Task linked to employee",
+					"employeeId": %d
+				}
+				""".formatted(employeeId);
+
+		ResponseEntity<String> response = postWithAuth("/api/tasks", taskBody);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		String body = response.getBody();
+		assertThat(body).isNotNull();
+
+		assertThat((Object) JsonPath.read(body, "$.id")).isNotNull();
+		assertThat((Integer) JsonPath.read(body, "$.employeeId")).isEqualTo(employeeId);
+		assertThat((String) JsonPath.read(body, "$.employeeName")).isEqualTo(employeeName);
+		assertThat((String) JsonPath.read(body, "$.status")).isEqualTo("OPEN");
+	}
+
+	@Test
+	void getTasks_taskWithoutEmployeeId_hasNullEmployeeFields() {
+		// Create a task without employeeId
+		String taskBody = """
+				{
+					"title": "Task without employee"
+				}
+				""";
+
+		ResponseEntity<String> createResponse = postWithAuth("/api/tasks", taskBody);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		Integer createdTaskId = JsonPath.read(createResponse.getBody(), "$.id");
+
+		// GET all tasks and find the one we just created
+		ResponseEntity<String> getResponse = getWithAuth("/api/tasks");
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		String body = getResponse.getBody();
+		assertThat(body).isNotNull();
+
+		List<Integer> ids = JsonPath.read(body, "$[*].id");
+		int taskIndex = ids.indexOf(createdTaskId);
+		assertThat(taskIndex).isGreaterThanOrEqualTo(0);
+
+		Object employeeId = JsonPath.read(body, "$[" + taskIndex + "].employeeId");
+		Object employeeName = JsonPath.read(body, "$[" + taskIndex + "].employeeName");
+		assertThat(employeeId).isNull();
+		assertThat(employeeName).isNull();
 	}
 
 	@Test
