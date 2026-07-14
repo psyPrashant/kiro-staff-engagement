@@ -54,6 +54,19 @@ class TaskIntegrationTest extends BaseIntegrationTest {
 		return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(jsonBody, headers), String.class);
 	}
 
+	private ResponseEntity<String> putWithAuth(String url, String jsonBody) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(HttpHeaders.COOKIE, sessionCookie);
+		return restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(jsonBody, headers), String.class);
+	}
+
+	private ResponseEntity<String> deleteWithAuth(String url) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.COOKIE, sessionCookie);
+		return restTemplate.exchange(url, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
+	}
+
 	@Test
 	void createTask_validRequest_returns201WithStatusOpen() {
 		String requestBody = """
@@ -190,5 +203,149 @@ class TaskIntegrationTest extends BaseIntegrationTest {
 		String body = response.getBody();
 		assertThat(body).isNotNull();
 		assertThat((String) JsonPath.read(body, "$.message")).contains("Interaction not found");
+	}
+
+	// --- PUT /api/tasks/{id} ---
+
+	@Test
+	void updateTask_validRequest_updatesAndPersistsFields() {
+		// Create a task
+		String createBody = """
+				{
+					"title": "Original title",
+					"description": "Original description"
+				}
+				""";
+		ResponseEntity<String> createResponse = postWithAuth("/api/tasks", createBody);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		Integer taskId = JsonPath.read(createResponse.getBody(), "$.id");
+
+		// Update title/description/dueDate/status
+		String updateBody = """
+				{
+					"title": "Updated title",
+					"description": "Updated description",
+					"dueDate": "2025-09-30",
+					"status": "DONE"
+				}
+				""";
+		ResponseEntity<String> updateResponse = putWithAuth("/api/tasks/" + taskId, updateBody);
+
+		assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		String updateBodyResp = updateResponse.getBody();
+		assertThat(updateBodyResp).isNotNull();
+		assertThat((String) JsonPath.read(updateBodyResp, "$.title")).isEqualTo("Updated title");
+		assertThat((String) JsonPath.read(updateBodyResp, "$.description")).isEqualTo("Updated description");
+		assertThat((String) JsonPath.read(updateBodyResp, "$.dueDate")).isEqualTo("2025-09-30");
+		assertThat((String) JsonPath.read(updateBodyResp, "$.status")).isEqualTo("DONE");
+
+		// GET all tasks and verify persisted state
+		ResponseEntity<String> getResponse = getWithAuth("/api/tasks");
+		String getBody = getResponse.getBody();
+		List<Integer> ids = JsonPath.read(getBody, "$[*].id");
+		int idx = ids.indexOf(taskId);
+		assertThat(idx).isGreaterThanOrEqualTo(0);
+		assertThat((String) JsonPath.read(getBody, "$[" + idx + "].title")).isEqualTo("Updated title");
+		assertThat((String) JsonPath.read(getBody, "$[" + idx + "].status")).isEqualTo("DONE");
+	}
+
+	@Test
+	void updateTask_nullEmployeeId_clearsEmployeeAssociation() {
+		// Get an employee and create a task linked to it
+		ResponseEntity<String> employeesResponse = getWithAuth("/api/employees");
+		Integer employeeId = JsonPath.read(employeesResponse.getBody(), "$[0].id");
+
+		String createBody = """
+				{
+					"title": "Task with employee",
+					"employeeId": %d
+				}
+				""".formatted(employeeId);
+		ResponseEntity<String> createResponse = postWithAuth("/api/tasks", createBody);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		Integer taskId = JsonPath.read(createResponse.getBody(), "$.id");
+		assertThat((Integer) JsonPath.read(createResponse.getBody(), "$.employeeId")).isEqualTo(employeeId);
+
+		// Update without employeeId -> association cleared
+		String updateBody = """
+				{
+					"title": "Task with employee"
+				}
+				""";
+		ResponseEntity<String> updateResponse = putWithAuth("/api/tasks/" + taskId, updateBody);
+		assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat((Object) JsonPath.read(updateResponse.getBody(), "$.employeeId")).isNull();
+		assertThat((Object) JsonPath.read(updateResponse.getBody(), "$.employeeName")).isNull();
+
+		// GET verifies the cleared association is persisted
+		ResponseEntity<String> getResponse = getWithAuth("/api/tasks");
+		String getBody = getResponse.getBody();
+		List<Integer> ids = JsonPath.read(getBody, "$[*].id");
+		int idx = ids.indexOf(taskId);
+		assertThat((Object) JsonPath.read(getBody, "$[" + idx + "].employeeId")).isNull();
+	}
+
+	@Test
+	void updateTask_nonExistentId_returns404() {
+		String updateBody = """
+				{
+					"title": "Does not matter"
+				}
+				""";
+		ResponseEntity<String> response = putWithAuth("/api/tasks/999999", updateBody);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat((String) JsonPath.read(response.getBody(), "$.message")).contains("Task not found");
+	}
+
+	@Test
+	void updateTask_blankTitle_returns400() {
+		String createBody = """
+				{
+					"title": "A task to update"
+				}
+				""";
+		ResponseEntity<String> createResponse = postWithAuth("/api/tasks", createBody);
+		Integer taskId = JsonPath.read(createResponse.getBody(), "$.id");
+
+		String updateBody = """
+				{
+					"title": ""
+				}
+				""";
+		ResponseEntity<String> response = putWithAuth("/api/tasks/" + taskId, updateBody);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat((Object) JsonPath.read(response.getBody(), "$.fieldErrors.title")).isNotNull();
+	}
+
+	// --- DELETE /api/tasks/{id} ---
+
+	@Test
+	void deleteTask_existingTask_removesTask() {
+		String createBody = """
+				{
+					"title": "Task to delete"
+				}
+				""";
+		ResponseEntity<String> createResponse = postWithAuth("/api/tasks", createBody);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		Integer taskId = JsonPath.read(createResponse.getBody(), "$.id");
+
+		ResponseEntity<String> deleteResponse = deleteWithAuth("/api/tasks/" + taskId);
+		assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+		// GET no longer includes the deleted task
+		ResponseEntity<String> getResponse = getWithAuth("/api/tasks");
+		List<Integer> ids = JsonPath.read(getResponse.getBody(), "$[*].id");
+		assertThat(ids).doesNotContain(taskId);
+	}
+
+	@Test
+	void deleteTask_nonExistentId_returns404() {
+		ResponseEntity<String> response = deleteWithAuth("/api/tasks/999999");
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat((String) JsonPath.read(response.getBody(), "$.message")).contains("Task not found");
 	}
 }

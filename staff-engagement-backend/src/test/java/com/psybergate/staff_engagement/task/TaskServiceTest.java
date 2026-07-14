@@ -5,6 +5,7 @@ import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.Interaction;
 import com.psybergate.staff_engagement.interaction.InteractionRepository;
 import com.psybergate.staff_engagement.task.dto.CreateTaskRequest;
+import com.psybergate.staff_engagement.task.dto.UpdateTaskRequest;
 import com.psybergate.staff_engagement.user.User;
 import com.psybergate.staff_engagement.user.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -259,5 +260,193 @@ class TaskServiceTest {
 		assertEquals("Standalone", captured.getTitle());
 		assertEquals(LocalDate.of(2025, 6, 1), captured.getDueDate());
 		assertEquals(TaskStatus.OPEN, captured.getStatus());
+	}
+
+	// --- update() ---
+
+	@Test
+	void update_taskNotFound_throwsTaskNotFoundExceptionAndDoesNotSave() {
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Updated title", "desc", null, null, null, null, null);
+
+		when(taskRepository.findById(999L)).thenReturn(Optional.empty());
+
+		TaskNotFoundException ex = assertThrows(TaskNotFoundException.class,
+				() -> taskService.update(999L, request));
+
+		assertTrue(ex.getMessage().contains("999"));
+		verify(taskRepository, never()).save(any());
+	}
+
+	@Test
+	void update_nonExistentAssignedUserId_throwsIllegalArgumentAndDoesNotSave() {
+		Task existing = new Task();
+		existing.setId(1L);
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Updated title", "desc", null, null, null, 999L, null);
+
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+				() -> taskService.update(1L, request));
+
+		assertTrue(ex.getMessage().contains("User not found"));
+		verify(taskRepository, never()).save(any());
+	}
+
+	@Test
+	void update_nonExistentEmployeeId_throwsIllegalArgumentAndDoesNotSave() {
+		Task existing = new Task();
+		existing.setId(1L);
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(employeeRepository.findById(999L)).thenReturn(Optional.empty());
+
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Updated title", "desc", null, 999L, null, null, null);
+
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+				() -> taskService.update(1L, request));
+
+		assertTrue(ex.getMessage().contains("Employee not found"));
+		verify(taskRepository, never()).save(any());
+	}
+
+	@Test
+	void update_nonExistentInteractionId_throwsIllegalArgumentAndDoesNotSave() {
+		Task existing = new Task();
+		existing.setId(1L);
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(interactionRepository.findById(999L)).thenReturn(Optional.empty());
+
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Updated title", "desc", 999L, null, null, null, null);
+
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+				() -> taskService.update(1L, request));
+
+		assertTrue(ex.getMessage().contains("Interaction not found"));
+		verify(taskRepository, never()).save(any());
+	}
+
+	@Test
+	void update_validRequest_persistsFieldsAndReplacesAssociations() {
+		Employee priorEmployee = new Employee();
+		priorEmployee.setId(3L);
+		priorEmployee.setName("Prior Employee");
+
+		Task existing = new Task();
+		existing.setId(1L);
+		existing.setTitle("Old title");
+		existing.setDescription("Old description");
+		existing.setStatus(TaskStatus.OPEN);
+		existing.setEmployee(priorEmployee);
+
+		Employee newEmployee = new Employee();
+		newEmployee.setId(5L);
+		newEmployee.setName("New Employee");
+
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(employeeRepository.findById(5L)).thenReturn(Optional.of(newEmployee));
+		when(taskRepository.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		LocalDate dueDate = LocalDate.of(2025, 3, 20);
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"New title", "New description", null, 5L, dueDate, null, null);
+
+		Task result = taskService.update(1L, request);
+
+		assertEquals("New title", result.getTitle());
+		assertEquals("New description", result.getDescription());
+		assertEquals(dueDate, result.getDueDate());
+		assertNotNull(result.getEmployee());
+		assertEquals(5L, result.getEmployee().getId());
+		// interaction/assignedUser were null in request -> cleared
+		assertNull(result.getInteraction());
+		assertNull(result.getAssignedUser());
+	}
+
+	@Test
+	void update_nullAssociationIds_clearsPreviouslySetAssociations() {
+		Employee priorEmployee = new Employee();
+		priorEmployee.setId(3L);
+		User priorUser = new User();
+		priorUser.setId(4L);
+
+		Task existing = new Task();
+		existing.setId(1L);
+		existing.setEmployee(priorEmployee);
+		existing.setAssignedUser(priorUser);
+		existing.setStatus(TaskStatus.OPEN);
+
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(taskRepository.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Title", null, null, null, null, null, null);
+
+		Task result = taskService.update(1L, request);
+
+		assertNull(result.getEmployee());
+		assertNull(result.getAssignedUser());
+		assertNull(result.getInteraction());
+	}
+
+	@Test
+	void update_omittedStatus_retainsCurrentStatus() {
+		Task existing = new Task();
+		existing.setId(1L);
+		existing.setStatus(TaskStatus.DONE);
+
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(taskRepository.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Title", null, null, null, null, null, null);
+
+		Task result = taskService.update(1L, request);
+
+		assertEquals(TaskStatus.DONE, result.getStatus());
+	}
+
+	@Test
+	void update_explicitStatus_overwritesCurrentStatus() {
+		Task existing = new Task();
+		existing.setId(1L);
+		existing.setStatus(TaskStatus.OPEN);
+
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+		when(taskRepository.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		UpdateTaskRequest request = new UpdateTaskRequest(
+				"Title", null, null, null, null, null, TaskStatus.DONE);
+
+		Task result = taskService.update(1L, request);
+
+		assertEquals(TaskStatus.DONE, result.getStatus());
+	}
+
+	// --- delete() ---
+
+	@Test
+	void delete_taskNotFound_throwsTaskNotFoundException() {
+		when(taskRepository.findById(999L)).thenReturn(Optional.empty());
+
+		TaskNotFoundException ex = assertThrows(TaskNotFoundException.class,
+				() -> taskService.delete(999L));
+
+		assertTrue(ex.getMessage().contains("999"));
+		verify(taskRepository, never()).delete(any());
+	}
+
+	@Test
+	void delete_existingTask_callsRepositoryDelete() {
+		Task existing = new Task();
+		existing.setId(1L);
+		when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+		taskService.delete(1L);
+
+		verify(taskRepository).delete(existing);
 	}
 }

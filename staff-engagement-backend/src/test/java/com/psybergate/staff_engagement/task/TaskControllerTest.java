@@ -4,6 +4,7 @@ import com.psybergate.staff_engagement.common.exception.GlobalExceptionHandler;
 import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.task.dto.CreateTaskRequest;
 import com.psybergate.staff_engagement.task.dto.TaskResponse;
+import com.psybergate.staff_engagement.task.dto.UpdateTaskRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,10 +19,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
@@ -232,5 +240,109 @@ class TaskControllerTest {
 				.andExpect(jsonPath("$[0].employeeName").value("Jane Smith"))
 				.andExpect(jsonPath("$[1].employeeId").doesNotExist())
 				.andExpect(jsonPath("$[1].employeeName").doesNotExist());
+	}
+
+	// --- PUT /api/tasks/{id} ---
+
+	@Test
+	void updateTask_validRequest_returns200WithBody() throws Exception {
+		Task updatedTask = new Task();
+		updatedTask.setId(7L);
+		updatedTask.setTitle("Updated title");
+		updatedTask.setStatus(TaskStatus.DONE);
+		updatedTask.setCreatedAt(Instant.now());
+
+		when(taskService.update(eq(7L), any(UpdateTaskRequest.class))).thenReturn(updatedTask);
+
+		String requestBody = """
+				{
+					"title": "Updated title",
+					"status": "DONE"
+				}
+				""";
+
+		mockMvc.perform(put("/api/tasks/7")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$.id").value(7))
+				.andExpect(jsonPath("$.title").value("Updated title"))
+				.andExpect(jsonPath("$.status").value("DONE"));
+	}
+
+	@Test
+	void updateTask_blankTitle_returns400WithFieldErrors() throws Exception {
+		String requestBody = """
+				{
+					"title": ""
+				}
+				""";
+
+		mockMvc.perform(put("/api/tasks/7")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Validation failed"))
+				.andExpect(jsonPath("$.fieldErrors.title").exists());
+	}
+
+	@Test
+	void updateTask_taskNotFound_returns404WithMessage() throws Exception {
+		when(taskService.update(eq(999L), any(UpdateTaskRequest.class)))
+				.thenThrow(new TaskNotFoundException(999L));
+
+		String requestBody = """
+				{
+					"title": "Updated title"
+				}
+				""";
+
+		mockMvc.perform(put("/api/tasks/999")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("Task not found with id: 999"));
+	}
+
+	@Test
+	void updateTask_invalidStatusValue_returns400() throws Exception {
+		String requestBody = """
+				{
+					"title": "Updated title",
+					"status": "CANCELLED"
+				}
+				""";
+
+		mockMvc.perform(put("/api/tasks/7")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest());
+	}
+
+	// --- DELETE /api/tasks/{id} ---
+
+	@Test
+	void deleteTask_existingTask_returns204NoBody() throws Exception {
+		doNothing().when(taskService).delete(7L);
+
+		mockMvc.perform(delete("/api/tasks/7").with(csrf()))
+				.andExpect(status().isNoContent())
+				.andExpect(content().string(""));
+
+		verify(taskService).delete(7L);
+	}
+
+	@Test
+	void deleteTask_taskNotFound_returns404WithMessage() throws Exception {
+		doThrow(new TaskNotFoundException(999L)).when(taskService).delete(anyLong());
+
+		mockMvc.perform(delete("/api/tasks/999").with(csrf()))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("Task not found with id: 999"));
 	}
 }
