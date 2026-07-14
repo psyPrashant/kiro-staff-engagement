@@ -1,20 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 // This test requires a live backend (login, /api/employees, /api/interactions, /api/tasks).
-// Skip in CI where only the frontend dev server is available.
+// In CI, the backend is started via Docker Compose before this runs.
 test.describe('Log Interaction - Full Flow', () => {
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(!!process.env['CI'], 'Requires a live backend — skipped in CI');
-
   test.beforeEach(async ({ page }) => {
-    // Login with seeded test credentials
+    // Login with seeded test credentials (see SeedDataLoader)
     await page.goto('/login');
-    await page.getByTestId('login-email-input').fill('admin@example.com');
-    await page.getByTestId('login-password-input').fill('password123');
+    await page.getByTestId('login-email-input').fill('alice.johnson@psybergate.com');
+    await page.getByTestId('login-password-input').fill('Password1');
     await page.getByTestId('login-submit-button').click();
 
     // Wait for redirect after successful login
-    await page.waitForURL(/(?!.*\/login)/);
+    // (a plain regex like /(?!.*\/login)/ is a no-op with .test() — it matches
+    // any string, including one that still contains "/login" — so this must
+    // be a predicate that actually inspects the resolved URL)
+    await page.waitForURL((url) => !url.pathname.startsWith('/login'));
   });
 
   test('should submit interaction with follow-up task and show success', async ({ page }) => {
