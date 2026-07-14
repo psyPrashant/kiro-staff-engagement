@@ -18,6 +18,8 @@ export class AuthService {
       .pipe(tap((user) => this.currentUser.set(user)));
   }
 
+  // Rehydrates currentUser from the backend session (e.g. JSESSIONID cookie)
+  // on app bootstrap, since currentUser is otherwise reset by any hard navigation.
   rehydrate(): Observable<User | null> {
     return this.http.get<User>('/api/auth/me').pipe(
       tap((user) => this.currentUser.set(user)),
