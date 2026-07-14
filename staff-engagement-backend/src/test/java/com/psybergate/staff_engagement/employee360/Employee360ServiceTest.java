@@ -7,6 +7,7 @@ import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.Interaction;
 import com.psybergate.staff_engagement.interaction.InteractionRepository;
 import com.psybergate.staff_engagement.interaction.InteractionType;
+import com.psybergate.staff_engagement.scheduling.NextScheduledInteractionService;
 import com.psybergate.staff_engagement.task.Task;
 import com.psybergate.staff_engagement.task.TaskRepository;
 import com.psybergate.staff_engagement.task.TaskStatus;
@@ -37,6 +38,9 @@ class Employee360ServiceTest {
 
 	@Mock
 	private TaskRepository taskRepository;
+
+	@Mock
+	private NextScheduledInteractionService nextScheduledInteractionService;
 
 	@InjectMocks
 	private Employee360Service employee360Service;

@@ -80,11 +80,11 @@ class RestControllerIntegrationTest extends BaseIntegrationTest {
 		List<?> employees = JsonPath.read(body, "$");
 		assertThat(employees).hasSizeGreaterThanOrEqualTo(5);
 
-		// Verify JSON structure contains expected fields
+		// Verify JSON structure contains expected EmployeeListDto fields
 		assertThat((String) JsonPath.read(body, "$[0].name")).isNotBlank();
 		assertThat((String) JsonPath.read(body, "$[0].email")).contains("@");
 		assertThat((Object) JsonPath.read(body, "$[0].id")).isNotNull();
-		assertThat((Object) JsonPath.read(body, "$[0].createdAt")).isNotNull();
+		assertThat((String) JsonPath.read(body, "$[0].jobTitle")).isNotBlank();
 	}
 
 	@Test

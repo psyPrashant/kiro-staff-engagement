@@ -1,9 +1,12 @@
 package com.psybergate.staff_engagement.employee360;
 
+import com.psybergate.staff_engagement.scheduling.NextScheduledDto;
+
 import java.util.List;
 
 public record Employee360Response(
 	ProfileDto profile,
 	List<InteractionDto> interactions,
-	List<TaskDto> openTasks
+	List<TaskDto> openTasks,
+	NextScheduledDto nextScheduled
 ) {}

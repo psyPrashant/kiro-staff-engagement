@@ -5,6 +5,8 @@ import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.Interaction;
 import com.psybergate.staff_engagement.interaction.InteractionRepository;
+import com.psybergate.staff_engagement.scheduling.NextScheduledDto;
+import com.psybergate.staff_engagement.scheduling.NextScheduledInteractionService;
 import com.psybergate.staff_engagement.task.Task;
 import com.psybergate.staff_engagement.task.TaskRepository;
 import com.psybergate.staff_engagement.task.TaskStatus;
@@ -21,6 +23,7 @@ public class Employee360Service {
 	private final EmployeeRepository employeeRepository;
 	private final InteractionRepository interactionRepository;
 	private final TaskRepository taskRepository;
+	private final NextScheduledInteractionService nextScheduledInteractionService;
 
 	@Transactional(readOnly = true)
 	public Employee360Response getEmployee360(Long employeeId) {
@@ -37,10 +40,12 @@ public class Employee360Service {
 			? List.of()
 			: taskRepository.findByInteractionIdInAndStatus(interactionIds, TaskStatus.OPEN);
 
-		return buildResponse(employee, interactions, openTasks);
+		NextScheduledDto nextScheduled = nextScheduledInteractionService.getNextScheduled(employeeId);
+
+		return buildResponse(employee, interactions, openTasks, nextScheduled);
 	}
 
-	private Employee360Response buildResponse(Employee employee, List<Interaction> interactions, List<Task> openTasks) {
+	private Employee360Response buildResponse(Employee employee, List<Interaction> interactions, List<Task> openTasks, NextScheduledDto nextScheduled) {
 		ProfileDto profile = mapProfile(employee);
 		List<InteractionDto> interactionDtos = interactions.stream()
 			.map(this::mapInteraction)
@@ -49,7 +54,7 @@ public class Employee360Service {
 			.map(this::mapTask)
 			.toList();
 
-		return new Employee360Response(profile, interactionDtos, taskDtos);
+		return new Employee360Response(profile, interactionDtos, taskDtos, nextScheduled);
 	}
 
 	private ProfileDto mapProfile(Employee employee) {

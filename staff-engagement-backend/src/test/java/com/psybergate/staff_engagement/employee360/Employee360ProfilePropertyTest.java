@@ -3,6 +3,7 @@ package com.psybergate.staff_engagement.employee360;
 import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.InteractionRepository;
+import com.psybergate.staff_engagement.scheduling.NextScheduledInteractionService;
 import com.psybergate.staff_engagement.task.TaskRepository;
 import net.jqwik.api.*;
 import org.mockito.Mockito;
@@ -25,8 +26,9 @@ class Employee360ProfilePropertyTest {
 	private final EmployeeRepository employeeRepository = Mockito.mock(EmployeeRepository.class);
 	private final InteractionRepository interactionRepository = Mockito.mock(InteractionRepository.class);
 	private final TaskRepository taskRepository = Mockito.mock(TaskRepository.class);
+	private final NextScheduledInteractionService nextScheduledInteractionService = Mockito.mock(NextScheduledInteractionService.class);
 	private final Employee360Service employee360Service = new Employee360Service(
-		employeeRepository, interactionRepository, taskRepository
+		employeeRepository, interactionRepository, taskRepository, nextScheduledInteractionService
 	);
 
 	/**

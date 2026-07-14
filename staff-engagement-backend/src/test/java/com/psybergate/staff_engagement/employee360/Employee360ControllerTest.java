@@ -30,7 +30,8 @@ class Employee360ControllerTest {
 		Employee360Response response = new Employee360Response(
 			new ProfileDto(1L, "John Doe", "john@example.com", "Engineer", "Jane Manager"),
 			List.of(new InteractionDto(10L, "CHECK_IN", Instant.parse("2024-12-15T10:00:00Z"), "Jane", "Notes", null)),
-			List.of(new TaskDto(20L, "Task title", LocalDate.of(2025, 6, 15), "John"))
+			List.of(new TaskDto(20L, "Task title", LocalDate.of(2025, 6, 15), "John")),
+			null
 		);
 
 		when(employee360Service.getEmployee360(1L)).thenReturn(response);

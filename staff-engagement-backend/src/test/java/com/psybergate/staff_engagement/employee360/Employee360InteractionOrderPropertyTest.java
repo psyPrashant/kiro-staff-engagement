@@ -5,6 +5,7 @@ import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.Interaction;
 import com.psybergate.staff_engagement.interaction.InteractionRepository;
 import com.psybergate.staff_engagement.interaction.InteractionType;
+import com.psybergate.staff_engagement.scheduling.NextScheduledInteractionService;
 import com.psybergate.staff_engagement.task.TaskRepository;
 import com.psybergate.staff_engagement.user.User;
 import net.jqwik.api.*;
@@ -36,7 +37,8 @@ class Employee360InteractionOrderPropertyTest {
 	private final EmployeeRepository employeeRepository = Mockito.mock(EmployeeRepository.class);
 	private final InteractionRepository interactionRepository = Mockito.mock(InteractionRepository.class);
 	private final TaskRepository taskRepository = Mockito.mock(TaskRepository.class);
-	private final Employee360Service service = new Employee360Service(employeeRepository, interactionRepository, taskRepository);
+	private final NextScheduledInteractionService nextScheduledInteractionService = Mockito.mock(NextScheduledInteractionService.class);
+	private final Employee360Service service = new Employee360Service(employeeRepository, interactionRepository, taskRepository, nextScheduledInteractionService);
 
 	@Property(tries = 100)
 	@Tag("Feature: employee-360-view, Property 2: Interaction ordering is descending by occurredAt")
