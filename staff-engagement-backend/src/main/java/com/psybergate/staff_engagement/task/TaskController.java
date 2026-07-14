@@ -6,8 +6,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.psybergate.staff_engagement.task.dto.UpdateTaskRequest;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +35,17 @@ public class TaskController {
 	public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid CreateTaskRequest request) {
 		Task savedTask = taskService.create(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponse.from(savedTask));
+	}
+
+	@PutMapping("/api/tasks/{id}")
+	public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody @Valid UpdateTaskRequest request) {
+		Task updatedTask = taskService.update(id, request);
+		return ResponseEntity.ok(TaskResponse.from(updatedTask));
+	}
+
+	@DeleteMapping("/api/tasks/{id}")
+	public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+		taskService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 }
