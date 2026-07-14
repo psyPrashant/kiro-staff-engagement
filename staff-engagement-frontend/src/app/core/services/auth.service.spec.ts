@@ -112,6 +112,83 @@ describe('AuthService', () => {
     });
   });
 
+  describe('rehydrate', () => {
+    it('should send GET to /api/auth/me', () => {
+      service.rehydrate().subscribe();
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      expect(req.request.method).toBe('GET');
+      req.flush({ id: 1, name: 'Test', email: 'test@example.com' });
+    });
+
+    it('should set currentUser and emit the user on HTTP 200', () => {
+      const mockUser: User = { id: 42, name: 'Jane Doe', email: 'jane@example.com' };
+      let emitted: User | null = undefined as unknown as User | null;
+
+      service.rehydrate().subscribe((user) => (emitted = user));
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      req.flush(mockUser);
+
+      expect(service.currentUser()).toEqual(mockUser);
+      expect(emitted).toEqual(mockUser);
+    });
+
+    it('should set currentUser to null and emit null on HTTP 401 without throwing', () => {
+      service.currentUser.set({ id: 1, name: 'Test', email: 'test@example.com' });
+      let emitted: User | null = undefined as unknown as User | null;
+      let errored = false;
+
+      service.rehydrate().subscribe({
+        next: (user) => (emitted = user),
+        error: () => (errored = true),
+      });
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+      expect(service.currentUser()).toBeNull();
+      expect(emitted).toBeNull();
+      expect(errored).toBe(false);
+    });
+
+    it('should set currentUser to null and emit null on a network error without throwing', () => {
+      service.currentUser.set({ id: 1, name: 'Test', email: 'test@example.com' });
+      let emitted: User | null = undefined as unknown as User | null;
+      let errored = false;
+
+      service.rehydrate().subscribe({
+        next: (user) => (emitted = user),
+        error: () => (errored = true),
+      });
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      req.error(new ProgressEvent('error'));
+
+      expect(service.currentUser()).toBeNull();
+      expect(emitted).toBeNull();
+      expect(errored).toBe(false);
+    });
+
+    it('should set currentUser to null and emit null on other HTTP errors without throwing', () => {
+      service.currentUser.set({ id: 1, name: 'Test', email: 'test@example.com' });
+      let emitted: User | null = undefined as unknown as User | null;
+      let errored = false;
+
+      service.rehydrate().subscribe({
+        next: (user) => (emitted = user),
+        error: () => (errored = true),
+      });
+
+      const req = httpTesting.expectOne('/api/auth/me');
+      req.flush({ message: 'Server Error' }, { status: 500, statusText: 'Internal Server Error' });
+
+      expect(service.currentUser()).toBeNull();
+      expect(emitted).toBeNull();
+      expect(errored).toBe(false);
+    });
+  });
+
   describe('logout', () => {
     it('should send POST to /api/auth/logout', () => {
       service.currentUser.set({ id: 1, name: 'Test', email: 'test@example.com' });

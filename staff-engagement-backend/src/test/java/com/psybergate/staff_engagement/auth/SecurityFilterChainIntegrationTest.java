@@ -43,6 +43,25 @@ class SecurityFilterChainIntegrationTest extends BaseIntegrationTest {
 	}
 
 	@Test
+	void unauthenticatedAccessToAuthMeReturns401WithJson() throws Exception {
+		// Confirms .requestMatchers("/api/**").authenticated() already covers
+		// GET /api/auth/me — no explicit matcher is required for it.
+		mockMvc.perform(get("/api/auth/me")
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isUnauthorized())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+			.andExpect(jsonPath("$.error").value("Authentication required"));
+	}
+
+	@Test
+	void authenticatedAccessToAuthMeSucceeds() throws Exception {
+		mockMvc.perform(get("/api/auth/me")
+				.with(user("alice.johnson@psybergate.com"))
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+	}
+
+	@Test
 	void unauthenticatedAccessToActuatorHealthSucceeds() throws Exception {
 		mockMvc.perform(get("/actuator/health")
 				.accept(MediaType.APPLICATION_JSON))

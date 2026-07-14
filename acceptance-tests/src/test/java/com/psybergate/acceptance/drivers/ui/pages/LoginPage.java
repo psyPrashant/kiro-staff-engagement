@@ -41,4 +41,8 @@ public class LoginPage extends BasePage {
 	public String getCurrentUrl() {
 		return page.url();
 	}
+
+	public void reload() {
+		page.reload();
+	}
 }

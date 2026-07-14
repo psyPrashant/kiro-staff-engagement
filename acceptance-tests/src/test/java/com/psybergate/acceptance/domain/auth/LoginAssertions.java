@@ -31,6 +31,12 @@ public class LoginAssertions {
 			.isTrue();
 	}
 
+	public void assertRemainsAuthenticatedAfterReload() {
+		assertThat(loginPage.isOnLoginPage())
+			.as("Expected the user to remain authenticated and not be redirected to the login page after reload")
+			.isFalse();
+	}
+
 	public void assertErrorMessageVisible(String expectedMessage) {
 		String actualMessage = loginPage.getErrorMessage();
 		assertThat(actualMessage)

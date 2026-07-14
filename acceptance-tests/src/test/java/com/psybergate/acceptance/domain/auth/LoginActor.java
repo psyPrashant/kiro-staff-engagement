@@ -28,4 +28,8 @@ public class LoginActor {
 		loginPage.submit();
 		testWorld.set("currentUserEmail", email);
 	}
+
+	public void reloadPage() {
+		loginPage.reload();
+	}
 }

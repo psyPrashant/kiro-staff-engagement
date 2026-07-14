@@ -44,4 +44,14 @@ public class LoginStepDefinitions {
 	public void theUserShouldRemainOnTheLoginPage() {
 		loginAssertions.assertOnLoginPage();
 	}
+
+	@And("the user reloads the page")
+	public void theUserReloadsThePage() {
+		loginActor.reloadPage();
+	}
+
+	@Then("the user should remain authenticated and not be redirected to the login page")
+	public void theUserShouldRemainAuthenticatedAndNotBeRedirectedToTheLoginPage() {
+		loginAssertions.assertRemainsAuthenticatedAfterReload();
+	}
 }
