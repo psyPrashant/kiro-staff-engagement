@@ -5,6 +5,7 @@ import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.Interaction;
 import com.psybergate.staff_engagement.interaction.InteractionRepository;
 import com.psybergate.staff_engagement.interaction.InteractionType;
+import com.psybergate.staff_engagement.scheduling.NextScheduledInteractionService;
 import com.psybergate.staff_engagement.task.Task;
 import com.psybergate.staff_engagement.task.TaskRepository;
 import com.psybergate.staff_engagement.task.TaskStatus;
@@ -45,8 +46,9 @@ class Employee360TaskFilterPropertyTest {
 		EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
 		InteractionRepository interactionRepository = mock(InteractionRepository.class);
 		TaskRepository taskRepository = mock(TaskRepository.class);
+		NextScheduledInteractionService nextScheduledInteractionService = mock(NextScheduledInteractionService.class);
 		Employee360Service service = new Employee360Service(
-				employeeRepository, interactionRepository, taskRepository
+				employeeRepository, interactionRepository, taskRepository, nextScheduledInteractionService
 		);
 
 		// Arrange: set up a valid employee and interaction
