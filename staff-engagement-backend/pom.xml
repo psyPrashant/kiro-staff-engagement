@@ -176,6 +176,30 @@
 						<phase>verify</phase>
 						<goals><goal>report</goal></goals>
 					</execution>
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals><goal>check</goal></goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.90</minimum>
+										</limit>
+										<limit>
+											<counter>BRANCH</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
@@ -201,8 +225,24 @@
 							<targetClasses>
 								<param>com.psybergate.staff_engagement.*</param>
 							</targetClasses>
+							<excludedClasses>
+								<param>com.psybergate.staff_engagement.StaffEngagementApplication</param>
+								<param>com.psybergate.staff_engagement.*.dto.*</param>
+								<param>com.psybergate.staff_engagement.*Dto</param>
+								<param>com.psybergate.staff_engagement.*Request</param>
+								<param>com.psybergate.staff_engagement.*Response</param>
+								<param>com.psybergate.staff_engagement.*Config</param>
+								<param>com.psybergate.staff_engagement.*Exception</param>
+							</excludedClasses>
+							<excludedTestClasses>
+								<param>com.psybergate.staff_engagement.*IntegrationTest</param>
+								<param>com.psybergate.staff_engagement.*Tests</param>
+								<param>com.psybergate.staff_engagement.scheduling.NextScheduledBatchConsistencyPropertyTest</param>
+								<param>com.psybergate.staff_engagement.scheduling.NextScheduledQueryPropertyTest</param>
+								<param>com.psybergate.staff_engagement.scheduling.ScheduledInteractionPersistencePropertyTest</param>
+							</excludedTestClasses>
 							<failWhenNoMutations>false</failWhenNoMutations>
-							<mutationThreshold>0</mutationThreshold>
+							<mutationThreshold>70</mutationThreshold>
 						</configuration>
 						<executions>
 							<execution>
