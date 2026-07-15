@@ -72,6 +72,7 @@ class EngagementIntegrationTest extends BaseIntegrationTest {
 	@BeforeEach
 	void setUp() {
 		// Clean existing data in correct FK order using JDBC for reliability
+		jdbcTemplate.execute("DELETE FROM scheduled_interactions");
 		jdbcTemplate.execute("DELETE FROM tasks");
 		jdbcTemplate.execute("DELETE FROM interactions");
 		jdbcTemplate.execute("DELETE FROM employees");
