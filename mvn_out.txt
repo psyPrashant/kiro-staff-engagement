@@ -1,0 +1,30 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.psybergate:staff-engagement >-------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- jacoco:0.8.13:prepare-agent (prepare-agent) @ staff-engagement ---
+[INFO] argLine set to "-javaagent:C:\\Users\\pierre.duplessis\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.13\\org.jacoco.agent-0.8.13-runtime.jar=destfile=C:\\myworkbench\\projects\\staff engagement poc _V2\\kiro-staff-engagement\\staff-engagement-backend\\target\\jacoco.exec"
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ staff-engagement ---
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] Copying 6 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ staff-engagement ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 68 source files with javac [debug parameters release 21] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ staff-engagement ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ staff-engagement ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 64 source files with javac [debug parameters release 21] to target\test-classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.056 s
+[INFO] Finished at: 2026-07-14T20:33:57+02:00
+[INFO] ------------------------------------------------------------------------
