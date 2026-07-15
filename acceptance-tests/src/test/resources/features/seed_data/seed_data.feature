@@ -1,4 +1,4 @@
-@seed-data
+@seed-data @backend-seed
 Feature: Seed data is accessible via API
 
   As a developer I want automated confidence that the seed-data loader has populated

@@ -3,13 +3,14 @@ package com.psybergate.acceptance.drivers.api;
 import com.psybergate.acceptance.config.EnvironmentConfig;
 import org.springframework.stereotype.Component;
 
+import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
 @Component
 public class SeedDataApiDriver extends BaseApiDriver {
 
-	public SeedDataApiDriver(EnvironmentConfig env) {
-		super(env);
+	public SeedDataApiDriver(EnvironmentConfig env, HttpClient httpClient) {
+		super(env, httpClient);
 	}
 
 	public HttpResponse<String> getUsers() {

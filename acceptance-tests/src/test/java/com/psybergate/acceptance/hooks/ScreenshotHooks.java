@@ -3,9 +3,7 @@ package com.psybergate.acceptance.hooks;
 import com.microsoft.playwright.Page;
 import io.cucumber.java.After;
 import io.cucumber.java.Scenario;
-import org.springframework.stereotype.Component;
 
-@Component
 public class ScreenshotHooks {
 
 	private final Page page;
@@ -14,7 +12,9 @@ public class ScreenshotHooks {
 		this.page = page;
 	}
 
-	@After
+	// Only UI scenarios need a browser screenshot; @backend-seed (API-only) scenarios skip this
+	// so they never trigger a Playwright browser launch.
+	@After("not @backend-seed")
 	public void screenshotOnFailure(Scenario scenario) {
 		if (scenario.isFailed()) {
 			byte[] screenshot = page.screenshot(
