@@ -18,6 +18,7 @@ import {
         class="modal-dialog"
         role="dialog"
         aria-modal="true"
+        tabindex="-1"
         [attr.aria-label]="title()"
         #dialog
       >
@@ -59,9 +60,18 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
 
   private trapFocus(): void {
     const el = this.dialog().nativeElement;
-    const focusable = el.querySelector<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    // Focus the first form control inside the projected content — NOT the close
+    // button. Auto-focusing a <button> means Space/Enter would activate it (e.g.
+    // the × close button), unexpectedly dismissing the modal.
+    const firstField = el.querySelector<HTMLElement>(
+      'input, select, textarea, [href], [tabindex]:not([tabindex="-1"])',
     );
-    focusable?.focus();
+    if (firstField) {
+      firstField.focus();
+    } else {
+      // No form control present — focus the dialog container itself so focus
+      // stays within the modal without triggering any button.
+      el.focus();
+    }
   }
 }

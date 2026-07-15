@@ -3,6 +3,7 @@ import { TaskService } from './services/task.service';
 import {
   CreateTaskRequest,
   TaskResponse,
+  UpdateTaskRequest,
   formatTaskStatusLabel,
   isOverdue,
 } from './models/task.model';
@@ -62,7 +63,18 @@ export class TaskListComponent implements OnInit {
   }
 
   completeTask(task: TaskResponse): void {
-    this.taskService.updateStatus(task.id, 'DONE').subscribe({
+    // The backend has no dedicated status endpoint — status is updated via the
+    // full PUT /api/tasks/{id}. Build a complete UpdateTaskRequest from the task.
+    const request: UpdateTaskRequest = {
+      title: task.title,
+      description: task.description,
+      interactionId: task.interaction?.id ?? null,
+      dueDate: task.dueDate,
+      assignedUserId: task.assignedUser?.id ?? null,
+      employeeId: task.employeeId,
+      status: 'DONE',
+    };
+    this.taskService.update(task.id, request).subscribe({
       next: (updated) => {
         this.tasks.update((tasks) => tasks.map((t) => (t.id === updated.id ? updated : t)));
         this.toast.success(`"${task.title}" marked as done`);

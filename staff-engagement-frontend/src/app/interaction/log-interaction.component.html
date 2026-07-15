@@ -1,203 +1,232 @@
-<h2>Log Interaction</h2>
+<section class="page interaction-page" data-testid="log-interaction">
+  <div class="card interaction-card">
+    <header class="interaction-header">
+      <div class="interaction-header-icon">&#9998;</div>
+      <div>
+        <h1>Log Interaction</h1>
+        <p class="interaction-subtitle">Record a conversation, check-in, or mentoring session.</p>
+      </div>
+    </header>
 
-@if (successMessage()) {
-  <div class="success-message">{{ successMessage() }}</div>
-}
+    @if (successMessage()) {
+      <div class="success-message" role="status">{{ successMessage() }}</div>
+    }
 
-@if (errorMessage()) {
-  <div class="error-message">{{ errorMessage() }}</div>
-}
+    @if (errorMessage()) {
+      <div class="error-message" role="alert">{{ errorMessage() }}</div>
+    }
 
-@if (taskErrorMessage()) {
-  <div class="error-message">{{ taskErrorMessage() }}</div>
-}
+    @if (taskErrorMessage()) {
+      <div class="error-message" role="alert">{{ taskErrorMessage() }}</div>
+    }
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <!-- Employee Picker -->
-  <div class="form-field">
-    <label for="employeeId">Employee</label>
-    @if (employeesLoading()) {
-      <span class="loading-indicator">Loading employees...</span>
-    }
-    @if (employeesError()) {
-      <span class="picker-error">{{ employeesError() }}</span>
-      <button type="button" class="retry-btn" (click)="retryEmployees()">Retry</button>
-    }
-    <select id="employeeId" formControlName="employeeId" [disabled]="employeesLoading()">
-      <option [ngValue]="null" disabled>-- Select --</option>
-      @for (employee of employees(); track employee.id) {
-        <option [ngValue]="employee.id">{{ employee.name }}</option>
-      }
-    </select>
-    @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
-      <span class="validation-error">Employee selection is required.</span>
-    }
-    @if (serverFieldErrors()['employeeId']) {
-      <span class="validation-error">{{ serverFieldErrors()['employeeId'] }}</span>
-    }
-  </div>
-
-  <!-- Conducted-By Picker -->
-  <div class="form-field">
-    <label for="conductedByUserId">Conducted By</label>
-    @if (usersLoading()) {
-      <span class="loading-indicator">Loading users...</span>
-    }
-    @if (usersError()) {
-      <span class="picker-error">{{ usersError() }}</span>
-      <button type="button" class="retry-btn" (click)="retryUsers()">Retry</button>
-    }
-    <select id="conductedByUserId" formControlName="conductedByUserId" [disabled]="usersLoading()">
-      <option [ngValue]="null" disabled>-- Select --</option>
-      @for (user of users(); track user.id) {
-        <option [ngValue]="user.id">{{ user.name }}</option>
-      }
-    </select>
-    @if (
-      form.get('conductedByUserId')?.touched && form.get('conductedByUserId')?.hasError('required')
-    ) {
-      <span class="validation-error">Conducted-by selection is required.</span>
-    }
-    @if (serverFieldErrors()['conductedByUserId']) {
-      <span class="validation-error">{{ serverFieldErrors()['conductedByUserId'] }}</span>
-    }
-  </div>
-
-  <!-- Type Selector -->
-  <div class="form-field">
-    <label for="type">Type</label>
-    <select id="type" formControlName="type">
-      <option [ngValue]="null" disabled>-- Select --</option>
-      @for (interactionType of interactionTypes; track interactionType.value) {
-        <option [ngValue]="interactionType.value">{{ interactionType.label }}</option>
-      }
-    </select>
-    @if (form.get('type')?.touched && form.get('type')?.hasError('required')) {
-      <span class="validation-error">Interaction type is required.</span>
-    }
-    @if (serverFieldErrors()['type']) {
-      <span class="validation-error">{{ serverFieldErrors()['type'] }}</span>
-    }
-  </div>
-
-  <!-- Notes Textarea -->
-  <div class="form-field">
-    <label for="notes">Notes</label>
-    <textarea id="notes" formControlName="notes" rows="4"></textarea>
-    @if (
-      form.get('notes')?.touched &&
-      (form.get('notes')?.hasError('required') || form.get('notes')?.hasError('notBlank'))
-    ) {
-      <span class="validation-error">Notes content is required.</span>
-    }
-    @if (serverFieldErrors()['notes']) {
-      <span class="validation-error">{{ serverFieldErrors()['notes'] }}</span>
-    }
-  </div>
-
-  <!-- Occurred-At DateTime -->
-  <div class="form-field">
-    <label for="occurredAt">Occurred At</label>
-    <input id="occurredAt" type="datetime-local" formControlName="occurredAt" />
-    @if (form.get('occurredAt')?.touched && form.get('occurredAt')?.hasError('required')) {
-      <span class="validation-error">Date and time is required.</span>
-    }
-    @if (serverFieldErrors()['occurredAt']) {
-      <span class="validation-error">{{ serverFieldErrors()['occurredAt'] }}</span>
-    }
-  </div>
-
-  <!-- Project Picker (optional) -->
-  <div class="form-field">
-    <label for="projectId">Project (optional)</label>
-    @if (projectsLoading()) {
-      <span class="loading-indicator">Loading projects...</span>
-    }
-    @if (projectsError()) {
-      <span class="picker-error">{{ projectsError() }}</span>
-      <button type="button" class="retry-btn" (click)="retryProjects()">Retry</button>
-    }
-    <select id="projectId" formControlName="projectId" [disabled]="projectsLoading()">
-      <option [ngValue]="null">-- None --</option>
-      @for (group of projectsByCompany() | keyvalue; track group.key) {
-        <optgroup [label]="group.key">
-          @for (project of group.value; track project.id) {
-            <option [ngValue]="project.id">{{ project.name }}</option>
-          }
-        </optgroup>
-      }
-    </select>
-    @if (serverFieldErrors()['projectId']) {
-      <span class="validation-error">{{ serverFieldErrors()['projectId'] }}</span>
-    }
-  </div>
-
-  <!-- Inline Task Section -->
-  <div class="task-section">
-    <button type="button" class="task-toggle-btn" (click)="toggleTaskSection()">
-      {{ taskSectionExpanded() ? 'Hide Follow-Up Task' : 'Add Follow-Up Task' }}
-    </button>
-
-    @if (taskSectionExpanded()) {
-      <div class="task-fields">
-        <!-- Task Title -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- Employee Picker -->
         <div class="form-field">
-          <label for="taskTitle">Task Title</label>
-          <input id="taskTitle" type="text" formControlName="taskTitle" maxlength="255" />
-          @if (
-            form.get('taskTitle')?.touched &&
-            (form.get('taskTitle')?.hasError('required') ||
-              form.get('taskTitle')?.hasError('notBlank'))
-          ) {
-            <span class="validation-error">Task title is required.</span>
+          <label for="employeeId">Employee</label>
+          @if (employeesLoading()) {
+            <span class="loading-indicator">Loading employees...</span>
           }
-          @if (form.get('taskTitle')?.touched && form.get('taskTitle')?.hasError('maxlength')) {
-            <span class="validation-error">Task title must be 255 characters or fewer.</span>
+          @if (employeesError()) {
+            <span class="picker-error">{{ employeesError() }}</span>
+            <button type="button" class="retry-btn" (click)="retryEmployees()">Retry</button>
+          }
+          <select id="employeeId" formControlName="employeeId" [disabled]="employeesLoading()">
+            <option [ngValue]="null" disabled>-- Select --</option>
+            @for (employee of employees(); track employee.id) {
+              <option [ngValue]="employee.id">{{ employee.name }}</option>
+            }
+          </select>
+          @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
+            <span class="validation-error">Employee selection is required.</span>
+          }
+          @if (serverFieldErrors()['employeeId']) {
+            <span class="validation-error">{{ serverFieldErrors()['employeeId'] }}</span>
           }
         </div>
 
-        <!-- Task Description -->
+        <!-- Conducted-By Picker -->
         <div class="form-field">
-          <label for="taskDescription">Task Description (optional)</label>
-          <textarea
-            id="taskDescription"
-            formControlName="taskDescription"
-            rows="3"
-            maxlength="2000"
-          ></textarea>
-        </div>
-
-        <!-- Task Due Date -->
-        <div class="form-field">
-          <label for="taskDueDate">Due Date (optional)</label>
-          <input id="taskDueDate" type="date" formControlName="taskDueDate" />
-          @if (
-            form.get('taskDueDate')?.touched && form.get('taskDueDate')?.hasError('futureDate')
-          ) {
-            <span class="validation-error">Due date must be today or a future date.</span>
+          <label for="conductedByUserId">Conducted By</label>
+          @if (usersLoading()) {
+            <span class="loading-indicator">Loading users...</span>
           }
-        </div>
-
-        <!-- Task Assigned User -->
-        <div class="form-field">
-          <label for="taskAssignedUserId">Assigned To (optional)</label>
+          @if (usersError()) {
+            <span class="picker-error">{{ usersError() }}</span>
+            <button type="button" class="retry-btn" (click)="retryUsers()">Retry</button>
+          }
           <select
-            id="taskAssignedUserId"
-            formControlName="taskAssignedUserId"
+            id="conductedByUserId"
+            formControlName="conductedByUserId"
             [disabled]="usersLoading()"
           >
-            <option [ngValue]="null">-- None --</option>
+            <option [ngValue]="null" disabled>-- Select --</option>
             @for (user of users(); track user.id) {
               <option [ngValue]="user.id">{{ user.name }}</option>
             }
           </select>
+          @if (
+            form.get('conductedByUserId')?.touched &&
+            form.get('conductedByUserId')?.hasError('required')
+          ) {
+            <span class="validation-error">Conducted-by selection is required.</span>
+          }
+          @if (serverFieldErrors()['conductedByUserId']) {
+            <span class="validation-error">{{ serverFieldErrors()['conductedByUserId'] }}</span>
+          }
+        </div>
+
+        <!-- Type Selector -->
+        <div class="form-field">
+          <label for="type">Type</label>
+          <select id="type" formControlName="type">
+            <option [ngValue]="null" disabled>-- Select --</option>
+            @for (interactionType of interactionTypes; track interactionType.value) {
+              <option [ngValue]="interactionType.value">{{ interactionType.label }}</option>
+            }
+          </select>
+          @if (form.get('type')?.touched && form.get('type')?.hasError('required')) {
+            <span class="validation-error">Interaction type is required.</span>
+          }
+          @if (serverFieldErrors()['type']) {
+            <span class="validation-error">{{ serverFieldErrors()['type'] }}</span>
+          }
+        </div>
+
+        <!-- Occurred-At DateTime -->
+        <div class="form-field">
+          <label for="occurredAt">Occurred At</label>
+          <input id="occurredAt" type="datetime-local" formControlName="occurredAt" />
+          @if (form.get('occurredAt')?.touched && form.get('occurredAt')?.hasError('required')) {
+            <span class="validation-error">Date and time is required.</span>
+          }
+          @if (serverFieldErrors()['occurredAt']) {
+            <span class="validation-error">{{ serverFieldErrors()['occurredAt'] }}</span>
+          }
+        </div>
+
+        <!-- Project Picker (optional) -->
+        <div class="form-field form-field--full">
+          <label for="projectId">Project (optional)</label>
+          @if (projectsLoading()) {
+            <span class="loading-indicator">Loading projects...</span>
+          }
+          @if (projectsError()) {
+            <span class="picker-error">{{ projectsError() }}</span>
+            <button type="button" class="retry-btn" (click)="retryProjects()">Retry</button>
+          }
+          <select id="projectId" formControlName="projectId" [disabled]="projectsLoading()">
+            <option [ngValue]="null">-- None --</option>
+            @for (group of projectsByCompany() | keyvalue; track group.key) {
+              <optgroup [label]="group.key">
+                @for (project of group.value; track project.id) {
+                  <option [ngValue]="project.id">{{ project.name }}</option>
+                }
+              </optgroup>
+            }
+          </select>
+          @if (serverFieldErrors()['projectId']) {
+            <span class="validation-error">{{ serverFieldErrors()['projectId'] }}</span>
+          }
+        </div>
+
+        <!-- Notes Textarea -->
+        <div class="form-field form-field--full">
+          <label for="notes">Notes</label>
+          <textarea id="notes" formControlName="notes" rows="4"></textarea>
+          @if (
+            form.get('notes')?.touched &&
+            (form.get('notes')?.hasError('required') || form.get('notes')?.hasError('notBlank'))
+          ) {
+            <span class="validation-error">Notes content is required.</span>
+          }
+          @if (serverFieldErrors()['notes']) {
+            <span class="validation-error">{{ serverFieldErrors()['notes'] }}</span>
+          }
         </div>
       </div>
-    }
-  </div>
 
-  <!-- Submit Button -->
-  <button type="submit" class="submit-btn" [disabled]="form.invalid || submitting()">
-    {{ submitting() ? 'Submitting...' : 'Submit' }}
-  </button>
-</form>
+      <!-- Inline Task Section -->
+      <div class="task-section">
+        <button
+          type="button"
+          class="task-toggle-btn"
+          (click)="toggleTaskSection()"
+          [class.task-toggle-btn--open]="taskSectionExpanded()"
+        >
+          <span class="task-toggle-icon">{{ taskSectionExpanded() ? '−' : '+' }}</span>
+          {{ taskSectionExpanded() ? 'Hide Follow-Up Task' : 'Add Follow-Up Task' }}
+        </button>
+
+        @if (taskSectionExpanded()) {
+          <div class="task-fields">
+            <div class="form-grid">
+              <!-- Task Title -->
+              <div class="form-field form-field--full">
+                <label for="taskTitle">Task Title</label>
+                <input id="taskTitle" type="text" formControlName="taskTitle" maxlength="255" />
+                @if (
+                  form.get('taskTitle')?.touched &&
+                  (form.get('taskTitle')?.hasError('required') ||
+                    form.get('taskTitle')?.hasError('notBlank'))
+                ) {
+                  <span class="validation-error">Task title is required.</span>
+                }
+                @if (
+                  form.get('taskTitle')?.touched && form.get('taskTitle')?.hasError('maxlength')
+                ) {
+                  <span class="validation-error">Task title must be 255 characters or fewer.</span>
+                }
+              </div>
+
+              <!-- Task Description -->
+              <div class="form-field form-field--full">
+                <label for="taskDescription">Task Description (optional)</label>
+                <textarea
+                  id="taskDescription"
+                  formControlName="taskDescription"
+                  rows="3"
+                  maxlength="2000"
+                ></textarea>
+              </div>
+
+              <!-- Task Due Date -->
+              <div class="form-field">
+                <label for="taskDueDate">Due Date (optional)</label>
+                <input id="taskDueDate" type="date" formControlName="taskDueDate" />
+                @if (
+                  form.get('taskDueDate')?.touched && form.get('taskDueDate')?.hasError('futureDate')
+                ) {
+                  <span class="validation-error">Due date must be today or a future date.</span>
+                }
+              </div>
+
+              <!-- Task Assigned User -->
+              <div class="form-field">
+                <label for="taskAssignedUserId">Assigned To (optional)</label>
+                <select
+                  id="taskAssignedUserId"
+                  formControlName="taskAssignedUserId"
+                  [disabled]="usersLoading()"
+                >
+                  <option [ngValue]="null">-- None --</option>
+                  @for (user of users(); track user.id) {
+                    <option [ngValue]="user.id">{{ user.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary submit-btn" [disabled]="form.invalid || submitting()">
+          {{ submitting() ? 'Submitting...' : 'Log Interaction' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
