@@ -76,6 +76,14 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- spring-test provides @ContextConfiguration, letting the Cucumber glue class point at the
+		     bean config without itself being a @Component/@Configuration (required by cucumber-spring 7.x). -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- PostgreSQL JDBC driver -->
 		<dependency>

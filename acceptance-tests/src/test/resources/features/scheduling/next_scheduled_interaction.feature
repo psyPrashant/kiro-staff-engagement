@@ -1,4 +1,4 @@
-@next-scheduled
+@next-scheduled @backend-seed
 Feature: Next Scheduled Interaction in API responses
 
   As a frontend developer,

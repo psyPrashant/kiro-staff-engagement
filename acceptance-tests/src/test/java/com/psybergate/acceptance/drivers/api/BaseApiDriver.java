@@ -7,18 +7,19 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 
 public abstract class BaseApiDriver {
 
 	protected final EnvironmentConfig env;
 	protected final HttpClient httpClient;
 
-	protected BaseApiDriver(EnvironmentConfig env) {
+	/**
+	 * @param httpClient the shared, cookie-aware client (see {@code AcceptanceTestConfig#apiHttpClient})
+	 *                   so the authenticated session is reused across all drivers.
+	 */
+	protected BaseApiDriver(EnvironmentConfig env, HttpClient httpClient) {
 		this.env = env;
-		this.httpClient = HttpClient.newBuilder()
-			.connectTimeout(Duration.ofSeconds(10))
-			.build();
+		this.httpClient = httpClient;
 	}
 
 	protected HttpResponse<String> get(String path) {

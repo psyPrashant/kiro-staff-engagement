@@ -3,13 +3,14 @@ package com.psybergate.acceptance.drivers.api;
 import com.psybergate.acceptance.config.EnvironmentConfig;
 import org.springframework.stereotype.Component;
 
+import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
 @Component
 public class NextScheduledApiDriver extends BaseApiDriver {
 
-	public NextScheduledApiDriver(EnvironmentConfig env) {
-		super(env);
+	public NextScheduledApiDriver(EnvironmentConfig env, HttpClient httpClient) {
+		super(env, httpClient);
 	}
 
 	/**
