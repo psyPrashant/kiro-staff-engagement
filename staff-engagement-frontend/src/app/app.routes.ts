@@ -19,10 +19,6 @@ export const routes: Routes = [
           import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
       {
-        path: 'user',
-        loadChildren: () => import('./user/user.routes').then((m) => m.routes),
-      },
-      {
         path: 'employee',
         loadChildren: () => import('./employee/employee.routes').then((m) => m.routes),
       },
@@ -41,6 +37,11 @@ export const routes: Routes = [
       {
         path: 'schedule',
         loadChildren: () => import('./schedule/schedule.routes').then((m) => m.routes),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./settings/settings.component').then((m) => m.SettingsComponent),
       },
       { path: '**', redirectTo: 'dashboard' },
     ],

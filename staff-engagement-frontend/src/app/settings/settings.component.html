@@ -1,0 +1,40 @@
+<section class="page" data-testid="settings">
+  <h1>Settings</h1>
+
+  <div class="card settings-card">
+    <h2>Engagement Thresholds</h2>
+    <p class="settings-description">
+      Configure how many days without interaction triggers each status level.
+    </p>
+
+    <div class="form-field">
+      <label for="atRiskDays">At risk (days since last interaction)</label>
+      <input
+        id="atRiskDays"
+        type="number"
+        min="1"
+        [ngModel]="atRiskDays()"
+        (ngModelChange)="atRiskDays.set($event)"
+        data-testid="input-at-risk"
+      />
+      <span class="field-hint">Employees with no interaction for this many days are flagged "At risk"</span>
+    </div>
+
+    <div class="form-field">
+      <label for="overdueDays">Overdue (days since last interaction)</label>
+      <input
+        id="overdueDays"
+        type="number"
+        min="1"
+        [ngModel]="overdueDays()"
+        (ngModelChange)="overdueDays.set($event)"
+        data-testid="input-overdue"
+      />
+      <span class="field-hint">Employees with no interaction for this many days are flagged "Overdue"</span>
+    </div>
+
+    <button class="btn btn-primary" (click)="save()" data-testid="btn-save-settings">
+      Save settings
+    </button>
+  </div>
+</section>

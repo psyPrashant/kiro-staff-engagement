@@ -1,21 +1,38 @@
-<nav class="app-nav" data-testid="app-nav">
-  <a routerLink="/dashboard" class="brand-label" data-testid="nav-brand">Staff Engagement</a>
-  <div class="nav-links">
-    <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-link-dashboard"
-      >Dashboard</a
-    >
-    <a routerLink="/employee" routerLinkActive="active" data-testid="nav-link-employee"
-      >Employees</a
-    >
-    <a routerLink="/interaction" routerLinkActive="active" data-testid="nav-link-interaction"
-      >Log interaction</a
-    >
-    <a routerLink="/task" routerLinkActive="active" data-testid="nav-link-task">Tasks</a>
-  </div>
-  <a routerLink="/user" routerLinkActive="active" data-testid="nav-link-user" hidden>User</a>
-  <a routerLink="/client" routerLinkActive="active" data-testid="nav-link-client" hidden>Client</a>
-  <button (click)="logout()" class="btn-logout" data-testid="logout-button">Logout</button>
-</nav>
-<main class="app-content">
-  <router-outlet />
-</main>
+<div class="shell-layout" data-testid="app-shell">
+  <aside class="sidebar" data-testid="app-nav">
+    <div class="sidebar-brand">
+      <div class="brand-icon">SE</div>
+      <span class="brand-text">Staff Engagement</span>
+    </div>
+
+    <nav class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-link-dashboard">
+        <span class="nav-icon">&#9632;</span>
+        Dashboard
+      </a>
+      <a routerLink="/employee" routerLinkActive="active" data-testid="nav-link-employee">
+        <span class="nav-icon">&#9679;</span>
+        Employees
+      </a>
+      <a routerLink="/task" routerLinkActive="active" data-testid="nav-link-task">
+        <span class="nav-icon">&#10003;</span>
+        Tasks
+      </a>
+      <a routerLink="/settings" routerLinkActive="active" data-testid="nav-link-settings">
+        <span class="nav-icon">&#9881;</span>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button (click)="logout()" class="btn-logout" data-testid="logout-button">
+        <span class="nav-icon">&#10140;</span>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="app-content">
+    <router-outlet />
+  </main>
+</div>

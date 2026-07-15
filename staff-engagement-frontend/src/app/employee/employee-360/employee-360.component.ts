@@ -17,11 +17,12 @@ import { TaskCreateDialogComponent } from '../../task/components/task-create-dia
 import { TaskService } from '../../task/services/task.service';
 import { CreateTaskRequest } from '../../task/models/task.model';
 import { AuthService } from '../../core/services/auth.service';
+import { AvatarComponent } from '../../shared';
 
 @Component({
   selector: 'app-employee-360',
   standalone: true,
-  imports: [CommonModule, RouterLink, TaskCreateDialogComponent],
+  imports: [CommonModule, RouterLink, TaskCreateDialogComponent, AvatarComponent],
   templateUrl: './employee-360.component.html',
   styleUrl: './employee-360.component.css',
 })

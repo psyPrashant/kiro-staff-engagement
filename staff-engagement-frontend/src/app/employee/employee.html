@@ -1,4 +1,4 @@
-<div class="page">
+<div class="page" data-testid="employees-page">
   <h1>Employees</h1>
 
   @if (loading()) {
@@ -25,6 +25,7 @@
         [value]="searchTerm()"
         (input)="searchTerm.set($any($event.target).value)"
         data-testid="employees-search"
+        aria-label="Search employees"
       />
       <div class="status-filter">
         <button
@@ -36,47 +37,49 @@
         </button>
         <button
           class="btn"
-          [class.btn-primary]="statusFilter() === 'OVERDUE'"
-          (click)="statusFilter.set('OVERDUE')"
+          [class.btn-primary]="statusFilter() === EngagementStatus.OVERDUE"
+          (click)="statusFilter.set(EngagementStatus.OVERDUE)"
         >
           Overdue
         </button>
         <button
           class="btn"
-          [class.btn-primary]="statusFilter() === 'AT_RISK'"
-          (click)="statusFilter.set('AT_RISK')"
+          [class.btn-primary]="statusFilter() === EngagementStatus.AT_RISK"
+          (click)="statusFilter.set(EngagementStatus.AT_RISK)"
         >
           At risk
         </button>
         <button
           class="btn"
-          [class.btn-primary]="statusFilter() === 'ON_TRACK'"
-          (click)="statusFilter.set('ON_TRACK')"
+          [class.btn-primary]="statusFilter() === EngagementStatus.ON_TRACK"
+          (click)="statusFilter.set(EngagementStatus.ON_TRACK)"
         >
           On track
         </button>
       </div>
     </div>
 
-    <div class="table-responsive" data-testid="employees-list">
+    <div class="table-card" data-testid="employees-list">
       <table>
         <thead>
           <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Job Title</th>
+            <th>Employee</th>
+            <th>Role</th>
             <th>Manager</th>
             <th>Status</th>
             <th>Last Seen</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (emp of filteredEmployees(); track emp.id) {
-            <tr (click)="navigateToEmployee(emp.id)" class="clickable-row">
+            <tr class="clickable-row" (click)="navigateToEmployee(emp.id)">
               <td>
-                <span class="avatar">{{ getInitials(emp.name) }}</span>
+                <div class="employee-cell">
+                  <app-avatar [name]="emp.name" size="sm" />
+                  <span class="employee-name">{{ emp.name }}</span>
+                </div>
               </td>
-              <td>{{ emp.name }}</td>
               <td>{{ emp.jobTitle }}</td>
               <td>{{ emp.managerName || '-' }}</td>
               <td>
@@ -88,7 +91,19 @@
                   <span class="badge">Unknown</span>
                 }
               </td>
-              <td>{{ emp.lastInteractionDate ? (emp.lastInteractionDate | date) : 'Never' }}</td>
+              <td class="last-seen">
+                {{ emp.lastInteractionDate ?? 'Never' }}
+              </td>
+              <td class="actions-cell" (click)="$event.stopPropagation()">
+                <button
+                  class="btn-icon"
+                  title="View profile"
+                  (click)="navigateToEmployee(emp.id)"
+                  aria-label="View profile for {{ emp.name }}"
+                >
+                  &#8594;
+                </button>
+              </td>
             </tr>
           }
         </tbody>

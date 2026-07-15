@@ -8,23 +8,26 @@
 @if (error()) {
   <div class="error-container" data-testid="error-message">
     <p class="error-text">{{ error() }}</p>
-    <button class="retry-button" (click)="retry()">Retry</button>
+    <button class="btn btn-primary" (click)="retry()">Retry</button>
   </div>
 }
 
 @if (data()) {
-  <div class="employee-360">
-    <section class="profile-summary" data-testid="profile-summary">
+  <div class="page employee-360">
+    <!-- Profile Header -->
+    <section class="profile-card" data-testid="profile-summary">
       <div class="profile-header">
-        <div class="profile-header-info">
-          <h2 data-testid="employee-name">
-            {{ data()!.profile.name || 'Information unavailable' }}
-          </h2>
-          @if (engagementStatus()) {
-            <span [class]="getEngagementBadgeClass()" data-testid="engagement-status-badge">{{
-              getEngagementStatusLabel()
-            }}</span>
-          }
+        <div class="profile-identity">
+          <app-avatar [name]="data()!.profile.name" size="lg" />
+          <div class="profile-info">
+            <h1 data-testid="employee-name">{{ data()!.profile.name }}</h1>
+            <p class="profile-role">{{ data()!.profile.jobTitle }}</p>
+            @if (engagementStatus()) {
+              <span [class]="getEngagementBadgeClass()" data-testid="engagement-status-badge">
+                {{ getEngagementStatusLabel() }}
+              </span>
+            }
+          </div>
         </div>
         <div class="profile-actions">
           <a
@@ -32,21 +35,18 @@
             [routerLink]="['/interaction']"
             [queryParams]="{ employeeId: employeeId }"
             data-testid="log-interaction-btn"
-            >Log interaction</a
           >
+            Log interaction
+          </a>
           <button class="btn btn-secondary" (click)="onNewTask()" data-testid="new-task-btn">
-            New task
+            Add task
           </button>
         </div>
       </div>
       <div class="profile-details">
         <p class="profile-field">
           <span class="label">Email:</span>
-          <span>{{ data()!.profile.email || 'Information unavailable' }}</span>
-        </p>
-        <p class="profile-field">
-          <span class="label">Job Title:</span>
-          <span>{{ data()!.profile.jobTitle || 'Information unavailable' }}</span>
+          <span>{{ data()!.profile.email }}</span>
         </p>
         @if (data()!.profile.managerName) {
           <p class="profile-field">
@@ -57,53 +57,75 @@
       </div>
     </section>
 
-    <section class="interaction-history" data-testid="interaction-history">
-      <h3>Interaction History</h3>
+    <!-- Interaction History -->
+    <section class="section" data-testid="interaction-history">
+      <h2>Interaction History</h2>
       @if (data()!.interactions.length === 0) {
         <p class="empty-state" data-testid="empty-interactions">No interaction history found</p>
       } @else {
-        <ul class="interaction-list">
-          @for (interaction of data()!.interactions; track interaction.id) {
-            <li class="interaction-item">
-              <div class="interaction-header">
-                <span class="interaction-type">{{ formatInteractionType(interaction.type) }}</span>
-                <span class="interaction-date">{{ interaction.occurredAt | date }}</span>
-              </div>
-              <p class="interaction-conducted-by">
-                Conducted by: {{ interaction.conductedByName }}
-              </p>
-              @if (interaction.projectContext) {
-                <p class="interaction-project-context">
-                  Project: {{ interaction.projectContext.projectName }} ({{
-                    interaction.projectContext.companyName
-                  }})
-                </p>
-              } @else {
-                <p class="interaction-project-context">No project</p>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Conducted by</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (interaction of data()!.interactions; track interaction.id) {
+                <tr>
+                  <td>{{ interaction.occurredAt | date }}</td>
+                  <td>
+                    <span class="badge badge-primary">
+                      {{ formatInteractionType(interaction.type) }}
+                    </span>
+                  </td>
+                  <td>{{ interaction.conductedByName }}</td>
+                  <td class="notes-cell">{{ truncateNotes(interaction.notes) }}</td>
+                </tr>
               }
-              <p class="interaction-notes">{{ truncateNotes(interaction.notes) }}</p>
-            </li>
-          }
-        </ul>
+            </tbody>
+          </table>
+        </div>
       }
     </section>
 
-    <section class="open-tasks" data-testid="open-tasks">
-      <h3>Open Tasks</h3>
+    <!-- Open Tasks -->
+    <section class="section" data-testid="open-tasks">
+      <h2>Open Tasks</h2>
       @if (data()!.openTasks.length === 0) {
         <p class="empty-state" data-testid="empty-tasks">No open tasks</p>
       } @else {
-        <ul class="task-list">
-          @for (task of data()!.openTasks; track task.id) {
-            <li class="task-row" data-testid="task-row" [class.overdue]="isOverdue(task.dueDate)">
-              <span class="task-title">{{ task.title }}</span>
-              @if (task.dueDate) {
-                <span class="task-due-date">Due: {{ task.dueDate | date }}</span>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Due date</th>
+                <th>Assigned to</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (task of data()!.openTasks; track task.id) {
+                <tr [class.overdue-row]="isOverdue(task.dueDate)">
+                  <td class="task-title">{{ task.title }}</td>
+                  <td>
+                    @if (task.dueDate) {
+                      <span [class.overdue-text]="isOverdue(task.dueDate)">
+                        {{ task.dueDate | date }}
+                      </span>
+                    } @else {
+                      <span class="muted">No due date</span>
+                    }
+                  </td>
+                  <td>{{ task.assignedUserName }}</td>
+                </tr>
               }
-              <span class="task-assigned">Assigned to: {{ task.assignedUserName }}</span>
-            </li>
-          }
-        </ul>
+            </tbody>
+          </table>
+        </div>
       }
     </section>
   </div>

@@ -1,44 +1,34 @@
-<div class="page">
-  <h1>Tasks</h1>
+<div class="page" data-testid="tasks-page">
+  <header class="tasks-header">
+    <h1>Tasks</h1>
+    <button class="btn btn-primary" (click)="showCreateModal.set(true)" data-testid="btn-new-task">
+      New task
+    </button>
+  </header>
 
   <div class="filter-bar" data-testid="tasks-filter">
     <button
-      class="btn filter-btn"
-      [class.filter-btn-active]="statusFilter() === 'OPEN'"
+      class="btn"
+      [class.btn-primary]="statusFilter() === 'ALL'"
+      (click)="setStatusFilter('ALL')"
+    >
+      All
+    </button>
+    <button
+      class="btn"
+      [class.btn-primary]="statusFilter() === 'OPEN'"
       (click)="setStatusFilter('OPEN')"
-      aria-label="Show open tasks"
     >
       Open
     </button>
     <button
-      class="btn filter-btn"
-      [class.filter-btn-active]="statusFilter() === 'DONE'"
+      class="btn"
+      [class.btn-primary]="statusFilter() === 'DONE'"
       (click)="setStatusFilter('DONE')"
-      aria-label="Show done tasks"
     >
       Done
     </button>
-    <button
-      class="btn filter-btn"
-      [class.filter-btn-active]="statusFilter() === 'ALL'"
-      (click)="setStatusFilter('ALL')"
-      aria-label="Show all tasks"
-    >
-      All
-    </button>
-    <button class="btn btn-primary" (click)="showNewTaskForm.set(!showNewTaskForm())">
-      {{ showNewTaskForm() ? 'Cancel' : 'New task' }}
-    </button>
   </div>
-
-  @if (showNewTaskForm()) {
-    <div class="card new-task-form-section">
-      <app-task-form
-        (submitted)="onNewTaskSubmitted($event)"
-        (cancelled)="showNewTaskForm.set(false)"
-      />
-    </div>
-  }
 
   @if (loading()) {
     <p class="loading-text" data-testid="tasks-loading" aria-live="polite">Loading tasks...</p>
@@ -56,43 +46,56 @@
   }
 
   @if (!loading() && !error() && filteredTasks().length > 0) {
-    <div class="table-responsive" data-testid="tasks-list">
+    <div class="table-card" data-testid="tasks-list">
       <table>
         <thead>
           <tr>
-            <th class="col-toggle"></th>
             <th>Title</th>
             <th>Employee</th>
             <th>Assignee</th>
             <th>Due Date</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (task of filteredTasks(); track task.id) {
-            <tr [class.overdue]="isTaskOverdue(task)">
-              <td class="col-toggle">
-                <button
-                  class="btn btn-toggle"
-                  [class.btn-toggle-done]="task.status === 'DONE'"
-                  (click)="toggleStatus(task)"
-                  [attr.aria-label]="
-                    task.status === 'OPEN'
-                      ? 'Mark ' + task.title + ' as done'
-                      : 'Mark ' + task.title + ' as open'
-                  "
-                  [attr.data-testid]="'task-toggle-' + task.id"
-                >
-                  @if (task.status === 'DONE') {
-                    &#10003;
-                  }
-                </button>
-              </td>
-              <td>{{ task.title }}</td>
+            <tr [class.overdue-row]="isTaskOverdue(task)" class="clickable-row" (click)="selectedTask.set(task)">
+              <td class="task-title">{{ task.title }}</td>
               <td>{{ task.employeeName || '-' }}</td>
               <td>{{ task.assignedUser?.name || '-' }}</td>
-              <td>{{ task.dueDate ? (task.dueDate | date) : '-' }}</td>
-              <td>{{ formatStatus(task.status) }}</td>
+              <td>
+                @if (task.dueDate) {
+                  <span [class.overdue-text]="isTaskOverdue(task)">{{ task.dueDate | date }}</span>
+                } @else {
+                  <span class="muted">-</span>
+                }
+              </td>
+              <td>
+                <span [class]="statusBadgeClass(task.status)">
+                  {{ formatStatus(task.status) }}
+                </span>
+              </td>
+              <td class="actions-cell" (click)="$event.stopPropagation()">
+                @if (task.status === 'OPEN') {
+                  <button
+                    class="btn-icon"
+                    title="Mark as done"
+                    (click)="completeTask(task)"
+                    [attr.aria-label]="'Mark ' + task.title + ' as done'"
+                  >
+                    &#10003;
+                  </button>
+                }
+                <button
+                  class="btn-icon"
+                  title="Delete"
+                  (click)="deleteTask(task)"
+                  [attr.aria-label]="'Delete ' + task.title"
+                >
+                  &#10005;
+                </button>
+              </td>
             </tr>
           }
         </tbody>
@@ -100,3 +103,55 @@
     </div>
   }
 </div>
+
+@if (showCreateModal()) {
+  <app-modal title="New task" (close)="showCreateModal.set(false)">
+    <app-task-form
+      (submitted)="onNewTaskSubmitted($event)"
+      (cancelled)="showCreateModal.set(false)"
+    />
+  </app-modal>
+}
+
+@if (selectedTask(); as task) {
+  <app-modal [title]="task.title" (close)="selectedTask.set(null)">
+    <div class="task-detail">
+      <div class="task-detail-row">
+        <span class="task-detail-label">Status</span>
+        <span [class]="statusBadgeClass(task.status)">{{ formatStatus(task.status) }}</span>
+      </div>
+      @if (task.description) {
+        <div class="task-detail-row">
+          <span class="task-detail-label">Description</span>
+          <p class="task-detail-value">{{ task.description }}</p>
+        </div>
+      }
+      <div class="task-detail-row">
+        <span class="task-detail-label">Employee</span>
+        <span>{{ task.employeeName || '-' }}</span>
+      </div>
+      <div class="task-detail-row">
+        <span class="task-detail-label">Assigned to</span>
+        <span>{{ task.assignedUser?.name || '-' }}</span>
+      </div>
+      <div class="task-detail-row">
+        <span class="task-detail-label">Due date</span>
+        <span [class.overdue-text]="isTaskOverdue(task)">{{ task.dueDate ? (task.dueDate | date) : 'No due date' }}</span>
+      </div>
+      <div class="task-detail-row">
+        <span class="task-detail-label">Created</span>
+        <span>{{ task.createdAt | date }}</span>
+      </div>
+      <div class="task-detail-actions">
+        @if (task.status === 'OPEN') {
+          <button class="btn btn-primary" (click)="completeTask(task); selectedTask.set(null)">
+            Mark as done
+          </button>
+        }
+        <button class="btn btn-danger" (click)="deleteTask(task); selectedTask.set(null)">
+          Delete
+        </button>
+      </div>
+    </div>
+  </app-modal>
+}

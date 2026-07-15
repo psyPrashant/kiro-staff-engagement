@@ -1,29 +1,39 @@
-import { formatEnumLabel } from '../../shared/utils/format-enum-label';
-
-export type EngagementStatus = 'OVERDUE' | 'AT_RISK' | 'ON_TRACK';
-
-export type SortOption = 'name' | 'recency';
-
-export interface MatrixEntry {
-  employeeId: number;
-  employeeName: string;
-  employeeEmail: string;
-  recency: number | null;
-  frequency: number;
-  lastInteractionDate: string | null;
-  engagementStatus: EngagementStatus;
-  followUpRequired: boolean;
+export enum EngagementStatus {
+  OVERDUE = 'OVERDUE',
+  AT_RISK = 'AT_RISK',
+  ON_TRACK = 'ON_TRACK',
 }
 
 export function formatEngagementStatusLabel(status: EngagementStatus): string {
   switch (status) {
-    case 'OVERDUE':
+    case EngagementStatus.OVERDUE:
       return 'Overdue';
-    case 'AT_RISK':
+    case EngagementStatus.AT_RISK:
       return 'At risk';
-    case 'ON_TRACK':
+    case EngagementStatus.ON_TRACK:
       return 'On track';
-    default:
-      return formatEnumLabel(status);
   }
+}
+
+export function engagementStatusBadgeClass(status: EngagementStatus): string {
+  switch (status) {
+    case EngagementStatus.OVERDUE:
+      return 'badge-danger';
+    case EngagementStatus.AT_RISK:
+      return 'badge-warning';
+    case EngagementStatus.ON_TRACK:
+      return 'badge-success';
+  }
+}
+
+export type SortOption = 'name' | 'recency' | 'frequency' | 'status';
+
+export interface MatrixEntry {
+  employeeId: number;
+  employeeName: string;
+  engagementStatus: EngagementStatus;
+  recency: number | null;
+  frequency: number;
+  lastInteractionDate: string | null;
+  followUpRequired: boolean;
 }

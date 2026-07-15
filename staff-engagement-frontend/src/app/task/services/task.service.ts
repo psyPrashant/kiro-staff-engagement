@@ -19,7 +19,15 @@ export class TaskService {
     return this.http.post<TaskResponse>('/api/tasks', request);
   }
 
+  update(taskId: number, request: Partial<CreateTaskRequest>): Observable<TaskResponse> {
+    return this.http.put<TaskResponse>(`/api/tasks/${taskId}`, request);
+  }
+
   updateStatus(taskId: number, status: string): Observable<TaskResponse> {
     return this.http.patch<TaskResponse>(`/api/tasks/${taskId}/status`, { status });
+  }
+
+  delete(taskId: number): Observable<void> {
+    return this.http.delete<void>(`/api/tasks/${taskId}`);
   }
 }

@@ -13,9 +13,9 @@ export class StatusFilterComponent {
 
   readonly filters: { label: string; value: EngagementStatus | null }[] = [
     { label: 'All', value: null },
-    { label: 'Overdue', value: 'OVERDUE' },
-    { label: 'At Risk', value: 'AT_RISK' },
-    { label: 'On Track', value: 'ON_TRACK' },
+    { label: 'Overdue', value: EngagementStatus.OVERDUE },
+    { label: 'At Risk', value: EngagementStatus.AT_RISK },
+    { label: 'On Track', value: EngagementStatus.ON_TRACK },
   ];
 
   onFilterSelect(value: EngagementStatus | null): void {

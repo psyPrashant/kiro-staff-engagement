@@ -1,5 +1,4 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { EmployeeService } from '../shared/services/employee.service';
@@ -8,14 +7,16 @@ import {
   EngagementStatus,
   MatrixEntry,
   formatEngagementStatusLabel,
+  engagementStatusBadgeClass,
 } from '../dashboard/models/engagement.model';
 import { Employee } from '../shared/models/employee.model';
 import { EmployeeListEntry } from './models/employee-list.model';
+import { AvatarComponent } from '../shared';
 
 @Component({
   selector: 'app-employee',
   standalone: true,
-  imports: [CommonModule],
+  imports: [AvatarComponent],
   templateUrl: './employee.html',
   styleUrl: './employee.css',
 })
@@ -23,6 +24,9 @@ export class EmployeesListComponent implements OnInit {
   private readonly employeeService = inject(EmployeeService);
   private readonly engagementService = inject(EngagementService);
   private readonly router = inject(Router);
+
+  // Expose enum for template use
+  readonly EngagementStatus = EngagementStatus;
 
   readonly employees = signal<EmployeeListEntry[]>([]);
   readonly loading = signal<boolean>(false);
@@ -86,11 +90,11 @@ export class EmployeesListComponent implements OnInit {
 
   getBadgeClass(status: EngagementStatus): string {
     switch (status) {
-      case 'OVERDUE':
+      case EngagementStatus.OVERDUE:
         return 'badge badge-danger';
-      case 'AT_RISK':
+      case EngagementStatus.AT_RISK:
         return 'badge badge-warning';
-      case 'ON_TRACK':
+      case EngagementStatus.ON_TRACK:
         return 'badge badge-success';
       default:
         return 'badge';

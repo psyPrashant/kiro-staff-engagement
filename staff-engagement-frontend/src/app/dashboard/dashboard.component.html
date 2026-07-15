@@ -1,4 +1,101 @@
-<section class="dashboard" data-testid="dashboard">
-  <h1>Dashboard</h1>
-  <app-interaction-matrix />
+<section class="page dashboard" data-testid="dashboard">
+  <!-- Greeting + Quick Actions -->
+  <header class="dashboard-header">
+    <h1>{{ greeting() }}</h1>
+    <div class="dashboard-actions">
+      <button class="btn btn-primary" (click)="openLogModal()" data-testid="btn-log-interaction">
+        Log interaction
+      </button>
+      <button class="btn btn-secondary" (click)="openScheduleModal()" data-testid="btn-schedule">
+        Schedule
+      </button>
+    </div>
+  </header>
+
+  <!-- Triage Stat Tiles -->
+  <div class="stat-tiles" data-testid="stat-tiles">
+    <div class="stat-tile stat-tile--danger">
+      <div class="stat-tile-value">{{ triageStats().overdue }}</div>
+      <div class="stat-tile-label">Overdue</div>
+    </div>
+    <div class="stat-tile stat-tile--warning">
+      <div class="stat-tile-value">{{ triageStats().atRisk }}</div>
+      <div class="stat-tile-label">At risk</div>
+    </div>
+    <div class="stat-tile stat-tile--success">
+      <div class="stat-tile-value">{{ triageStats().onTrack }}</div>
+      <div class="stat-tile-label">On track</div>
+    </div>
+  </div>
+
+  <p class="threshold-legend">
+    At risk = 14+ days &middot; Overdue = 30+ days &middot; adjust in settings
+  </p>
+
+  <!-- Week Calendar -->
+  <section class="calendar-section" aria-label="Upcoming interactions this week">
+    <h2>This week</h2>
+    <div class="week-calendar">
+      @for (day of calendarEntries(); track day.date) {
+        <div class="calendar-day" [class.calendar-day--today]="day.isToday">
+          <div class="calendar-day-label">{{ day.label }}</div>
+          <div class="calendar-day-slots">
+            @for (item of day.interactions; track item.id) {
+              <div class="calendar-slot badge badge-primary">
+                {{ item.employeeName }}
+              </div>
+            }
+            @if (day.interactions.length === 0) {
+              <span class="calendar-empty">&mdash;</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Needs Follow-Up -->
+  @if (followUpEntries().length > 0) {
+    <section class="follow-up-section" aria-label="Needs follow-up">
+      <h2>Needs follow-up</h2>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Status</th>
+              <th>Last interaction</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of followUpEntries(); track entry.employeeId) {
+              <tr>
+                <td>
+                  <div class="employee-cell">
+                    <app-avatar [name]="entry.employeeName" size="sm" />
+                    <span>{{ entry.employeeName }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span [class]="badgeClass(entry.engagementStatus)">
+                    {{ formatStatus(entry.engagementStatus) }}
+                  </span>
+                </td>
+                <td>{{ entry.lastInteractionDate ?? 'Never' }}</td>
+                <td>
+                  <button
+                    class="btn btn-primary"
+                    (click)="navigateToEmployee(entry.employeeId)"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
 </section>
