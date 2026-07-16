@@ -1,7 +1,6 @@
 import {
   Component,
   ElementRef,
-  HostListener,
   input,
   output,
   AfterViewInit,
@@ -47,10 +46,9 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     this.previousFocus?.focus();
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.close.emit();
-  }
+  // Note: Escape does NOT close the modal. Per the app-wide modal rule, a modal
+  // only closes when the backdrop (area outside the dialog) is clicked or when a
+  // relevant action button inside the modal is used.
 
   protected onBackdropClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) {

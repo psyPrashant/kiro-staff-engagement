@@ -47,6 +47,62 @@
   white-space: nowrap;
 }
 
+.settings-icon-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: var(--space-1);
+  border-radius: var(--radius-card);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.settings-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* Logged-in user segment (shares the footer row with the logout button) */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Nav Links */
 .nav-links {
   display: flex;
@@ -87,32 +143,40 @@
   flex-shrink: 0;
 }
 
-/* Sidebar Footer */
+/* Sidebar Footer — user identity on the left, logout on the same line */
 .sidebar-footer {
-  padding: var(--space-3) var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-3);
+  padding: var(--space-3) var(--space-2);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: auto;
 }
 
 .btn-logout {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
   border-radius: var(--radius-card);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-  background: none;
-  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .btn-logout:hover {
   background-color: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.4);
   color: var(--color-danger);
+}
+
+.logout-icon {
+  display: block;
 }
 
 /* Main Content */
@@ -140,6 +204,28 @@
     display: none;
   }
 
+  .settings-icon-btn {
+    display: none;
+  }
+
+  /* Collapsed rail: stack the avatar over the logout button. */
+  .sidebar-footer {
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0 var(--space-2);
+    padding: var(--space-3) 0;
+  }
+
+  .sidebar-user {
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0;
+  }
+
+  .user-meta {
+    display: none;
+  }
+
   .nav-links a {
     justify-content: center;
     padding: var(--space-2);
@@ -147,15 +233,6 @@
   }
 
   .nav-links a .nav-icon {
-    font-size: 18px;
-  }
-
-  .btn-logout {
-    justify-content: center;
-    font-size: 0;
-  }
-
-  .btn-logout .nav-icon {
     font-size: 18px;
   }
 

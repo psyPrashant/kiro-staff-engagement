@@ -94,7 +94,7 @@ textarea:focus {
 
 /* --- Stat Tiles --- */
 .stat-tile {
-  padding: 24px;
+  padding: var(--space-3) var(--space-4);
   text-align: left;
   border: 1px solid transparent;
   position: relative;
@@ -119,12 +119,12 @@ textarea:focus {
 }
 
 .stat-tile-value {
-  font-size: 32px;
+  font-size: 20px;
   letter-spacing: -0.02em;
 }
 
 .stat-tile-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 

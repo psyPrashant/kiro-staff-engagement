@@ -3,6 +3,15 @@
     <div class="sidebar-brand">
       <div class="brand-icon">SE</div>
       <span class="brand-text">Staff Engagement</span>
+      <button
+        class="settings-icon-btn"
+        (click)="showSettings.set(true)"
+        aria-label="Settings"
+        title="Settings"
+        data-testid="nav-link-settings"
+      >
+        <span aria-hidden="true">&#9881;</span>
+      </button>
     </div>
 
     <nav class="nav-links">
@@ -18,16 +27,40 @@
         <span class="nav-icon">&#10003;</span>
         Tasks
       </a>
-      <a routerLink="/settings" routerLinkActive="active" data-testid="nav-link-settings">
-        <span class="nav-icon">&#9881;</span>
-        Settings
-      </a>
     </nav>
 
     <div class="sidebar-footer">
-      <button (click)="logout()" class="btn-logout" data-testid="logout-button">
-        <span class="nav-icon">&#10140;</span>
-        Logout
+      @if (currentUser(); as user) {
+        <div class="sidebar-user" data-testid="logged-in-user">
+          <div class="user-avatar" aria-hidden="true">{{ user.name.charAt(0).toUpperCase() }}</div>
+          <div class="user-meta">
+            <span class="user-name">{{ user.name }}</span>
+          </div>
+        </div>
+      }
+      <button
+        (click)="logout()"
+        class="btn-logout"
+        data-testid="logout-button"
+        title="Log out"
+        aria-label="Log out"
+      >
+        <svg
+          class="logout-icon"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
       </button>
     </div>
   </aside>
@@ -36,3 +69,9 @@
     <router-outlet />
   </main>
 </div>
+
+@if (showSettings()) {
+  <app-modal title="Settings" (close)="showSettings.set(false)">
+    <app-settings />
+  </app-modal>
+}

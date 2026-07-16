@@ -1,13 +1,23 @@
-<section class="page interaction-page" data-testid="log-interaction">
-  <div class="card interaction-card">
-    <header class="interaction-header">
-      <div class="interaction-header-icon">&#9998;</div>
-      <div>
-        <h1>Log Interaction</h1>
-        <p class="interaction-subtitle">Record a conversation, check-in, or mentoring session.</p>
-      </div>
-    </header>
+@if (embedded()) {
+  <div class="interaction-embedded" data-testid="log-interaction">
+    <ng-container [ngTemplateOutlet]="formBody" />
+  </div>
+} @else {
+  <section class="page interaction-page" data-testid="log-interaction">
+    <div class="card interaction-card">
+      <header class="interaction-header">
+        <div class="interaction-header-icon">&#9998;</div>
+        <div>
+          <h1>Log Interaction</h1>
+          <p class="interaction-subtitle">Record a conversation, check-in, or mentoring session.</p>
+        </div>
+      </header>
+      <ng-container [ngTemplateOutlet]="formBody" />
+    </div>
+  </section>
+}
 
+<ng-template #formBody>
     @if (successMessage()) {
       <div class="success-message" role="status">{{ successMessage() }}</div>
     }
@@ -223,10 +233,12 @@
 
       <!-- Submit Button -->
       <div class="form-actions">
+        @if (embedded()) {
+          <button type="button" class="btn btn-secondary" (click)="cancelled.emit()">Cancel</button>
+        }
         <button type="submit" class="btn btn-primary submit-btn" [disabled]="form.invalid || submitting()">
           {{ submitting() ? 'Submitting...' : 'Log Interaction' }}
         </button>
       </div>
     </form>
-  </div>
-</section>
+</ng-template>

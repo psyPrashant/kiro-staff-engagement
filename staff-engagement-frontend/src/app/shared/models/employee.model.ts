@@ -5,3 +5,10 @@ export interface Employee {
   jobTitle: string;
   manager?: { id: number; name: string } | null;
 }
+
+export interface CreateEmployeeRequest {
+  name: string;
+  email: string;
+  jobTitle?: string | null;
+  managerId?: number | null;
+}

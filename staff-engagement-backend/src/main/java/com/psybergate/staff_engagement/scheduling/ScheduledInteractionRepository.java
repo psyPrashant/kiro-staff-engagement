@@ -53,4 +53,6 @@ public interface ScheduledInteractionRepository extends JpaRepository<ScheduledI
 
 	long countByScheduledByIdAndCompletionStatusAndScheduledDateBefore(
 			Long userId, CompletionStatus status, LocalDate date);
+
+	List<ScheduledInteraction> findByEmployeeId(Long employeeId);
 }

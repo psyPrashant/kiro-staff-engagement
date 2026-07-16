@@ -59,11 +59,11 @@
           </tr>
         </thead>
         <tbody>
-          @for (task of filteredTasks(); track task.id) {
+          @for (task of pagedTasks(); track task.id) {
             <tr [class.overdue-row]="isTaskOverdue(task)" class="clickable-row" (click)="selectedTask.set(task)">
               <td class="task-title">{{ task.title }}</td>
               <td>{{ task.employeeName || '-' }}</td>
-              <td>{{ task.assignedUser?.name || '-' }}</td>
+              <td>{{ task.assignedUserName || '-' }}</td>
               <td>
                 @if (task.dueDate) {
                   <span [class.overdue-text]="isTaskOverdue(task)">{{ task.dueDate | date }}</span>
@@ -77,16 +77,15 @@
                 </span>
               </td>
               <td class="actions-cell" (click)="$event.stopPropagation()">
-                @if (task.status === 'OPEN') {
-                  <button
-                    class="btn-icon"
-                    title="Mark as done"
-                    (click)="completeTask(task)"
-                    [attr.aria-label]="'Mark ' + task.title + ' as done'"
-                  >
-                    &#10003;
-                  </button>
-                }
+                <button
+                  class="btn-icon"
+                  title="Mark as done"
+                  [disabled]="task.status !== 'OPEN'"
+                  (click)="completeTask(task)"
+                  [attr.aria-label]="'Mark ' + task.title + ' as done'"
+                >
+                  &#10003;
+                </button>
                 <button
                   class="btn-icon"
                   title="Delete"
@@ -101,6 +100,12 @@
         </tbody>
       </table>
     </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      (pageChange)="page.set($event)"
+    />
   }
 </div>
 
@@ -109,6 +114,17 @@
     <app-task-form
       (submitted)="onNewTaskSubmitted($event)"
       (cancelled)="showCreateModal.set(false)"
+    />
+  </app-modal>
+}
+
+@if (editingTask(); as task) {
+  <app-modal title="Edit task" (close)="editingTask.set(null)">
+    <app-task-form
+      [initialTask]="task"
+      submitLabel="Save changes"
+      (submitted)="onEditTaskSubmitted($event)"
+      (cancelled)="editingTask.set(null)"
     />
   </app-modal>
 }
@@ -132,7 +148,7 @@
       </div>
       <div class="task-detail-row">
         <span class="task-detail-label">Assigned to</span>
-        <span>{{ task.assignedUser?.name || '-' }}</span>
+        <span>{{ task.assignedUserName || '-' }}</span>
       </div>
       <div class="task-detail-row">
         <span class="task-detail-label">Due date</span>
@@ -143,6 +159,7 @@
         <span>{{ task.createdAt | date }}</span>
       </div>
       <div class="task-detail-actions">
+        <button class="btn btn-secondary" (click)="startEdit(task)">Edit</button>
         @if (task.status === 'OPEN') {
           <button class="btn btn-primary" (click)="completeTask(task); selectedTask.set(null)">
             Mark as done

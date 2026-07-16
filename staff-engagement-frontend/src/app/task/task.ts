@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { TaskService } from './services/task.service';
 import {
   CreateTaskRequest,
@@ -8,13 +8,15 @@ import {
   isOverdue,
 } from './models/task.model';
 import { TaskFormComponent } from './components/task-form/task-form.component';
-import { ToastService, ModalComponent } from '../shared';
+import { ToastService, ModalComponent, PaginationComponent } from '../shared';
 import { DatePipe } from '@angular/common';
+
+const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-task',
   standalone: true,
-  imports: [TaskFormComponent, ModalComponent, DatePipe],
+  imports: [TaskFormComponent, ModalComponent, PaginationComponent, DatePipe],
   templateUrl: './task.html',
   styleUrl: './task.css',
 })
@@ -28,15 +30,40 @@ export class TaskListComponent implements OnInit {
   readonly statusFilter = signal<string>('OPEN');
   readonly showCreateModal = signal<boolean>(false);
   readonly selectedTask = signal<TaskResponse | null>(null);
+  readonly editingTask = signal<TaskResponse | null>(null);
+  readonly page = signal<number>(1);
 
   readonly filteredTasks = computed(() => {
     const filter = this.statusFilter();
     const all = this.tasks();
-    if (filter === 'ALL') {
-      return all;
-    }
-    return all.filter((task) => task.status === filter);
+    const matching = filter === 'ALL' ? all : all.filter((task) => task.status === filter);
+    // Always sort by due date, closest upcoming date first (nulls last).
+    return [...matching].sort((a, b) => {
+      if (a.dueDate === null && b.dueDate === null) return 0;
+      if (a.dueDate === null) return 1;
+      if (b.dueDate === null) return -1;
+      return a.dueDate.localeCompare(b.dueDate);
+    });
   });
+
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredTasks().length / PAGE_SIZE)),
+  );
+
+  readonly pagedTasks = computed(() => {
+    const start = (this.page() - 1) * PAGE_SIZE;
+    return this.filteredTasks().slice(start, start + PAGE_SIZE);
+  });
+
+  constructor() {
+    // Keep the current page within range when the underlying list shrinks.
+    effect(() => {
+      const total = this.totalPages();
+      if (this.page() > total) {
+        this.page.set(total);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.fetchTasks();
@@ -60,6 +87,7 @@ export class TaskListComponent implements OnInit {
 
   setStatusFilter(filter: string): void {
     this.statusFilter.set(filter);
+    this.page.set(1);
   }
 
   completeTask(task: TaskResponse): void {
@@ -68,9 +96,9 @@ export class TaskListComponent implements OnInit {
     const request: UpdateTaskRequest = {
       title: task.title,
       description: task.description,
-      interactionId: task.interaction?.id ?? null,
+      interactionId: task.interactionId,
       dueDate: task.dueDate,
-      assignedUserId: task.assignedUser?.id ?? null,
+      assignedUserId: task.assignedUserId,
       employeeId: task.employeeId,
       status: 'DONE',
     };
@@ -102,6 +130,28 @@ export class TaskListComponent implements OnInit {
         this.fetchTasks();
       },
       error: () => this.toast.error('Failed to create task'),
+    });
+  }
+
+  startEdit(task: TaskResponse): void {
+    this.selectedTask.set(null);
+    this.editingTask.set(task);
+  }
+
+  onEditTaskSubmitted(request: CreateTaskRequest): void {
+    const original = this.editingTask();
+    if (!original) return;
+    const update: UpdateTaskRequest = {
+      ...request,
+      status: original.status,
+    };
+    this.taskService.update(original.id, update).subscribe({
+      next: (updated) => {
+        this.tasks.update((tasks) => tasks.map((t) => (t.id === updated.id ? updated : t)));
+        this.editingTask.set(null);
+        this.toast.success('Task updated');
+      },
+      error: () => this.toast.error('Failed to update task'),
     });
   }
 

@@ -18,9 +18,10 @@ import { Project } from '../shared/models/project.model';
 function groupProjectsByCompany(projects: Project[]): Map<string, Project[]> {
   const groups = new Map<string, Project[]>();
   for (const p of projects) {
-    const list = groups.get(p.companyName) ?? [];
+    const companyName = p.company?.name ?? 'Other';
+    const list = groups.get(companyName) ?? [];
     list.push(p);
-    groups.set(p.companyName, list);
+    groups.set(companyName, list);
   }
   return groups;
 }
@@ -29,7 +30,10 @@ describe('Property 4: Project grouping preserves all items', () => {
   const projectArb = fc.record({
     id: fc.nat(),
     name: fc.string({ minLength: 1, maxLength: 20 }),
-    companyName: fc.string({ minLength: 1, maxLength: 20 }),
+    company: fc.record({
+      id: fc.nat(),
+      name: fc.string({ minLength: 1, maxLength: 20 }),
+    }),
   });
   const projectListArb = fc.array(projectArb, { minLength: 0, maxLength: 50 });
 

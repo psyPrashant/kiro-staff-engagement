@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
 	List<Task> findByInteractionIdInAndStatus(List<Long> interactionIds, TaskStatus status);
+
+	List<Task> findByEmployeeId(Long employeeId);
+
+	List<Task> findByInteractionIdIn(List<Long> interactionIds);
 }

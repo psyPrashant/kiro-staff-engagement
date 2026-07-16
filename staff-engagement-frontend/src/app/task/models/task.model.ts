@@ -25,8 +25,9 @@ export interface TaskResponse {
   description: string | null;
   status: string;
   dueDate: string | null;
-  assignedUser: { id: number; name: string } | null;
-  interaction: { id: number } | null;
+  assignedUserId: number | null;
+  assignedUserName: string | null;
+  interactionId: number | null;
   employeeId: number | null;
   employeeName: string | null;
   createdAt: string;

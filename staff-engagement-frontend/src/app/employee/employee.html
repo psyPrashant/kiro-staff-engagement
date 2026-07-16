@@ -1,5 +1,14 @@
 <div class="page" data-testid="employees-page">
-  <h1>Employees</h1>
+  <header class="employees-header">
+    <h1>Employees</h1>
+    <button
+      class="btn btn-primary"
+      (click)="showCreateModal.set(true)"
+      data-testid="btn-add-employee"
+    >
+      Add employee
+    </button>
+  </header>
 
   @if (loading()) {
     <p data-testid="employees-loading" aria-live="polite">Loading employees...</p>
@@ -65,14 +74,12 @@
           <tr>
             <th>Employee</th>
             <th>Role</th>
-            <th>Manager</th>
             <th>Status</th>
             <th>Last Seen</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          @for (emp of filteredEmployees(); track emp.id) {
+          @for (emp of pagedEmployees(); track emp.id) {
             <tr class="clickable-row" (click)="navigateToEmployee(emp.id)">
               <td>
                 <div class="employee-cell">
@@ -81,7 +88,6 @@
                 </div>
               </td>
               <td>{{ emp.jobTitle }}</td>
-              <td>{{ emp.managerName || '-' }}</td>
               <td>
                 @if (emp.engagementStatus) {
                   <span [class]="getBadgeClass(emp.engagementStatus)">
@@ -94,20 +100,24 @@
               <td class="last-seen">
                 {{ emp.lastInteractionDate ?? 'Never' }}
               </td>
-              <td class="actions-cell" (click)="$event.stopPropagation()">
-                <button
-                  class="btn-icon"
-                  title="View profile"
-                  (click)="navigateToEmployee(emp.id)"
-                  aria-label="View profile for {{ emp.name }}"
-                >
-                  &#8594;
-                </button>
-              </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      (pageChange)="page.set($event)"
+    />
   }
 </div>
+
+@if (showCreateModal()) {
+  <app-employee-create-modal
+    [managers]="managers()"
+    (closed)="showCreateModal.set(false)"
+    (created)="onEmployeeCreated()"
+  />
+}

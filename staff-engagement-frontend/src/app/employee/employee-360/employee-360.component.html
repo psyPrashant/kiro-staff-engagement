@@ -14,6 +14,10 @@
 
 @if (data()) {
   <div class="page employee-360">
+    <button type="button" class="back-link" (click)="goBack()" data-testid="back-to-employees">
+      <span aria-hidden="true">&#8592;</span> Back to employees
+    </button>
+
     <!-- Profile Header -->
     <section class="profile-card" data-testid="profile-summary">
       <div class="profile-header">
@@ -30,16 +34,30 @@
           </div>
         </div>
         <div class="profile-actions">
-          <a
+          <button
             class="btn btn-primary"
-            [routerLink]="['/interaction']"
-            [queryParams]="{ employeeId: employeeId }"
+            (click)="showLogModal.set(true)"
             data-testid="log-interaction-btn"
           >
             Log interaction
-          </a>
+          </button>
           <button class="btn btn-secondary" (click)="onNewTask()" data-testid="new-task-btn">
             Add task
+          </button>
+          <button
+            class="btn btn-secondary"
+            (click)="showScheduleModal.set(true)"
+            data-testid="schedule-btn"
+          >
+            Schedule
+          </button>
+          <button
+            class="btn btn-danger"
+            [disabled]="deleting()"
+            (click)="deleteEmployee()"
+            data-testid="delete-employee-btn"
+          >
+            Delete
           </button>
         </div>
       </div>
@@ -55,6 +73,33 @@
           </p>
         }
       </div>
+    </section>
+
+    <!-- Upcoming Interactions -->
+    <section class="section" data-testid="upcoming-interactions">
+      <h2>Upcoming Interactions</h2>
+      @if (upcomingInteractions().length === 0) {
+        <p class="empty-state" data-testid="empty-upcoming">No upcoming interactions scheduled</p>
+      } @else {
+        <ul class="upcoming-list">
+          @for (item of upcomingInteractions(); track item.id) {
+            <li>
+              <button
+                type="button"
+                class="upcoming-item"
+                (click)="selectedScheduled.set(item)"
+                data-testid="upcoming-item"
+              >
+                <span class="upcoming-date">{{ item.scheduledDate | date }}</span>
+                <span class="badge badge-primary">{{ formatInteractionType(item.interactionType) }}</span>
+                @if (item.notes) {
+                  <span class="upcoming-notes">{{ item.notes }}</span>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
     </section>
 
     <!-- Interaction History -->
@@ -74,8 +119,8 @@
               </tr>
             </thead>
             <tbody>
-              @for (interaction of data()!.interactions; track interaction.id) {
-                <tr>
+              @for (interaction of pagedInteractions(); track interaction.id) {
+                <tr class="clickable-row" (click)="selectedInteraction.set(interaction)">
                   <td>{{ interaction.occurredAt | date }}</td>
                   <td>
                     <span class="badge badge-primary">
@@ -89,6 +134,12 @@
             </tbody>
           </table>
         </div>
+
+        <app-pagination
+          [page]="interactionPage()"
+          [totalPages]="interactionTotalPages()"
+          (pageChange)="interactionPage.set($event)"
+        />
       }
     </section>
 
@@ -109,7 +160,11 @@
             </thead>
             <tbody>
               @for (task of data()!.openTasks; track task.id) {
-                <tr [class.overdue-row]="isOverdue(task.dueDate)">
+                <tr
+                  class="clickable-row"
+                  [class.overdue-row]="isOverdue(task.dueDate)"
+                  (click)="selectedTask.set(task)"
+                >
                   <td class="task-title">{{ task.title }}</td>
                   <td>
                     @if (task.dueDate) {
@@ -130,12 +185,70 @@
     </section>
   </div>
 
-  <app-task-create-dialog
-    [open]="dialogOpen()"
-    [employeeId]="employeeId"
-    [defaultAssigneeId]="currentUserId()"
-    [interactions]="interactionsForDialog()"
-    (submitted)="onTaskSubmitted($event)"
-    (closed)="dialogOpen.set(false)"
-  />
+  <!-- Add task modal -->
+  @if (showTaskModal()) {
+    <app-modal title="Create task" (close)="showTaskModal.set(false)">
+      <app-task-form
+        [employeeId]="employeeId"
+        [defaultAssigneeId]="currentUserId()"
+        [interactions]="interactionsForDialog()"
+        (submitted)="onTaskSubmitted($event)"
+        (cancelled)="showTaskModal.set(false)"
+      />
+    </app-modal>
+  }
+
+  <!-- Schedule interaction modal -->
+  @if (showScheduleModal()) {
+    <app-schedule-create-modal
+      [employeeId]="employeeId"
+      (closed)="showScheduleModal.set(false)"
+      (created)="onScheduleCreated()"
+    />
+  }
+
+  <!-- Log interaction modal -->
+  @if (showLogModal()) {
+    <app-log-interaction-modal
+      [prefilledEmployeeId]="employeeId"
+      (closed)="showLogModal.set(false)"
+      (saved)="onInteractionLogged()"
+    />
+  }
+
+  <!-- Interaction detail modal -->
+  @if (selectedInteraction(); as interaction) {
+    <app-interaction-detail-modal
+      [interaction]="interaction"
+      (closed)="selectedInteraction.set(null)"
+      (changed)="onInteractionChanged()"
+    />
+  }
+
+  <!-- Scheduled interaction detail modal -->
+  @if (selectedScheduled(); as scheduled) {
+    <app-scheduled-interaction-detail-modal
+      [interaction]="scheduled"
+      (closed)="selectedScheduled.set(null)"
+      (changed)="onScheduledChanged()"
+    />
+  }
+
+  <!-- Task detail modal -->
+  @if (selectedTask(); as task) {
+    <app-modal [title]="task.title" (close)="selectedTask.set(null)">
+      <div class="task-detail">
+        <div class="task-detail-row">
+          <span class="task-detail-label">Due date</span>
+          <span [class.overdue-text]="isOverdue(task.dueDate)">
+            {{ task.dueDate ? (task.dueDate | date) : 'No due date' }}
+          </span>
+        </div>
+        <div class="task-detail-row">
+          <span class="task-detail-label">Assigned to</span>
+          <span>{{ task.assignedUserName || '-' }}</span>
+        </div>
+      </div>
+    </app-modal>
+  }
 }

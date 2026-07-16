@@ -6,6 +6,17 @@ h1 {
   margin-bottom: var(--space-4);
 }
 
+.employees-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.employees-header h1 {
+  margin-bottom: 0;
+}
+
 .error-card {
   color: var(--color-danger);
 }

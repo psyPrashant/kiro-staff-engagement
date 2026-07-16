@@ -10,6 +10,13 @@ export interface CreateInteractionRequest {
   projectId?: number | null;
 }
 
+export interface UpdateInteractionRequest {
+  type: InteractionType;
+  notes: string;
+  occurredAt: string; // ISO 8601 instant
+  projectId?: number | null;
+}
+
 export interface InteractionResponse {
   id: number;
   employee: { id: number; name: string };

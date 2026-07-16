@@ -284,29 +284,33 @@ textarea:focus-visible {
 .stat-tiles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .stat-tile {
-  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-card);
-  text-align: center;
+  border: 1px solid transparent;
 }
 
 .stat-tile-value {
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .stat-tile-label {
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--color-muted);
-  margin-top: var(--space-1);
+  font-weight: var(--fw-medium);
 }
 
 .stat-tile--danger {
   background-color: var(--color-danger-soft);
+  border-color: rgba(220, 38, 38, 0.2);
 }
 
 .stat-tile--danger .stat-tile-value {
@@ -315,6 +319,7 @@ textarea:focus-visible {
 
 .stat-tile--warning {
   background-color: var(--color-warning-soft);
+  border-color: rgba(217, 119, 6, 0.2);
 }
 
 .stat-tile--warning .stat-tile-value {
@@ -323,6 +328,7 @@ textarea:focus-visible {
 
 .stat-tile--success {
   background-color: var(--color-success-soft);
+  border-color: rgba(22, 163, 74, 0.2);
 }
 
 .stat-tile--success .stat-tile-value {
@@ -361,6 +367,10 @@ textarea:focus-visible {
 
 .table-card tbody tr:hover {
   background-color: var(--color-surface-alt);
+}
+
+.clickable-row {
+  cursor: pointer;
 }
 
 /* --- Avatar (initials circle) --- */
