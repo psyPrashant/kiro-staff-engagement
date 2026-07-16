@@ -1,15 +1,20 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { signal } from '@angular/core';
 import { ShellComponent } from './shell.component';
 import { AuthService } from '../core/services/auth.service';
 
 describe('ShellComponent', () => {
   let fixture: ComponentFixture<ShellComponent>;
-  let authService: { logout: ReturnType<typeof vi.fn> };
+  let authService: {
+    logout: ReturnType<typeof vi.fn>;
+    currentUser: ReturnType<typeof signal>;
+  };
 
   beforeEach(async () => {
     authService = {
       logout: vi.fn(),
+      currentUser: signal({ id: 1, name: 'Test User', email: 'test@example.com' }),
     };
 
     await TestBed.configureTestingModule({
@@ -22,7 +27,7 @@ describe('ShellComponent', () => {
   });
 
   describe('navigation bar rendering', () => {
-    it('should render visible links for Dashboard, Employees, Log interaction, and Tasks', () => {
+    it('should render visible links for Dashboard, Employees, and Tasks', () => {
       const compiled = fixture.nativeElement as HTMLElement;
 
       const dashboardLink = compiled.querySelector(
@@ -31,59 +36,69 @@ describe('ShellComponent', () => {
       const employeeLink = compiled.querySelector(
         '[data-testid="nav-link-employee"]',
       ) as HTMLAnchorElement;
-      const interactionLink = compiled.querySelector(
-        '[data-testid="nav-link-interaction"]',
-      ) as HTMLAnchorElement;
       const taskLink = compiled.querySelector('[data-testid="nav-link-task"]') as HTMLAnchorElement;
 
       expect(dashboardLink).toBeTruthy();
       expect(employeeLink).toBeTruthy();
-      expect(interactionLink).toBeTruthy();
       expect(taskLink).toBeTruthy();
 
       expect(dashboardLink.getAttribute('href')).toBe('/dashboard');
       expect(employeeLink.getAttribute('href')).toBe('/employee');
-      expect(interactionLink.getAttribute('href')).toBe('/interaction');
       expect(taskLink.getAttribute('href')).toBe('/task');
     });
 
-    it('should render brand label linked to /dashboard', () => {
+    it('should render the Staff Engagement brand label', () => {
       const compiled = fixture.nativeElement as HTMLElement;
-      const brand = compiled.querySelector('[data-testid="nav-brand"]') as HTMLAnchorElement;
+      const brand = compiled.querySelector('.brand-text');
 
       expect(brand).toBeTruthy();
-      expect(brand.textContent?.trim()).toBe('Staff Engagement');
-      expect(brand.getAttribute('href')).toBe('/dashboard');
-    });
-
-    it('should hide User and Client links from visible navigation', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-
-      const userLink = compiled.querySelector('[data-testid="nav-link-user"]') as HTMLAnchorElement;
-      const clientLink = compiled.querySelector(
-        '[data-testid="nav-link-client"]',
-      ) as HTMLAnchorElement;
-
-      expect(userLink).toBeTruthy();
-      expect(clientLink).toBeTruthy();
-      expect(userLink.hidden).toBe(true);
-      expect(clientLink.hidden).toBe(true);
+      expect(brand!.textContent?.trim()).toBe('Staff Engagement');
     });
 
     it('should display link labels matching the workflow navigation', () => {
       const compiled = fixture.nativeElement as HTMLElement;
 
+      const dashboardLink = compiled.querySelector(
+        '[data-testid="nav-link-dashboard"]',
+      ) as HTMLAnchorElement;
       const employeeLink = compiled.querySelector(
         '[data-testid="nav-link-employee"]',
       ) as HTMLAnchorElement;
-      const interactionLink = compiled.querySelector(
-        '[data-testid="nav-link-interaction"]',
-      ) as HTMLAnchorElement;
       const taskLink = compiled.querySelector('[data-testid="nav-link-task"]') as HTMLAnchorElement;
 
-      expect(employeeLink.textContent?.trim()).toBe('Employees');
-      expect(interactionLink.textContent?.trim()).toBe('Log interaction');
-      expect(taskLink.textContent?.trim()).toBe('Tasks');
+      expect(dashboardLink.textContent?.trim()).toContain('Dashboard');
+      expect(employeeLink.textContent?.trim()).toContain('Employees');
+      expect(taskLink.textContent?.trim()).toContain('Tasks');
+    });
+
+    it('should have data-testid attributes on all navigation links', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      const expectedTestIds = ['nav-link-dashboard', 'nav-link-employee', 'nav-link-task'];
+
+      for (const testId of expectedTestIds) {
+        const element = compiled.querySelector(`[data-testid="${testId}"]`);
+        expect(element).toBeTruthy();
+      }
+    });
+  });
+
+  describe('settings', () => {
+    it('should render a settings button', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const settingsButton = compiled.querySelector('[data-testid="nav-link-settings"]');
+
+      expect(settingsButton).toBeTruthy();
+    });
+  });
+
+  describe('logged-in user', () => {
+    it('should display the current user name', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const loggedInUser = compiled.querySelector('[data-testid="logged-in-user"]');
+
+      expect(loggedInUser).toBeTruthy();
+      expect(loggedInUser!.textContent).toContain('Test User');
     });
   });
 
@@ -107,25 +122,6 @@ describe('ShellComponent', () => {
       const routerOutlet = compiled.querySelector('router-outlet');
 
       expect(routerOutlet).toBeTruthy();
-    });
-  });
-
-  describe('data-testid attributes', () => {
-    it('should have data-testid attributes on all navigation links', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-
-      const expectedTestIds = [
-        'nav-link-user',
-        'nav-link-employee',
-        'nav-link-client',
-        'nav-link-interaction',
-        'nav-link-task',
-      ];
-
-      for (const testId of expectedTestIds) {
-        const element = compiled.querySelector(`[data-testid="${testId}"]`);
-        expect(element).toBeTruthy();
-      }
     });
   });
 });

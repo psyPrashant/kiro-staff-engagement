@@ -27,11 +27,10 @@ describe('Route Configuration', () => {
       expect(shellRoute!.canActivate).toContain(authGuard);
     });
 
-    it('should contain child routes for dashboard, user, employee, client, interaction, task, and wildcard', () => {
+    it('should contain child routes for dashboard, employee, client, interaction, task, and wildcard', () => {
       const childPaths = shellChildren.map((r) => r.path);
 
       expect(childPaths).toContain('dashboard');
-      expect(childPaths).toContain('user');
       expect(childPaths).toContain('employee');
       expect(childPaths).toContain('client');
       expect(childPaths).toContain('interaction');
