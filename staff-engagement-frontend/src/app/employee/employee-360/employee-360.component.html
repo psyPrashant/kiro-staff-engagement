@@ -187,7 +187,7 @@
 
   <!-- Add task modal -->
   @if (showTaskModal()) {
-    <app-modal title="Create task" (close)="showTaskModal.set(false)">
+    <app-modal title="Create task" (closeModal)="showTaskModal.set(false)">
       <app-task-form
         [employeeId]="employeeId"
         [defaultAssigneeId]="currentUserId()"
@@ -236,7 +236,7 @@
 
   <!-- Task detail modal -->
   @if (selectedTask(); as task) {
-    <app-modal [title]="task.title" (close)="selectedTask.set(null)">
+    <app-modal [title]="task.title" (closeModal)="selectedTask.set(null)">
       <div class="task-detail">
         <div class="task-detail-row">
           <span class="task-detail-label">Due date</span>

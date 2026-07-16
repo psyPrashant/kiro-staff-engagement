@@ -10,7 +10,7 @@ import { CreateEmployeeRequest } from '../shared/models/employee.model';
   standalone: true,
   imports: [ModalComponent, ReactiveFormsModule],
   template: `
-    <app-modal title="Add employee" (close)="closed.emit()">
+    <app-modal title="Add employee" (closeModal)="closed.emit()">
       @if (apiError()) {
         <div class="error-message" role="alert">{{ apiError() }}</div>
       }

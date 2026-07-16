@@ -13,7 +13,7 @@ import {
   standalone: true,
   imports: [ModalComponent, ReactiveFormsModule],
   template: `
-    <app-modal title="Schedule interaction" (close)="closed.emit()">
+    <app-modal title="Schedule interaction" (closeModal)="closed.emit()">
       @if (apiError()) {
         <div class="error-message" role="alert">{{ apiError() }}</div>
       }

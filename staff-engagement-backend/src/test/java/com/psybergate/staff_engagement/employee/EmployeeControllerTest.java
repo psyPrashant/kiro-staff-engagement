@@ -31,6 +31,9 @@ class EmployeeControllerTest {
 	@MockitoBean
 	private NextScheduledInteractionService nextScheduledService;
 
+	@MockitoBean
+	private EmployeeService employeeService;
+
 	@Test
 	void getAllEmployees_returnsOkWithJsonArray() throws Exception {
 		Employee emp1 = new Employee();

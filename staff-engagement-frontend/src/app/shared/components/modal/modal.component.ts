@@ -12,7 +12,13 @@ import {
   selector: 'app-modal',
   standalone: true,
   template: `
-    <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div
+      class="modal-backdrop"
+      role="presentation"
+      tabindex="-1"
+      (click)="onBackdropClick($event)"
+      (keydown)="onBackdropKeydown($event)"
+    >
       <div
         class="modal-dialog"
         role="dialog"
@@ -23,7 +29,7 @@ import {
       >
         <div class="modal-header">
           <h2>{{ title() }}</h2>
-          <button class="modal-close" (click)="close.emit()" aria-label="Close">&times;</button>
+          <button class="modal-close" (click)="closeModal.emit()" aria-label="Close">&times;</button>
         </div>
         <ng-content />
       </div>
@@ -32,7 +38,7 @@ import {
 })
 export class ModalComponent implements AfterViewInit, OnDestroy {
   readonly title = input.required<string>();
-  readonly close = output<void>();
+  readonly closeModal = output<void>();
 
   private readonly dialog = viewChild.required<ElementRef<HTMLElement>>('dialog');
   private previousFocus: HTMLElement | null = null;
@@ -52,7 +58,14 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
 
   protected onBackdropClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
-      this.close.emit();
+      this.closeModal.emit();
+    }
+  }
+
+  protected onBackdropKeydown(event: KeyboardEvent): void {
+    if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) {
+      event.preventDefault();
+      this.closeModal.emit();
     }
   }
 

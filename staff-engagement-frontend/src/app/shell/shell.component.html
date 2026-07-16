@@ -71,7 +71,7 @@
 </div>
 
 @if (showSettings()) {
-  <app-modal title="Settings" (close)="showSettings.set(false)">
+  <app-modal title="Settings" (closeModal)="showSettings.set(false)">
     <app-settings />
   </app-modal>
 }

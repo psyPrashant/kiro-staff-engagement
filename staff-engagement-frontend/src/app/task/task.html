@@ -110,7 +110,7 @@
 </div>
 
 @if (showCreateModal()) {
-  <app-modal title="New task" (close)="showCreateModal.set(false)">
+  <app-modal title="New task" (closeModal)="showCreateModal.set(false)">
     <app-task-form
       (submitted)="onNewTaskSubmitted($event)"
       (cancelled)="showCreateModal.set(false)"
@@ -119,7 +119,7 @@
 }
 
 @if (editingTask(); as task) {
-  <app-modal title="Edit task" (close)="editingTask.set(null)">
+  <app-modal title="Edit task" (closeModal)="editingTask.set(null)">
     <app-task-form
       [initialTask]="task"
       submitLabel="Save changes"
@@ -130,7 +130,7 @@
 }
 
 @if (selectedTask(); as task) {
-  <app-modal [title]="task.title" (close)="selectedTask.set(null)">
+  <app-modal [title]="task.title" (closeModal)="selectedTask.set(null)">
     <div class="task-detail">
       <div class="task-detail-row">
         <span class="task-detail-label">Status</span>

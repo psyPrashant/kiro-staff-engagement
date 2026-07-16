@@ -7,7 +7,7 @@ import { LogInteractionComponent } from './log-interaction.component';
   standalone: true,
   imports: [ModalComponent, LogInteractionComponent],
   template: `
-    <app-modal title="Log interaction" (close)="closed.emit()">
+    <app-modal title="Log interaction" (closeModal)="closed.emit()">
       <app-log-interaction
         [embedded]="true"
         [prefilledEmployeeId]="prefilledEmployeeId()"

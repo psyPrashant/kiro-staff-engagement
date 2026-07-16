@@ -7,7 +7,6 @@ import {
   EngagementStatus,
   MatrixEntry,
   formatEngagementStatusLabel,
-  engagementStatusBadgeClass,
 } from '../dashboard/models/engagement.model';
 import { Employee } from '../shared/models/employee.model';
 import { EmployeeListEntry } from './models/employee-list.model';

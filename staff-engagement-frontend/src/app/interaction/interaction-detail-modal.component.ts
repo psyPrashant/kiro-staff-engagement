@@ -16,7 +16,7 @@ import {
   standalone: true,
   imports: [ModalComponent, FormsModule, DatePipe],
   template: `
-    <app-modal title="Interaction" (close)="closed.emit()">
+    <app-modal title="Interaction" (closeModal)="closed.emit()">
       <div class="detail-body" data-testid="interaction-detail">
         <div class="detail-row">
           <span class="detail-label">Conducted by</span>

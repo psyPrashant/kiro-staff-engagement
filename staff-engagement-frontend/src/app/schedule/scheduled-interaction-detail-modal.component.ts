@@ -18,7 +18,7 @@ const TYPE_LABELS: Record<string, string> = {
   standalone: true,
   imports: [ModalComponent, FormsModule, DatePipe],
   template: `
-    <app-modal title="Scheduled interaction" (close)="closed.emit()">
+    <app-modal title="Scheduled interaction" (closeModal)="closed.emit()">
       <div class="detail-body" data-testid="scheduled-detail">
         <div class="detail-row">
           <span class="detail-label">Employee</span>
