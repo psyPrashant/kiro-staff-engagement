@@ -5,6 +5,9 @@ import com.psybergate.staff_engagement.client.ProjectRepository;
 import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.employee.EmployeeRepository;
 import com.psybergate.staff_engagement.interaction.dto.CreateInteractionRequest;
+import com.psybergate.staff_engagement.interaction.dto.UpdateInteractionRequest;
+import com.psybergate.staff_engagement.task.Task;
+import com.psybergate.staff_engagement.task.TaskRepository;
 import com.psybergate.staff_engagement.user.User;
 import com.psybergate.staff_engagement.user.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -15,10 +18,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +41,9 @@ class InteractionServiceTest {
 
 	@Mock
 	private ProjectRepository projectRepository;
+
+	@Mock
+	private TaskRepository taskRepository;
 
 	@InjectMocks
 	private InteractionService interactionService;
@@ -207,5 +215,101 @@ class InteractionServiceTest {
 		assertEquals(InteractionType.MENTORING, captured.getType());
 		assertEquals("Mentoring session", captured.getNotes());
 		assertEquals(occurredAt, captured.getOccurredAt());
+	}
+
+	// --- update -------------------------------------------------------------
+
+	@Test
+	void update_validRequest_updatesFieldsAndSaves() {
+		Interaction existing = new Interaction();
+		existing.setId(7L);
+		when(interactionRepository.findById(7L)).thenReturn(Optional.of(existing));
+
+		Project project = new Project();
+		project.setId(10L);
+		when(projectRepository.findById(10L)).thenReturn(Optional.of(project));
+		when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		Instant occurredAt = Instant.parse("2025-01-10T09:00:00Z");
+		UpdateInteractionRequest request = new UpdateInteractionRequest(
+				InteractionType.CATCH_UP, "Updated notes", occurredAt, 10L);
+
+		Interaction result = interactionService.update(7L, request);
+
+		assertEquals(InteractionType.CATCH_UP, result.getType());
+		assertEquals("Updated notes", result.getNotes());
+		assertEquals(occurredAt, result.getOccurredAt());
+		assertEquals(project, result.getProject());
+	}
+
+	@Test
+	void update_nullProjectId_clearsProject() {
+		Interaction existing = new Interaction();
+		existing.setId(7L);
+		existing.setProject(new Project());
+		when(interactionRepository.findById(7L)).thenReturn(Optional.of(existing));
+		when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
+
+		UpdateInteractionRequest request = new UpdateInteractionRequest(
+				InteractionType.OTHER, "Notes", Instant.now(), null);
+
+		Interaction result = interactionService.update(7L, request);
+
+		assertNull(result.getProject());
+	}
+
+	@Test
+	void update_nonExistentId_throwsInteractionNotFound() {
+		when(interactionRepository.findById(999L)).thenReturn(Optional.empty());
+
+		UpdateInteractionRequest request = new UpdateInteractionRequest(
+				InteractionType.CHECK_IN, "Notes", Instant.now(), null);
+
+		assertThrows(InteractionNotFoundException.class, () -> interactionService.update(999L, request));
+		verify(interactionRepository, never()).save(any());
+	}
+
+	@Test
+	void update_nonExistentProjectId_throwsIllegalArgument() {
+		Interaction existing = new Interaction();
+		existing.setId(7L);
+		when(interactionRepository.findById(7L)).thenReturn(Optional.of(existing));
+		when(projectRepository.findById(999L)).thenReturn(Optional.empty());
+
+		UpdateInteractionRequest request = new UpdateInteractionRequest(
+				InteractionType.CHECK_IN, "Notes", Instant.now(), 999L);
+
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+				() -> interactionService.update(7L, request));
+		assertTrue(ex.getMessage().contains("Project not found"));
+		verify(interactionRepository, never()).save(any());
+	}
+
+	// --- delete ---------------------------------------------------------------
+
+	@Test
+	void delete_existingId_detachesLinkedTasksAndDeletesInteraction() {
+		Interaction existing = new Interaction();
+		existing.setId(7L);
+		when(interactionRepository.findById(7L)).thenReturn(Optional.of(existing));
+
+		Task linkedTask = new Task();
+		linkedTask.setId(50L);
+		linkedTask.setInteraction(existing);
+		when(taskRepository.findByInteractionIdIn(List.of(7L))).thenReturn(List.of(linkedTask));
+
+		interactionService.delete(7L);
+
+		assertNull(linkedTask.getInteraction());
+		verify(taskRepository).saveAll(List.of(linkedTask));
+		verify(interactionRepository).delete(existing);
+	}
+
+	@Test
+	void delete_nonExistentId_throwsInteractionNotFound() {
+		when(interactionRepository.findById(999L)).thenReturn(Optional.empty());
+
+		assertThrows(InteractionNotFoundException.class, () -> interactionService.delete(999L));
+		verify(interactionRepository, never()).delete(any());
 	}
 }

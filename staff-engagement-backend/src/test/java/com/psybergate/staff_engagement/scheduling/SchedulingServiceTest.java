@@ -250,6 +250,40 @@ class SchedulingServiceTest {
 		verify(repository, never()).save(any());
 	}
 
+	// --- delete -------------------------------------------------------------------
+
+	@Test
+	void deleteRemovesEntityForOwner() {
+		Employee jane = employee(1L, "Jane Doe");
+		ScheduledInteraction existing = entity(7L, jane, TODAY.plusDays(1), CompletionStatus.PENDING);
+		when(repository.findById(7L)).thenReturn(Optional.of(existing));
+
+		service().delete(7L, USER_ID);
+
+		verify(repository).delete(existing);
+	}
+
+	@Test
+	void deleteByNonOwnerThrowsNotFoundAndDoesNotDelete() {
+		Employee jane = employee(1L, "Jane Doe");
+		ScheduledInteraction ownedByOther = entity(7L, jane, TODAY.plusDays(1), CompletionStatus.PENDING);
+		ownedByOther.setScheduledBy(user(999L));
+		when(repository.findById(7L)).thenReturn(Optional.of(ownedByOther));
+
+		assertThatThrownBy(() -> service().delete(7L, USER_ID))
+				.isInstanceOf(ScheduledInteractionNotFoundException.class);
+		verify(repository, never()).delete(any());
+	}
+
+	@Test
+	void deleteNonExistentIdThrowsNotFound() {
+		when(repository.findById(7L)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> service().delete(7L, USER_ID))
+				.isInstanceOf(ScheduledInteractionNotFoundException.class);
+		verify(repository, never()).delete(any());
+	}
+
 	// --- countOverdue -----------------------------------------------------------
 
 	@Test
