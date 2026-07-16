@@ -38,11 +38,10 @@ function createMockEntry(overrides: Partial<MatrixEntry> = {}): MatrixEntry {
   return {
     employeeId: 1,
     employeeName: 'John Doe',
-    employeeEmail: 'john@example.com',
     recency: 5,
     frequency: 3,
     lastInteractionDate: '2024-01-15T00:00:00Z',
-    engagementStatus: 'ON_TRACK',
+    engagementStatus: EngagementStatus.ON_TRACK,
     followUpRequired: false,
     ...overrides,
   };
@@ -179,21 +178,21 @@ describe('InteractionMatrixComponent', () => {
 
   describe('correct CSS class per EngagementStatus value', () => {
     it('should apply badge-danger class for OVERDUE status', () => {
-      triggerInitialLoad([createMockEntry({ engagementStatus: 'OVERDUE' })]);
+      triggerInitialLoad([createMockEntry({ engagementStatus: EngagementStatus.OVERDUE })]);
 
       const badge = fixture.nativeElement.querySelector('.badge');
       expect(badge.classList.contains('badge-danger')).toBe(true);
     });
 
     it('should apply badge-warning class for AT_RISK status', () => {
-      triggerInitialLoad([createMockEntry({ engagementStatus: 'AT_RISK' })]);
+      triggerInitialLoad([createMockEntry({ engagementStatus: EngagementStatus.AT_RISK })]);
 
       const badge = fixture.nativeElement.querySelector('.badge');
       expect(badge.classList.contains('badge-warning')).toBe(true);
     });
 
     it('should apply badge-success class for ON_TRACK status', () => {
-      triggerInitialLoad([createMockEntry({ engagementStatus: 'ON_TRACK' })]);
+      triggerInitialLoad([createMockEntry({ engagementStatus: EngagementStatus.ON_TRACK })]);
 
       const badge = fixture.nativeElement.querySelector('.badge');
       expect(badge.classList.contains('badge-success')).toBe(true);
@@ -260,7 +259,7 @@ describe('InteractionMatrixComponent', () => {
       initialReq.flush([]);
       fixture.detectChanges();
 
-      component.onFilterChange('OVERDUE');
+      component.onFilterChange(EngagementStatus.OVERDUE);
       fixture.detectChanges();
 
       const filterReq = httpTesting.expectOne(
@@ -348,7 +347,6 @@ function arbitraryMatrixEntry(): fc.Arbitrary<MatrixEntry> {
   return fc.record({
     employeeId: fc.integer({ min: 1 }),
     employeeName: fc.string({ minLength: 1, maxLength: 50 }),
-    employeeEmail: fc.emailAddress(),
     recency: fc.option(fc.nat(), { nil: null }),
     frequency: fc.nat(),
     lastInteractionDate: fc.option(

@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { formatEnumLabel } from './format-enum-label';
-import { formatEngagementStatusLabel } from '../../dashboard/models/engagement.model';
+import {
+  EngagementStatus,
+  formatEngagementStatusLabel,
+} from '../../dashboard/models/engagement.model';
 import { formatTaskStatusLabel } from '../../task/models/task.model';
 
 describe('formatEnumLabel', () => {
@@ -39,7 +42,11 @@ describe('Label helpers - property tests', () => {
    * **Validates: Requirements 5.1, 5.2, 5.3**
    */
   it('Property 1: formatEngagementStatusLabel returns non-empty transformed string for any valid status', () => {
-    const statuses = ['OVERDUE', 'AT_RISK', 'ON_TRACK'] as const;
+    const statuses = [
+      EngagementStatus.OVERDUE,
+      EngagementStatus.AT_RISK,
+      EngagementStatus.ON_TRACK,
+    ] as const;
     fc.assert(
       fc.property(fc.constantFrom(...statuses), (status) => {
         const result = formatEngagementStatusLabel(status);
