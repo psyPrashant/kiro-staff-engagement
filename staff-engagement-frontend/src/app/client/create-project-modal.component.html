@@ -1,0 +1,62 @@
+<app-modal title="Create Project" (closeModal)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="client-form" novalidate>
+    <div class="form-field">
+      <label for="project-name">Project name <span class="required">*</span></label>
+      <input
+        id="project-name"
+        type="text"
+        formControlName="name"
+        maxlength="255"
+        placeholder="Enter project name"
+        [attr.aria-invalid]="isInvalid('name')"
+        data-testid="project-name-input"
+      />
+      @if (isInvalid('name')) {
+        <span class="field-error" role="alert">Project name is required</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="project-company">Company <span class="required">*</span></label>
+      <select
+        id="project-company"
+        formControlName="company"
+        (change)="onCompanyChange()"
+        [attr.aria-invalid]="isInvalid('company')"
+        data-testid="project-company-select"
+      >
+        <option value="" disabled>Select company</option>
+        @for (company of companies(); track company.id) {
+          <option [value]="company.id">{{ company.name }}</option>
+        }
+        <option value="new">+ Add new company</option>
+      </select>
+      @if (isInvalid('company')) {
+        <span class="field-error" role="alert">Company is required</span>
+      }
+    </div>
+
+    @if (isNewCompany()) {
+      <div class="form-field">
+        <label for="new-company-name">New company name <span class="required">*</span></label>
+        <input
+          id="new-company-name"
+          type="text"
+          formControlName="newCompanyName"
+          maxlength="255"
+          placeholder="Enter company name"
+          [attr.aria-invalid]="isInvalid('newCompanyName')"
+          data-testid="new-company-input"
+        />
+        @if (isInvalid('newCompanyName')) {
+          <span class="field-error" role="alert">Company name is required</span>
+        }
+      </div>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">Create project</button>
+      <button type="button" class="btn btn-secondary" (click)="closed.emit()">Cancel</button>
+    </div>
+  </form>
+</app-modal>

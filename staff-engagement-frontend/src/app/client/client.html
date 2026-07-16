@@ -1,1 +1,69 @@
-<h1>Client</h1>
+<div class="page" data-testid="companies-page">
+  <header class="companies-header">
+    <h1>Companies</h1>
+    <button
+      class="btn btn-primary"
+      (click)="showCreateModal.set(true)"
+      data-testid="btn-add-project"
+    >
+      Add project
+    </button>
+  </header>
+
+  @if (loading()) {
+    <p data-testid="companies-loading" aria-live="polite">Loading companies...</p>
+  }
+
+  @if (error(); as errorMsg) {
+    <div class="card error-card" data-testid="companies-error">
+      <p>{{ errorMsg }}</p>
+      <button class="btn btn-primary" (click)="fetchData()">Retry</button>
+    </div>
+  }
+
+  @if (!loading() && !error() && projects().length === 0) {
+    <p data-testid="companies-empty">No projects found.</p>
+  }
+
+  @if (!loading() && !error() && projects().length > 0) {
+    <div class="table-card" data-testid="companies-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Project</th>
+            <th>Employees Assigned</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (project of projects(); track project.id) {
+            <tr
+              class="clickable-row"
+              (click)="selectedProjectId.set(project.id)"
+              data-testid="company-row"
+            >
+              <td>{{ project.companyName }}</td>
+              <td>{{ project.name }}</td>
+              <td>{{ project.employeeCount }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (showCreateModal()) {
+  <app-create-project-modal
+    (closed)="showCreateModal.set(false)"
+    (created)="onProjectCreated()"
+  />
+}
+
+@if (selectedProjectId(); as projectId) {
+  <app-project-detail-modal
+    [projectId]="projectId"
+    (closed)="selectedProjectId.set(null)"
+    (updated)="onProjectUpdated()"
+  />
+}
