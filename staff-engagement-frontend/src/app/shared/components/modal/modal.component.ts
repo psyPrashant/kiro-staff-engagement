@@ -29,7 +29,9 @@ import {
       >
         <div class="modal-header">
           <h2>{{ title() }}</h2>
-          <button class="modal-close" (click)="closeModal.emit()" aria-label="Close">&times;</button>
+          <button class="modal-close" (click)="closeModal.emit()" aria-label="Close">
+            &times;
+          </button>
         </div>
         <ng-content />
       </div>

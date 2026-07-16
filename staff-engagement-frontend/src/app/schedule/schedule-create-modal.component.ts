@@ -154,7 +154,9 @@ export class ScheduleCreateModalComponent {
       },
       error: (err) => {
         this.submitting.set(false);
-        this.apiError.set(err?.error?.message ?? 'Failed to schedule interaction. Please try again.');
+        this.apiError.set(
+          err?.error?.message ?? 'Failed to schedule interaction. Please try again.',
+        );
       },
     });
   }

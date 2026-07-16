@@ -91,7 +91,9 @@
                 data-testid="upcoming-item"
               >
                 <span class="upcoming-date">{{ item.scheduledDate | date }}</span>
-                <span class="badge badge-primary">{{ formatInteractionType(item.interactionType) }}</span>
+                <span class="badge badge-primary">{{
+                  formatInteractionType(item.interactionType)
+                }}</span>
                 @if (item.notes) {
                   <span class="upcoming-notes">{{ item.notes }}</span>
                 }

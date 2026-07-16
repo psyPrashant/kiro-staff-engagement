@@ -17,7 +17,9 @@
         (ngModelChange)="atRiskDays.set($event)"
         data-testid="input-at-risk"
       />
-      <span class="field-hint">Employees with no interaction for this many days are flagged "At risk"</span>
+      <span class="field-hint"
+        >Employees with no interaction for this many days are flagged "At risk"</span
+      >
     </div>
 
     <div class="form-field">
@@ -30,7 +32,9 @@
         (ngModelChange)="overdueDays.set($event)"
         data-testid="input-overdue"
       />
-      <span class="field-hint">Employees with no interaction for this many days are flagged "Overdue"</span>
+      <span class="field-hint"
+        >Employees with no interaction for this many days are flagged "Overdue"</span
+      >
     </div>
 
     <button class="btn btn-primary" (click)="save()" data-testid="btn-save-settings">

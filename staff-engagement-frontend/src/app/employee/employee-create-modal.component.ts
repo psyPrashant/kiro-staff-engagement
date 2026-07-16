@@ -42,7 +42,11 @@ import { CreateEmployeeRequest } from '../shared/models/employee.model';
           />
           @if (isInvalid('email')) {
             <span class="field-error" role="alert">
-              {{ form.get('email')?.hasError('required') ? 'Email is required' : 'Enter a valid email' }}
+              {{
+                form.get('email')?.hasError('required')
+                  ? 'Email is required'
+                  : 'Enter a valid email'
+              }}
             </span>
           }
         </div>

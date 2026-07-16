@@ -74,7 +74,12 @@ const TYPE_LABELS: Record<string, string> = {
             <button class="btn btn-secondary" (click)="startEdit()" data-testid="edit-scheduled">
               Edit
             </button>
-            <button class="btn btn-danger" [disabled]="saving()" (click)="remove()" data-testid="delete-scheduled">
+            <button
+              class="btn btn-danger"
+              [disabled]="saving()"
+              (click)="remove()"
+              data-testid="delete-scheduled"
+            >
               Delete
             </button>
           }

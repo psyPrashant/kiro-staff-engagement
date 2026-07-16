@@ -65,9 +65,7 @@ export class EmployeesListComponent implements OnInit {
   });
 
   // Candidate managers for the create-employee modal.
-  readonly managers = computed(() =>
-    this.employees().map((e) => ({ id: e.id, name: e.name })),
-  );
+  readonly managers = computed(() => this.employees().map((e) => ({ id: e.id, name: e.name })));
 
   constructor() {
     // Reset to the first page whenever the active filters change.

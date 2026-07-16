@@ -88,9 +88,7 @@ export class Employee360Component implements OnInit {
   readonly sortedInteractions = computed(() => {
     const employeeData = this.data();
     if (!employeeData) return [];
-    return [...employeeData.interactions].sort((a, b) =>
-      b.occurredAt.localeCompare(a.occurredAt),
-    );
+    return [...employeeData.interactions].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
   });
 
   readonly interactionTotalPages = computed(() =>
