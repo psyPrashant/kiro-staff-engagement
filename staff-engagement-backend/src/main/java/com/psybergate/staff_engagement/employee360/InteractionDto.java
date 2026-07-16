@@ -8,5 +8,6 @@ public record InteractionDto(
 	Instant occurredAt,
 	String conductedByName,
 	String notes,
-	ProjectContextDto projectContext
+	ProjectContextDto projectContext,
+	Long projectId
 ) {}

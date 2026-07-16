@@ -1,4 +1,186 @@
-<section class="dashboard" data-testid="dashboard">
-  <h1>Dashboard</h1>
-  <app-interaction-matrix />
+<section class="page dashboard" data-testid="dashboard">
+  <!-- Greeting -->
+  <header class="dashboard-header">
+    <h1>{{ greeting() }}</h1>
+  </header>
+
+  <!-- Triage Stat Tiles -->
+  <div class="stat-tiles" data-testid="stat-tiles">
+    <div class="stat-tile stat-tile--danger">
+      <div class="stat-tile-value">{{ triageStats().overdue }}</div>
+      <div class="stat-tile-label">Overdue</div>
+    </div>
+    <div class="stat-tile stat-tile--warning">
+      <div class="stat-tile-value">{{ triageStats().atRisk }}</div>
+      <div class="stat-tile-label">At risk</div>
+    </div>
+    <div class="stat-tile stat-tile--success">
+      <div class="stat-tile-value">{{ triageStats().onTrack }}</div>
+      <div class="stat-tile-label">On track</div>
+    </div>
+  </div>
+
+  <p class="threshold-legend">
+    At risk = 14+ days &middot; Overdue = 30+ days &middot; adjust in settings
+  </p>
+
+  <!-- Calendar -->
+  <section class="calendar-section" aria-label="Scheduled interactions">
+    <div class="calendar-toolbar">
+      <div class="calendar-nav">
+        <button
+          class="btn btn-secondary btn-icon"
+          (click)="previous()"
+          [attr.aria-label]="'Previous ' + view()"
+          data-testid="calendar-prev"
+        >
+          &#8592;
+        </button>
+        <button class="btn btn-secondary" (click)="today()" data-testid="calendar-today">
+          Today
+        </button>
+        <button
+          class="btn btn-secondary btn-icon"
+          (click)="next()"
+          [attr.aria-label]="'Next ' + view()"
+          data-testid="calendar-next"
+        >
+          &#8594;
+        </button>
+        <h2 class="calendar-title" data-testid="calendar-title">{{ periodLabel() }}</h2>
+      </div>
+
+      <div class="calendar-view-toggle" role="group" aria-label="Calendar view">
+        <button
+          class="btn"
+          [class.btn-primary]="view() === 'week'"
+          (click)="setView('week')"
+          data-testid="calendar-view-week"
+        >
+          Week
+        </button>
+        <button
+          class="btn"
+          [class.btn-primary]="view() === 'month'"
+          (click)="setView('month')"
+          data-testid="calendar-view-month"
+        >
+          Month
+        </button>
+      </div>
+    </div>
+
+    @if (view() === 'week') {
+      <div class="week-calendar" data-testid="calendar-week">
+        @for (day of weekCells(); track day.dateKey) {
+          <div class="calendar-day" [class.calendar-day--today]="day.isToday">
+            <div class="calendar-day-header">
+              <span class="calendar-day-label">{{ day.label }}</span>
+              <span class="calendar-day-date">{{ day.dayOfMonth }}</span>
+            </div>
+            <div class="calendar-day-slots">
+              @for (item of day.interactions; track item.id) {
+                <button
+                  type="button"
+                  class="calendar-slot"
+                  (click)="selectedScheduled.set(item)"
+                  data-testid="calendar-interaction"
+                >
+                  <span class="calendar-slot-name">{{ item.employeeName }}</span>
+                  <span class="calendar-slot-type">{{ typeLabel(item.interactionType) }}</span>
+                </button>
+              }
+              @if (day.interactions.length === 0) {
+                <span class="calendar-empty">No interactions</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="month-calendar" data-testid="calendar-month">
+        <div class="month-weekdays">
+          @for (header of weekdayHeaders; track header) {
+            <div class="month-weekday">{{ header }}</div>
+          }
+        </div>
+        @for (week of monthWeeks(); track $index) {
+          <div class="month-week">
+            @for (day of week; track day.dateKey) {
+              <div
+                class="month-cell"
+                [class.month-cell--today]="day.isToday"
+                [class.month-cell--outside]="!day.inCurrentMonth"
+              >
+                <div class="month-cell-date">{{ day.label }}</div>
+                <div class="month-cell-slots">
+                  @for (item of day.interactions; track item.id) {
+                    <button
+                      type="button"
+                      class="calendar-slot calendar-slot--compact"
+                      (click)="selectedScheduled.set(item)"
+                      data-testid="calendar-interaction"
+                    >
+                      <span class="calendar-slot-name">{{ item.employeeName }}</span>
+                      <span class="calendar-slot-type">{{ typeLabel(item.interactionType) }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Needs Follow-Up -->
+  @if (followUpEntries().length > 0) {
+    <section class="follow-up-section" aria-label="Needs follow-up">
+      <h2>Needs follow-up</h2>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Status</th>
+              <th>Last interaction</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of followUpEntries(); track entry.employeeId) {
+              <tr>
+                <td>
+                  <div class="employee-cell">
+                    <app-avatar [name]="entry.employeeName" size="sm" />
+                    <span>{{ entry.employeeName }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span [class]="badgeClass(entry.engagementStatus)">
+                    {{ formatStatus(entry.engagementStatus) }}
+                  </span>
+                </td>
+                <td>{{ entry.lastInteractionDate ?? 'Never' }}</td>
+                <td>
+                  <button class="btn btn-primary" (click)="navigateToEmployee(entry.employeeId)">
+                    View
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
 </section>
+
+@if (selectedScheduled(); as scheduled) {
+  <app-scheduled-interaction-detail-modal
+    [interaction]="scheduled"
+    (closed)="selectedScheduled.set(null)"
+    (changed)="onScheduledChanged()"
+  />
+}

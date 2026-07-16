@@ -1,21 +1,77 @@
-<nav class="app-nav" data-testid="app-nav">
-  <a routerLink="/dashboard" class="brand-label" data-testid="nav-brand">Staff Engagement</a>
-  <div class="nav-links">
-    <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-link-dashboard"
-      >Dashboard</a
-    >
-    <a routerLink="/employee" routerLinkActive="active" data-testid="nav-link-employee"
-      >Employees</a
-    >
-    <a routerLink="/interaction" routerLinkActive="active" data-testid="nav-link-interaction"
-      >Log interaction</a
-    >
-    <a routerLink="/task" routerLinkActive="active" data-testid="nav-link-task">Tasks</a>
-  </div>
-  <a routerLink="/user" routerLinkActive="active" data-testid="nav-link-user" hidden>User</a>
-  <a routerLink="/client" routerLinkActive="active" data-testid="nav-link-client" hidden>Client</a>
-  <button (click)="logout()" class="btn-logout" data-testid="logout-button">Logout</button>
-</nav>
-<main class="app-content">
-  <router-outlet />
-</main>
+<div class="shell-layout" data-testid="app-shell">
+  <aside class="sidebar" data-testid="app-nav">
+    <div class="sidebar-brand">
+      <div class="brand-icon">SE</div>
+      <span class="brand-text">Staff Engagement</span>
+      <button
+        class="settings-icon-btn"
+        (click)="showSettings.set(true)"
+        aria-label="Settings"
+        title="Settings"
+        data-testid="nav-link-settings"
+      >
+        <span aria-hidden="true">&#9881;</span>
+      </button>
+    </div>
+
+    <nav class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active" data-testid="nav-link-dashboard">
+        <span class="nav-icon">&#9632;</span>
+        Dashboard
+      </a>
+      <a routerLink="/employee" routerLinkActive="active" data-testid="nav-link-employee">
+        <span class="nav-icon">&#9679;</span>
+        Employees
+      </a>
+      <a routerLink="/task" routerLinkActive="active" data-testid="nav-link-task">
+        <span class="nav-icon">&#10003;</span>
+        Tasks
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (currentUser(); as user) {
+        <div class="sidebar-user" data-testid="logged-in-user">
+          <div class="user-avatar" aria-hidden="true">{{ user.name.charAt(0).toUpperCase() }}</div>
+          <div class="user-meta">
+            <span class="user-name">{{ user.name }}</span>
+          </div>
+        </div>
+      }
+      <button
+        (click)="logout()"
+        class="btn-logout"
+        data-testid="logout-button"
+        title="Log out"
+        aria-label="Log out"
+      >
+        <svg
+          class="logout-icon"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="app-content">
+    <router-outlet />
+  </main>
+</div>
+
+@if (showSettings()) {
+  <app-modal title="Settings" (closeModal)="showSettings.set(false)">
+    <app-settings />
+  </app-modal>
+}

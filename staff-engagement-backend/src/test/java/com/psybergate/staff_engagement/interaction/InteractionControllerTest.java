@@ -3,6 +3,7 @@ package com.psybergate.staff_engagement.interaction;
 import com.psybergate.staff_engagement.common.exception.GlobalExceptionHandler;
 import com.psybergate.staff_engagement.employee.Employee;
 import com.psybergate.staff_engagement.interaction.dto.CreateInteractionRequest;
+import com.psybergate.staff_engagement.interaction.dto.UpdateInteractionRequest;
 import com.psybergate.staff_engagement.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,13 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(InteractionController.class)
@@ -181,5 +185,89 @@ class InteractionControllerTest {
 						.content(requestBody))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message").value("Employee not found with id: 999"));
+	}
+
+	@Test
+	void updateInteraction_validRequest_returns200WithBody() throws Exception {
+		Interaction updated = new Interaction();
+		updated.setId(7L);
+		updated.setType(InteractionType.CATCH_UP);
+		updated.setNotes("Updated notes");
+		updated.setOccurredAt(Instant.parse("2025-01-10T09:00:00Z"));
+
+		when(interactionService.update(org.mockito.ArgumentMatchers.eq(7L), any(UpdateInteractionRequest.class)))
+				.thenReturn(updated);
+
+		String requestBody = """
+				{
+					"type": "CATCH_UP",
+					"notes": "Updated notes",
+					"occurredAt": "2025-01-10T09:00:00Z"
+				}
+				""";
+
+		mockMvc.perform(put("/api/interactions/7")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(7))
+				.andExpect(jsonPath("$.type").value("CATCH_UP"))
+				.andExpect(jsonPath("$.notes").value("Updated notes"));
+	}
+
+	@Test
+	void updateInteraction_nonExistentId_returns404() throws Exception {
+		when(interactionService.update(org.mockito.ArgumentMatchers.eq(999L), any(UpdateInteractionRequest.class)))
+				.thenThrow(new InteractionNotFoundException(999L));
+
+		String requestBody = """
+				{
+					"type": "CATCH_UP",
+					"notes": "Updated notes",
+					"occurredAt": "2025-01-10T09:00:00Z"
+				}
+				""";
+
+		mockMvc.perform(put("/api/interactions/999")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("Interaction not found with id: 999"));
+	}
+
+	@Test
+	void updateInteraction_missingRequiredFields_returns400WithFieldErrors() throws Exception {
+		String requestBody = """
+				{
+					"type": null,
+					"notes": "",
+					"occurredAt": null
+				}
+				""";
+
+		mockMvc.perform(put("/api/interactions/7")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message").value("Validation failed"));
+	}
+
+	@Test
+	void deleteInteraction_existingId_returns204() throws Exception {
+		mockMvc.perform(delete("/api/interactions/7").with(csrf()))
+				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	void deleteInteraction_nonExistentId_returns404() throws Exception {
+		org.mockito.Mockito.doThrow(new InteractionNotFoundException(999L))
+				.when(interactionService).delete(999L);
+
+		mockMvc.perform(delete("/api/interactions/999").with(csrf()))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.message").value("Interaction not found with id: 999"));
 	}
 }

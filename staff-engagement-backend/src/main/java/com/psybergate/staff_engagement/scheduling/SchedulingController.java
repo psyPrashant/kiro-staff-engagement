@@ -65,6 +65,15 @@ public class SchedulingController {
 		return schedulingService.update(id, request, userId);
 	}
 
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(
+			@PathVariable Long id,
+			@AuthenticationPrincipal UserDetails principal) {
+		Long userId = extractUserId(principal);
+		schedulingService.delete(id, userId);
+	}
+
 	private Long extractUserId(UserDetails principal) {
 		String email = principal.getUsername();
 		User user = userRepository.findByEmail(email)

@@ -1,0 +1,206 @@
+/* ============================================================
+   Theme Enhancements — loaded after styles.css (cascade wins)
+   Visual polish layer: gradients, shadows, hover states.
+   ============================================================ */
+
+:root {
+  /* Refined palette */
+  --color-bg: #f4f5f8;
+  --color-surface-alt: #f5f6f8;
+  --color-text: #14152b;
+  --color-border: #e7e8ee;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-soft: #eef2ff;
+  --color-accent: #7c3aed;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #4f46e5, #7c3aed);
+  --gradient-sidebar: linear-gradient(180deg, #1a1a2e, #16213e);
+
+  /* Softer radii */
+  --radius-control: 8px;
+  --radius-card: 14px;
+
+  /* Layered shadows */
+  --shadow-sm: 0 1px 2px rgba(20, 21, 43, 0.04);
+  --shadow-default: 0 1px 3px rgba(20, 21, 43, 0.06), 0 1px 2px rgba(20, 21, 43, 0.04);
+  --shadow-md: 0 4px 12px rgba(20, 21, 43, 0.08), 0 2px 4px rgba(20, 21, 43, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 21, 43, 0.12), 0 4px 8px rgba(20, 21, 43, 0.06);
+  --shadow-primary: 0 4px 14px rgba(79, 70, 229, 0.35);
+}
+
+/* --- Inputs --- */
+input,
+select,
+textarea {
+  padding: 10px 12px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: #cfd1da;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+/* --- Cards --- */
+.card {
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Buttons --- */
+.btn {
+  gap: 8px;
+  padding: 10px 16px;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: #fff;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.45);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface-alt);
+  border-color: #cfd1da;
+  transform: translateY(-1px);
+}
+
+/* --- Stat Tiles --- */
+.stat-tile {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.stat-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.stat-tile-value {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.stat-tile-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.stat-tile--danger {
+  border-color: rgba(220, 38, 38, 0.15);
+}
+.stat-tile--danger::before {
+  background-color: var(--color-danger);
+}
+
+.stat-tile--warning {
+  border-color: rgba(217, 119, 6, 0.15);
+}
+.stat-tile--warning::before {
+  background-color: var(--color-warning);
+}
+
+.stat-tile--success {
+  border-color: rgba(22, 163, 74, 0.15);
+}
+.stat-tile--success::before {
+  background-color: var(--color-success);
+}
+
+/* --- Tables --- */
+.table-card {
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.table-card thead th {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 12px 16px;
+}
+
+.table-card tbody td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.table-card tbody tr {
+  transition: background-color 0.12s;
+}
+
+.table-card tbody tr:hover {
+  background-color: var(--color-primary-soft);
+}
+
+/* --- Avatar --- */
+.avatar {
+  background: var(--gradient-primary);
+  color: #fff;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* --- Modal --- */
+.modal-backdrop {
+  background-color: rgba(20, 21, 43, 0.45);
+  backdrop-filter: blur(4px);
+  padding: 16px;
+}
+
+.modal-dialog {
+  box-shadow: var(--shadow-lg);
+  animation: modal-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

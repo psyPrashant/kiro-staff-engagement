@@ -91,6 +91,14 @@ public class SchedulingService {
 		return toResponse(saved);
 	}
 
+	@Transactional
+	public void delete(Long id, Long userId) {
+		ScheduledInteraction entity = repository.findById(id)
+				.filter(e -> e.getScheduledBy().getId().equals(userId))
+				.orElseThrow(() -> new ScheduledInteractionNotFoundException(id));
+		repository.delete(entity);
+	}
+
 	public long countOverdue(Long userId) {
 		return repository.countByScheduledByIdAndCompletionStatusAndScheduledDateBefore(
 				userId, CompletionStatus.PENDING, LocalDate.now(clock));

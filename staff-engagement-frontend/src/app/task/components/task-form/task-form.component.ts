@@ -6,7 +6,7 @@ import { EmployeeService } from '../../../shared/services/employee.service';
 import { UserService } from '../../../shared/services/user.service';
 import { Employee } from '../../../shared/models/employee.model';
 import { User } from '../../../core/models/user.model';
-import { CreateTaskRequest } from '../../models/task.model';
+import { CreateTaskRequest, TaskResponse } from '../../models/task.model';
 
 @Component({
   selector: 'app-task-form',
@@ -23,6 +23,8 @@ export class TaskFormComponent implements OnInit {
   readonly employeeId = input<number | null>(null);
   readonly defaultAssigneeId = input<number | null>(null);
   readonly interactions = input<{ id: number; label: string }[]>([]);
+  readonly initialTask = input<TaskResponse | null>(null);
+  readonly submitLabel = input<string>('Create task');
 
   // Outputs
   readonly submitted = output<CreateTaskRequest>();
@@ -74,6 +76,19 @@ export class TaskFormComponent implements OnInit {
     const assigneeId = this.defaultAssigneeId();
     if (assigneeId != null) {
       this.form.get('assignedUserId')!.setValue(assigneeId);
+    }
+
+    // Pre-fill from an existing task when editing.
+    const existing = this.initialTask();
+    if (existing) {
+      this.form.patchValue({
+        employeeId: existing.employeeId ?? null,
+        assignedUserId: existing.assignedUserId ?? null,
+        title: existing.title,
+        description: existing.description ?? '',
+        dueDate: existing.dueDate ?? null,
+        interactionId: existing.interactionId ?? null,
+      });
     }
 
     this.loadEmployees();

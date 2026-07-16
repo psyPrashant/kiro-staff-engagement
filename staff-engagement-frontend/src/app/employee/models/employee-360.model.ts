@@ -19,6 +19,7 @@ export interface InteractionDto {
   conductedByName: string;
   notes: string;
   projectContext: ProjectContextDto | null;
+  projectId?: number | null;
 }
 
 export interface ProjectContextDto {

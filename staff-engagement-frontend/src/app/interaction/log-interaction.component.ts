@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -56,9 +56,10 @@ export class LogInteractionComponent implements OnInit {
   readonly projectsByCompany = computed(() => {
     const groups = new Map<string, Project[]>();
     for (const p of this.projects()) {
-      const list = groups.get(p.companyName) ?? [];
+      const companyName = p.company?.name ?? 'Other';
+      const list = groups.get(companyName) ?? [];
       list.push(p);
-      groups.set(p.companyName, list);
+      groups.set(companyName, list);
     }
     return groups;
   });
@@ -87,11 +88,22 @@ export class LogInteractionComponent implements OnInit {
   // Reactive form
   form!: FormGroup;
 
+  // When rendered inside a modal for a specific employee, prefill and lock the
+  // employee and notify the host once an interaction is saved.
+  readonly prefilledEmployeeId = input<number | null>(null);
+  // When embedded in a modal, render bare (no page/card/header chrome) so the
+  // form sits directly inside the dialog, matching the add-task modal.
+  readonly embedded = input<boolean>(false);
+  readonly saved = output<void>();
+  readonly cancelled = output<void>();
+
   currentUser = this.authService.currentUser;
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      employeeId: new FormControl<number | null>(null, [Validators.required]),
+      employeeId: new FormControl<number | null>(this.prefilledEmployeeId() ?? null, [
+        Validators.required,
+      ]),
       conductedByUserId: new FormControl<number | null>(this.currentUser()?.id ?? null, [
         Validators.required,
       ]),
@@ -263,6 +275,7 @@ export class LogInteractionComponent implements OnInit {
               });
               this.taskSectionExpanded.set(false);
               this.submitting.set(false);
+              this.saved.emit();
             },
             error: (taskError: HttpErrorResponse) => {
               this.successMessage.set('Interaction created successfully.');
@@ -285,6 +298,7 @@ export class LogInteractionComponent implements OnInit {
           });
           this.taskSectionExpanded.set(false);
           this.submitting.set(false);
+          this.saved.emit();
         }
       },
       error: (error: HttpErrorResponse) => {

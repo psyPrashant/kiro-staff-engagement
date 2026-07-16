@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateTaskRequest, TaskResponse } from '../models/task.model';
+import { CreateTaskRequest, TaskResponse, UpdateTaskRequest } from '../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
@@ -19,7 +19,11 @@ export class TaskService {
     return this.http.post<TaskResponse>('/api/tasks', request);
   }
 
-  updateStatus(taskId: number, status: string): Observable<TaskResponse> {
-    return this.http.patch<TaskResponse>(`/api/tasks/${taskId}/status`, { status });
+  update(taskId: number, request: UpdateTaskRequest): Observable<TaskResponse> {
+    return this.http.put<TaskResponse>(`/api/tasks/${taskId}`, request);
+  }
+
+  delete(taskId: number): Observable<void> {
+    return this.http.delete<void>(`/api/tasks/${taskId}`);
   }
 }

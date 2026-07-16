@@ -13,21 +13,19 @@ describe('EngagementService', () => {
     {
       employeeId: 1,
       employeeName: 'Alice Smith',
-      employeeEmail: 'alice@example.com',
       recency: 5,
       frequency: 12,
       lastInteractionDate: '2024-06-01T10:00:00Z',
-      engagementStatus: 'ON_TRACK',
+      engagementStatus: EngagementStatus.ON_TRACK,
       followUpRequired: false,
     },
     {
       employeeId: 2,
       employeeName: 'Bob Jones',
-      employeeEmail: 'bob@example.com',
       recency: 30,
       frequency: 2,
       lastInteractionDate: '2024-05-01T10:00:00Z',
-      engagementStatus: 'OVERDUE',
+      engagementStatus: EngagementStatus.OVERDUE,
       followUpRequired: true,
     },
   ];
@@ -62,7 +60,7 @@ describe('EngagementService', () => {
 
   it('should GET with ?status=OVERDUE when status filter provided', () => {
     let result: MatrixEntry[] | undefined;
-    service.getMatrix({ status: 'OVERDUE' }).subscribe((res) => (result = res));
+    service.getMatrix({ status: EngagementStatus.OVERDUE }).subscribe((res) => (result = res));
 
     const req = httpTesting.expectOne(
       (r) => r.url === '/api/engagement/matrix' && r.params.get('status') === 'OVERDUE',
@@ -92,7 +90,9 @@ describe('EngagementService', () => {
 
   it('should GET with ?status=AT_RISK&sort=recency when both provided', () => {
     let result: MatrixEntry[] | undefined;
-    service.getMatrix({ status: 'AT_RISK', sort: 'recency' }).subscribe((res) => (result = res));
+    service
+      .getMatrix({ status: EngagementStatus.AT_RISK, sort: 'recency' })
+      .subscribe((res) => (result = res));
 
     const req = httpTesting.expectOne(
       (r) =>

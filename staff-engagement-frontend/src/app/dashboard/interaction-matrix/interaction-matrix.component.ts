@@ -110,23 +110,27 @@ export class InteractionMatrixComponent implements OnInit {
 
   getStatusClass(status: EngagementStatus): string {
     switch (status) {
-      case 'OVERDUE':
+      case EngagementStatus.OVERDUE:
         return 'status-overdue';
-      case 'AT_RISK':
+      case EngagementStatus.AT_RISK:
         return 'status-at-risk';
-      case 'ON_TRACK':
+      case EngagementStatus.ON_TRACK:
         return 'status-on-track';
+      default:
+        return '';
     }
   }
 
   getStatusLabel(status: EngagementStatus): string {
     switch (status) {
-      case 'OVERDUE':
+      case EngagementStatus.OVERDUE:
         return 'Status: Overdue';
-      case 'AT_RISK':
+      case EngagementStatus.AT_RISK:
         return 'Status: At Risk';
-      case 'ON_TRACK':
+      case EngagementStatus.ON_TRACK:
         return 'Status: On Track';
+      default:
+        return '';
     }
   }
 
@@ -136,12 +140,14 @@ export class InteractionMatrixComponent implements OnInit {
 
   getBadgeClass(status: EngagementStatus): string {
     switch (status) {
-      case 'OVERDUE':
+      case EngagementStatus.OVERDUE:
         return 'badge badge-danger';
-      case 'AT_RISK':
+      case EngagementStatus.AT_RISK:
         return 'badge badge-warning';
-      case 'ON_TRACK':
+      case EngagementStatus.ON_TRACK:
         return 'badge badge-success';
+      default:
+        return 'badge';
     }
   }
 }

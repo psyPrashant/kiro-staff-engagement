@@ -14,7 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +39,21 @@ public class Employee360Service {
 		List<Long> interactionIds = interactions.stream()
 			.map(Interaction::getId).toList();
 
-		List<Task> openTasks = interactionIds.isEmpty()
-			? List.of()
-			: taskRepository.findByInteractionIdInAndStatus(interactionIds, TaskStatus.OPEN);
+		// Open tasks for an employee come from two sources: tasks created directly
+		// against the employee, and tasks linked to one of the employee's
+		// interactions. Combine (deduplicated) so a task added from the employee
+		// page shows up even when it isn't linked to an interaction.
+		Set<Task> openTaskSet = new LinkedHashSet<>();
+		for (Task task : taskRepository.findByEmployeeId(employeeId)) {
+			if (task.getStatus() == TaskStatus.OPEN) {
+				openTaskSet.add(task);
+			}
+		}
+		if (!interactionIds.isEmpty()) {
+			openTaskSet.addAll(
+				taskRepository.findByInteractionIdInAndStatus(interactionIds, TaskStatus.OPEN));
+		}
+		List<Task> openTasks = new ArrayList<>(openTaskSet);
 
 		NextScheduledDto nextScheduled = nextScheduledInteractionService.getNextScheduled(employeeId);
 
@@ -87,7 +102,8 @@ public class Employee360Service {
 			interaction.getOccurredAt(),
 			interaction.getConductedBy().getName(),
 			interaction.getNotes(),
-			projectContext
+			projectContext,
+			project != null ? project.getId() : null
 		);
 	}
 

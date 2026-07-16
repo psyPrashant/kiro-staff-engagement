@@ -2,13 +2,40 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { of, throwError, NEVER } from 'rxjs';
-import { signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Employee360Component } from './employee-360.component';
 import { Employee360Service } from '../services/employee-360.service';
 import { EngagementService } from '../../dashboard/services/engagement.service';
 import { TaskService } from '../../task/services/task.service';
+import { SchedulingService } from '../../schedule/services/scheduling.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AvatarComponent, PaginationComponent } from '../../shared';
 import { Employee360Response } from '../models/employee-360.model';
+
+// The real AvatarComponent/PaginationComponent use signal-based `input.required()`,
+// which is only registered by the AOT compiler. Under this JIT test harness those
+// inputs are invisible, causing NG0303/NG0950. Swap them for decorator-based stubs
+// that JIT recognizes, keeping these tests focused on Employee360Component itself.
+@Component({
+  selector: 'app-avatar',
+  standalone: true,
+  template: '',
+})
+class MockAvatarComponent {
+  @Input() name = '';
+  @Input() size = 'md';
+}
+
+@Component({
+  selector: 'app-pagination',
+  standalone: true,
+  template: '',
+})
+class MockPaginationComponent {
+  @Input() page = 1;
+  @Input() totalPages = 1;
+  @Output() pageChange = new EventEmitter<number>();
+}
 
 const mockEmployee360Service = {
   getEmployee360: vi.fn(),
@@ -20,6 +47,10 @@ const mockEngagementService = {
 
 const mockTaskService = {
   create: vi.fn(),
+};
+
+const mockSchedulingService = {
+  list: vi.fn().mockReturnValue(of([])),
 };
 
 const mockAuthService = {
@@ -65,6 +96,7 @@ describe('Employee360Component', () => {
     mockEmployee360Service.getEmployee360.mockReset();
     mockEngagementService.getMatrix.mockReset();
     mockEngagementService.getMatrix.mockReturnValue(of([]));
+    mockSchedulingService.list.mockReturnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [Employee360Component],
@@ -73,10 +105,16 @@ describe('Employee360Component', () => {
         { provide: Employee360Service, useValue: mockEmployee360Service },
         { provide: EngagementService, useValue: mockEngagementService },
         { provide: TaskService, useValue: mockTaskService },
+        { provide: SchedulingService, useValue: mockSchedulingService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(Employee360Component, {
+        remove: { imports: [AvatarComponent, PaginationComponent] },
+        add: { imports: [MockAvatarComponent, MockPaginationComponent] },
+      })
+      .compileComponents();
   });
 
   function createComponent(): void {
@@ -119,7 +157,7 @@ describe('Employee360Component', () => {
       expect(errorMessage).toBeTruthy();
       expect(errorMessage!.textContent).toContain('error');
 
-      const retryButton = el.querySelector('.retry-button');
+      const retryButton = el.querySelector('[data-testid="error-message"] button');
       expect(retryButton).toBeTruthy();
     });
 
@@ -132,7 +170,9 @@ describe('Employee360Component', () => {
 
       mockEmployee360Service.getEmployee360.mockReturnValue(of(mockResponse));
       const el = fixture.nativeElement as HTMLElement;
-      const retryButton = el.querySelector('.retry-button') as HTMLButtonElement;
+      const retryButton = el.querySelector(
+        '[data-testid="error-message"] button',
+      ) as HTMLButtonElement;
       retryButton.click();
       fixture.detectChanges();
 
@@ -143,19 +183,19 @@ describe('Employee360Component', () => {
   });
 
   describe('overdue tasks', () => {
-    it('should apply .overdue class to tasks with past due dates', () => {
+    it('should apply the overdue-row class to tasks with past due dates', () => {
       mockEmployee360Service.getEmployee360.mockReturnValue(of(mockResponse));
       createComponent();
       fixture.detectChanges();
 
       const el = fixture.nativeElement as HTMLElement;
-      const taskRows = el.querySelectorAll('[data-testid="task-row"]');
+      const taskRows = el.querySelectorAll('[data-testid="open-tasks"] tbody tr');
       expect(taskRows.length).toBe(2);
 
       // First task has dueDate '2020-01-01' which is overdue
-      expect(taskRows[0].classList.contains('overdue')).toBe(true);
+      expect(taskRows[0].classList.contains('overdue-row')).toBe(true);
       // Second task has dueDate '2099-12-31' which is in the future
-      expect(taskRows[1].classList.contains('overdue')).toBe(false);
+      expect(taskRows[1].classList.contains('overdue-row')).toBe(false);
     });
   });
 
@@ -180,11 +220,11 @@ describe('Employee360Component', () => {
       fixture.detectChanges();
 
       const el = fixture.nativeElement as HTMLElement;
-      const notesEl = el.querySelector('.interaction-notes');
+      const notesEl = el.querySelector('.notes-cell');
       expect(notesEl).toBeTruthy();
       // Should be 200 chars + ellipsis character (…)
-      expect(notesEl!.textContent!.length).toBe(201);
-      expect(notesEl!.textContent!.endsWith('\u2026')).toBe(true);
+      expect(notesEl!.textContent!.trim().length).toBe(201);
+      expect(notesEl!.textContent!.trim().endsWith('\u2026')).toBe(true);
     });
   });
 

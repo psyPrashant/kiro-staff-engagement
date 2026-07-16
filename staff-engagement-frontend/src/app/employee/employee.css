@@ -6,6 +6,17 @@ h1 {
   margin-bottom: var(--space-4);
 }
 
+.employees-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.employees-header h1 {
+  margin-bottom: 0;
+}
+
 .error-card {
   color: var(--color-danger);
 }
@@ -37,40 +48,46 @@ h1 {
   font-size: var(--fs-sm);
 }
 
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
 .clickable-row {
   cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
-.clickable-row:hover {
-  background-color: var(--color-bg);
-}
-
-.avatar {
-  display: inline-flex;
+.employee-cell {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--color-primary);
-  color: #fff;
-  font-size: var(--fs-sm);
+  gap: var(--space-2);
+}
+
+.employee-name {
   font-weight: var(--fw-medium);
-  flex-shrink: 0;
+}
+
+.last-seen {
+  color: var(--color-muted);
+  font-size: var(--fs-sm);
+}
+
+.actions-cell {
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    width: 100%;
+  }
 }
 
 @media (max-width: 375px) {
-  .table-responsive {
+  .table-card {
     overflow-x: auto;
   }
 
-  table {
+  .table-card table {
     min-width: 600px;
   }
 }

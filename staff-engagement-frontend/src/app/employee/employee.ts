@@ -1,5 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { EmployeeService } from '../shared/services/employee.service';
@@ -11,11 +10,15 @@ import {
 } from '../dashboard/models/engagement.model';
 import { Employee } from '../shared/models/employee.model';
 import { EmployeeListEntry } from './models/employee-list.model';
+import { AvatarComponent, PaginationComponent, ToastService } from '../shared';
+import { EmployeeCreateModalComponent } from './employee-create-modal.component';
+
+const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-employee',
   standalone: true,
-  imports: [CommonModule],
+  imports: [AvatarComponent, PaginationComponent, EmployeeCreateModalComponent],
   templateUrl: './employee.html',
   styleUrl: './employee.css',
 })
@@ -23,6 +26,10 @@ export class EmployeesListComponent implements OnInit {
   private readonly employeeService = inject(EmployeeService);
   private readonly engagementService = inject(EngagementService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+
+  // Expose enum for template use
+  readonly EngagementStatus = EngagementStatus;
 
   readonly employees = signal<EmployeeListEntry[]>([]);
   readonly loading = signal<boolean>(false);
@@ -30,6 +37,8 @@ export class EmployeesListComponent implements OnInit {
 
   readonly searchTerm = signal('');
   readonly statusFilter = signal<EngagementStatus | null>(null);
+  readonly showCreateModal = signal<boolean>(false);
+  readonly page = signal<number>(1);
 
   readonly filteredEmployees = computed(() => {
     let result = this.employees();
@@ -46,7 +55,34 @@ export class EmployeesListComponent implements OnInit {
     return result;
   });
 
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredEmployees().length / PAGE_SIZE)),
+  );
+
+  readonly pagedEmployees = computed(() => {
+    const start = (this.page() - 1) * PAGE_SIZE;
+    return this.filteredEmployees().slice(start, start + PAGE_SIZE);
+  });
+
+  // Candidate managers for the create-employee modal.
+  readonly managers = computed(() => this.employees().map((e) => ({ id: e.id, name: e.name })));
+
+  constructor() {
+    // Reset to the first page whenever the active filters change.
+    effect(() => {
+      this.searchTerm();
+      this.statusFilter();
+      this.page.set(1);
+    });
+  }
+
   ngOnInit(): void {
+    this.fetchData();
+  }
+
+  onEmployeeCreated(): void {
+    this.showCreateModal.set(false);
+    this.toast.success('Employee added');
     this.fetchData();
   }
 
@@ -86,11 +122,11 @@ export class EmployeesListComponent implements OnInit {
 
   getBadgeClass(status: EngagementStatus): string {
     switch (status) {
-      case 'OVERDUE':
+      case EngagementStatus.OVERDUE:
         return 'badge badge-danger';
-      case 'AT_RISK':
+      case EngagementStatus.AT_RISK:
         return 'badge badge-warning';
-      case 'ON_TRACK':
+      case EngagementStatus.ON_TRACK:
         return 'badge badge-success';
       default:
         return 'badge';

@@ -9,14 +9,25 @@ export interface CreateTaskRequest {
   employeeId: number;
 }
 
+export interface UpdateTaskRequest {
+  title: string;
+  description?: string | null;
+  interactionId?: number | null;
+  dueDate?: string | null; // ISO date (YYYY-MM-DD)
+  assignedUserId?: number | null;
+  employeeId?: number | null;
+  status: string; // 'OPEN' | 'DONE'
+}
+
 export interface TaskResponse {
   id: number;
   title: string;
   description: string | null;
   status: string;
   dueDate: string | null;
-  assignedUser: { id: number; name: string } | null;
-  interaction: { id: number } | null;
+  assignedUserId: number | null;
+  assignedUserName: string | null;
+  interactionId: number | null;
   employeeId: number | null;
   employeeName: string | null;
   createdAt: string;

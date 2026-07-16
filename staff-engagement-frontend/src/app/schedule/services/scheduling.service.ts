@@ -39,4 +39,8 @@ export class SchedulingService {
   ): Observable<ScheduledInteraction> {
     return this.http.patch<ScheduledInteraction>(`${this.baseUrl}/${id}`, body);
   }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }
