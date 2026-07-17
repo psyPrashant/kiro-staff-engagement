@@ -15,8 +15,14 @@
 
 .filter-bar {
   display: flex;
+  align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
+}
+
+/* Push the assignee filter to the right, separate from the status filters. */
+.assigned-toggle {
+  margin-left: auto;
 }
 
 .loading-text {
