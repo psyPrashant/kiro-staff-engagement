@@ -9,6 +9,7 @@ import {
 } from './models/task.model';
 import { TaskFormComponent } from './components/task-form/task-form.component';
 import { ToastService, ModalComponent, PaginationComponent } from '../shared';
+import { AuthService } from '../core/services/auth.service';
 import { DatePipe } from '@angular/common';
 
 const PAGE_SIZE = 10;
@@ -23,11 +24,13 @@ const PAGE_SIZE = 10;
 export class TaskListComponent implements OnInit {
   private readonly taskService = inject(TaskService);
   private readonly toast = inject(ToastService);
+  private readonly authService = inject(AuthService);
 
   readonly tasks = signal<TaskResponse[]>([]);
   readonly loading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
   readonly statusFilter = signal<string>('OPEN');
+  readonly assignedToMeOnly = signal<boolean>(false);
   readonly showCreateModal = signal<boolean>(false);
   readonly selectedTask = signal<TaskResponse | null>(null);
   readonly editingTask = signal<TaskResponse | null>(null);
@@ -36,7 +39,12 @@ export class TaskListComponent implements OnInit {
   readonly filteredTasks = computed(() => {
     const filter = this.statusFilter();
     const all = this.tasks();
-    const matching = filter === 'ALL' ? all : all.filter((task) => task.status === filter);
+    let matching = filter === 'ALL' ? all : all.filter((task) => task.status === filter);
+    // Narrow to tasks assigned to the logged-in user when the toggle is on.
+    if (this.assignedToMeOnly()) {
+      const currentUserId = this.authService.currentUser()?.id ?? null;
+      matching = matching.filter((task) => task.assignedUserId === currentUserId);
+    }
     // Always sort by due date, closest upcoming date first (nulls last).
     return [...matching].sort((a, b) => {
       if (a.dueDate === null && b.dueDate === null) return 0;
@@ -87,6 +95,11 @@ export class TaskListComponent implements OnInit {
 
   setStatusFilter(filter: string): void {
     this.statusFilter.set(filter);
+    this.page.set(1);
+  }
+
+  toggleAssignedToMe(): void {
+    this.assignedToMeOnly.update((value) => !value);
     this.page.set(1);
   }
 

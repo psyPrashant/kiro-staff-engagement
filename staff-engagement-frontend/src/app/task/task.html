@@ -28,6 +28,15 @@
     >
       Done
     </button>
+    <button
+      class="btn assigned-toggle"
+      [class.btn-primary]="assignedToMeOnly()"
+      (click)="toggleAssignedToMe()"
+      [attr.aria-pressed]="assignedToMeOnly()"
+      data-testid="filter-assigned-to-me"
+    >
+      Assigned to me
+    </button>
   </div>
 
   @if (loading()) {
