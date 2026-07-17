@@ -193,8 +193,8 @@ public class SeedDataLoader implements ApplicationRunner {
 				User loggedBy = allUsers.get((i + 2) % 5);
 				Project project = (i <= 7) ? allProjects.get(i % 3) : null;
 				Instant occurredAt = Instant.now().minus((long) i * 18, ChronoUnit.DAYS);
-				String notes = String.format("Interaction note for employee %d - session %d: %s discussion covering key topics and action items",
-						empIdx, i, topics[i % topics.length]);
+				String notes = String.format("%s discussion covering key topics and action items",
+						topics[i % topics.length]);
 
 				Interaction interaction = new Interaction();
 				interaction.setEmployee(employee);
@@ -220,11 +220,11 @@ public class SeedDataLoader implements ApplicationRunner {
 		for (int empIdx = 0; empIdx < 5; empIdx++) {
 			Employee employee = employees.get(empIdx);
 			for (int taskIdx = 0; taskIdx < 5; taskIdx++) {
-				String title = String.format("Task %d for employee %d: %s %s",
-						taskIdx + 1, empIdx, actionVerbs[taskIdx], topics[taskIdx]);
+				String title = String.format("%s %s",
+						actionVerbs[taskIdx], topics[taskIdx]);
 				String description = String.format(
-						"Description for task %d assigned to employee %d: detailed action items for %s",
-						taskIdx + 1, empIdx, topics[taskIdx]);
+						"detailed action items for %s",
+						topics[taskIdx]);
 				TaskStatus status = statuses[taskIdx];
 				LocalDate dueDate = LocalDate.now().plusDays(dueDayOffsets[taskIdx]);
 				Interaction interaction = interactions.get(empIdx * 20 + taskIdx);
