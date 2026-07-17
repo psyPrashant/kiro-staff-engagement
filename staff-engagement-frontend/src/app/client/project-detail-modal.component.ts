@@ -89,18 +89,20 @@ export class ProjectDetailModalComponent implements OnInit {
 
     const { name, companyId } = this.editForm.getRawValue();
     this.submitting.set(true);
-    this.projectService.update(this.projectId(), { name: name.trim(), companyId: Number(companyId) }).subscribe({
-      next: (detail) => {
-        this.submitting.set(false);
-        this.detail.set(detail);
-        this.editing.set(false);
-        this.toast.success('Project updated');
-        this.updated.emit();
-      },
-      error: () => {
-        this.submitting.set(false);
-        this.toast.error('Failed to update project');
-      },
-    });
+    this.projectService
+      .update(this.projectId(), { name: name.trim(), companyId: Number(companyId) })
+      .subscribe({
+        next: (detail) => {
+          this.submitting.set(false);
+          this.detail.set(detail);
+          this.editing.set(false);
+          this.toast.success('Project updated');
+          this.updated.emit();
+        },
+        error: () => {
+          this.submitting.set(false);
+          this.toast.error('Failed to update project');
+        },
+      });
   }
 }

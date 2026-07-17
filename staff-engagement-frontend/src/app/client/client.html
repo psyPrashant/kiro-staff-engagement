@@ -54,10 +54,7 @@
 </div>
 
 @if (showCreateModal()) {
-  <app-create-project-modal
-    (closed)="showCreateModal.set(false)"
-    (created)="onProjectCreated()"
-  />
+  <app-create-project-modal (closed)="showCreateModal.set(false)" (created)="onProjectCreated()" />
 }
 
 @if (selectedProjectId(); as projectId) {

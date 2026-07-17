@@ -23,6 +23,9 @@ class CompanyControllerTest {
 	@MockitoBean
 	private CompanyRepository companyRepository;
 
+	@MockitoBean
+	private ClientService clientService;
+
 	@Test
 	void getCompanies_returnsOkWithJsonArray() throws Exception {
 		Company company1 = new Company();

@@ -23,6 +23,9 @@ class ProjectControllerTest {
 	@MockitoBean
 	private ProjectRepository projectRepository;
 
+	@MockitoBean
+	private ClientService clientService;
+
 	@Test
 	void getProjects_withCompanyId_returnsFilteredProjects() throws Exception {
 		Company company = new Company();
