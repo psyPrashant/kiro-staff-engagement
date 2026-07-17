@@ -17,8 +17,9 @@ class FlywayMigrationV4IntegrationTest extends BaseIntegrationTest {
 
 	private static final List<String> SEED_EMAILS = List.of(
 			"alice.johnson@psybergate.com",
-			"bob.smith@psybergate.com",
-			"carol.williams@psybergate.com"
+			"marcus.vanderberg@psybergate.com",
+			"priya.naidoo@psybergate.com",
+			"thabo.molefe@psybergate.com"
 	);
 
 	private static final String SEED_PASSWORD = "Password1";
@@ -33,7 +34,6 @@ class FlywayMigrationV4IntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void passwordHashColumnExistsOnUsersTable() {
-		// Query database metadata to verify the column exists
 		Integer columnCount = jdbcTemplate.queryForObject(
 				"SELECT COUNT(*) FROM information_schema.columns " +
 						"WHERE table_name = 'users' AND column_name = 'password_hash'",
