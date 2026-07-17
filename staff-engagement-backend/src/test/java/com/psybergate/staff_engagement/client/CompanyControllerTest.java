@@ -3,6 +3,7 @@ package com.psybergate.staff_engagement.client;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -10,7 +11,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.Instant;
 import java.util.List;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CompanyController.class)
@@ -22,6 +26,9 @@ class CompanyControllerTest {
 
 	@MockitoBean
 	private CompanyRepository companyRepository;
+
+	@MockitoBean
+	private ClientService clientService;
 
 	@Test
 	void getCompanies_returnsOkWithJsonArray() throws Exception {
@@ -44,5 +51,30 @@ class CompanyControllerTest {
 				.andExpect(jsonPath("$.length()").value(2))
 				.andExpect(jsonPath("$[0].name").value("Acme Corp"))
 				.andExpect(jsonPath("$[1].name").value("Globex Inc"));
+	}
+
+	@Test
+	void createCompany_validRequest_returns201WithCreatedCompany() throws Exception {
+		Company created = new Company();
+		created.setId(3L);
+		created.setName("Initech");
+		created.setCreatedAt(Instant.now());
+
+		when(clientService.createCompany(new CreateCompanyRequest("Initech"))).thenReturn(created);
+
+		String requestBody = """
+				{
+					"name": "Initech"
+				}
+				""";
+
+		mockMvc.perform(post("/api/companies")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isCreated())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$.id").value(3))
+				.andExpect(jsonPath("$.name").value("Initech"));
 	}
 }

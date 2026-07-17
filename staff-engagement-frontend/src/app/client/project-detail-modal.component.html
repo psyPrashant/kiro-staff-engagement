@@ -1,0 +1,73 @@
+<app-modal [title]="detail()?.name ?? 'Project'" (closeModal)="closed.emit()">
+  @if (loading()) {
+    <p class="modal-loading" data-testid="detail-loading">Loading project...</p>
+  }
+
+  @if (detail(); as project) {
+    @if (!editing()) {
+      <div class="detail-row">
+        <span class="detail-label">Company</span>
+        <span data-testid="detail-company">{{ project.companyName }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Employees assigned ({{ project.employees.length }})</span>
+        @if (project.employees.length > 0) {
+          <ul class="employee-list" data-testid="detail-employees">
+            @for (employee of project.employees; track employee.id) {
+              <li>{{ employee.name }}</li>
+            }
+          </ul>
+        } @else {
+          <span class="empty-note" data-testid="detail-employees-empty"
+            >No employees assigned yet.</span
+          >
+        }
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" (click)="startEdit()" data-testid="edit-project-btn">
+          Edit
+        </button>
+        <button class="btn btn-secondary" (click)="closed.emit()">Close</button>
+      </div>
+    } @else {
+      <form [formGroup]="editForm" (ngSubmit)="onSave()" class="client-form" novalidate>
+        <div class="form-field">
+          <label for="edit-project-name">Project name <span class="required">*</span></label>
+          <input
+            id="edit-project-name"
+            type="text"
+            formControlName="name"
+            maxlength="255"
+            [attr.aria-invalid]="editInvalid('name')"
+            data-testid="edit-project-name-input"
+          />
+          @if (editInvalid('name')) {
+            <span class="field-error" role="alert">Project name is required</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="edit-project-company">Company <span class="required">*</span></label>
+          <select
+            id="edit-project-company"
+            formControlName="companyId"
+            data-testid="edit-project-company-select"
+          >
+            @for (company of companies(); track company.id) {
+              <option [value]="company.id">{{ company.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+            Save changes
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </form>
+    }
+  }
+</app-modal>

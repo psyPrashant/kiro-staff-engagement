@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.companies-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.companies-header h1 {
+  margin-bottom: 0;
+}
+
+.error-card {
+  color: var(--color-danger);
+}
+
+.error-card p {
+  margin-bottom: var(--space-3);
+}
+
+.clickable-row {
+  cursor: pointer;
+}
