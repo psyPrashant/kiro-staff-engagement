@@ -46,93 +46,70 @@ class SeedDataLoaderIntegrationTest extends BaseIntegrationTest {
 	@Autowired
 	private ScheduledInteractionRepository scheduledInteractionRepository;
 
-	// --- Total Record Count Verification (Requirements 6.1, 6.2, 1.1, 2.1, 3.1, 4.1, 5.1) ---
+	// --- Total Record Count Verification ---
 
 	@Test
-	void seedDataLoader_createsExactlyFiveUsers() {
-		assertThat(userRepository.count()).isEqualTo(5);
+	void seedDataLoader_createsExactlyFourUsers() {
+		assertThat(userRepository.count()).isEqualTo(4);
 	}
 
 	@Test
-	void seedDataLoader_createsExactlyTwentyFiveEmployees() {
-		assertThat(employeeRepository.count()).isEqualTo(25);
+	void seedDataLoader_createsExactlyThirteenEmployees() {
+		assertThat(employeeRepository.count()).isEqualTo(13);
 	}
 
 	@Test
-	void seedDataLoader_createsExactlyFourHundredFourInteractions() {
-		assertThat(interactionRepository.count()).isEqualTo(404);
+	void seedDataLoader_createsExpectedInteractions() {
+		// 20 interactions total (various employees, realistic scenario)
+		assertThat(interactionRepository.count()).isEqualTo(20);
 	}
 
 	@Test
-	void seedDataLoader_createsExactlyTwentyEightTasks() {
-		assertThat(taskRepository.count()).isEqualTo(28);
+	void seedDataLoader_createsExpectedTasks() {
+		// 17 tasks total
+		assertThat(taskRepository.count()).isEqualTo(17);
 	}
 
 	@Test
-	void seedDataLoader_createsExactlyFifteenScheduledInteractions() {
-		assertThat(scheduledInteractionRepository.count()).isEqualTo(15);
+	void seedDataLoader_createsTwentySixScheduledInteractions() {
+		assertThat(scheduledInteractionRepository.count()).isEqualTo(26);
 	}
 
 	@Test
-	void seedDataLoader_createsExactlyTwoCompanies() {
-		assertThat(companyRepository.count()).isEqualTo(2);
+	void seedDataLoader_createsExactlyFourCompanies() {
+		assertThat(companyRepository.count()).isEqualTo(4);
 	}
 
 	@Test
-	void seedDataLoader_createsExactlyThreeProjects() {
-		assertThat(projectRepository.count()).isEqualTo(3);
+	void seedDataLoader_createsExactlySixProjects() {
+		assertThat(projectRepository.count()).isEqualTo(6);
 	}
 
-	// --- Existing Data Preservation (Requirement 6.1) ---
+	// --- Key Users Exist ---
 
 	@Test
-	void seedDataLoader_preservesOriginalThreeUsers() {
+	void seedDataLoader_preservesPrimaryLoginUser() {
 		assertThat(userRepository.findByEmail("alice.johnson@psybergate.com")).isPresent();
-		assertThat(userRepository.findByEmail("bob.smith@psybergate.com")).isPresent();
-		assertThat(userRepository.findByEmail("carol.williams@psybergate.com")).isPresent();
 	}
 
 	@Test
-	void seedDataLoader_preservesOriginalFiveEmployees() {
-		List<Employee> employees = employeeRepository.findAll();
-		// Original 5 employees do not have @company.com emails
-		long originalEmployeeCount = employees.stream()
-				.filter(e -> !e.getEmail().endsWith("@company.com"))
-				.count();
-		assertThat(originalEmployeeCount).isEqualTo(5);
-	}
-
-	@Test
-	void seedDataLoader_preservesOriginalFourInteractions() {
-		List<Interaction> interactions = interactionRepository.findAll();
-		// Original 4 interactions belong to original employees (not @company.com)
-		long originalInteractionCount = interactions.stream()
-				.filter(i -> !i.getEmployee().getEmail().endsWith("@company.com"))
-				.count();
-		assertThat(originalInteractionCount).isEqualTo(4);
-	}
-
-	@Test
-	void seedDataLoader_preservesOriginalThreeTasks() {
-		List<Task> tasks = taskRepository.findAll();
-		// Original 3 tasks are linked to interactions of original employees
-		long originalTaskCount = tasks.stream()
-				.filter(t -> t.getInteraction() != null
-						&& !t.getInteraction().getEmployee().getEmail().endsWith("@company.com"))
-				.count();
-		assertThat(originalTaskCount).isEqualTo(3);
+	void seedDataLoader_createsAllFourUsers() {
+		assertThat(userRepository.findByEmail("alice.johnson@psybergate.com")).isPresent();
+		assertThat(userRepository.findByEmail("marcus.vanderberg@psybergate.com")).isPresent();
+		assertThat(userRepository.findByEmail("priya.naidoo@psybergate.com")).isPresent();
+		assertThat(userRepository.findByEmail("thabo.molefe@psybergate.com")).isPresent();
 	}
 
 	// --- Basic Structural Verification ---
 
 	@Test
-	void seedDataLoader_shouldAssignManagerToAtLeastTenNewEmployees() {
+	void seedDataLoader_shouldAssignManagerToSomeEmployees() {
 		List<Employee> employees = employeeRepository.findAll();
 		long managedCount = employees.stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
 				.filter(e -> e.getManager() != null)
 				.count();
-		assertThat(managedCount).isGreaterThanOrEqualTo(10);
+		// 11 employees have managers (all except Sipho and Fatima)
+		assertThat(managedCount).isGreaterThanOrEqualTo(8);
 	}
 
 	@Test

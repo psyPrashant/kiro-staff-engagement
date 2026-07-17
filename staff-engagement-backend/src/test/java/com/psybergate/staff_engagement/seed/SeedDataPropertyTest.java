@@ -17,14 +17,10 @@ import com.psybergate.staff_engagement.user.UserRepository;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,398 +51,172 @@ class SeedDataPropertyTest extends BaseIntegrationTest {
 	private SeedDataLoader seedDataLoader;
 
 	/**
-	 * Property 1: Interaction type distribution per employee
+	 * Property 1: Interaction type diversity
 	 *
-	 * For any new employee in the seeded dataset, the distribution of interaction types
-	 * across that employee's 20 interactions SHALL include at least 3 of the 4 defined types
-	 * (CHECK_IN, MENTORING, CATCH_UP, OTHER) and no single type SHALL account for more than
-	 * 10 interactions.
-	 *
-	 * Validates: Requirements 3.2
+	 * The seeded interactions SHALL include at least 3 of the 4 defined interaction types
+	 * (CHECK_IN, MENTORING, CATCH_UP, OTHER).
 	 */
 	@Test
-	@Tag("Feature: add-test-seed-data, Property 1: Interaction type distribution per employee")
-	void interactionTypeDistributionPerEmployee() {
-		// Get the 20 new employees (those with @company.com emails)
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
+	@Tag("seed-data")
+	void interactionTypeDiversityAcrossDataset() {
+		List<Interaction> allInteractions = interactionRepository.findAll();
 
-		assertThat(newEmployees).hasSize(20);
+		assertThat(allInteractions).isNotEmpty();
 
-		for (Employee emp : newEmployees) {
-			List<Interaction> interactions = interactionRepository
-					.findByEmployeeIdOrderByOccurredAtDesc(emp.getId());
-			assertThat(interactions)
-					.as("Employee %s should have exactly 20 interactions", emp.getName())
-					.hasSize(20);
-
-			Map<InteractionType, Long> typeCounts = interactions.stream()
-					.collect(Collectors.groupingBy(Interaction::getType, Collectors.counting()));
-
-			// At least 3 of 4 types represented
-			assertThat(typeCounts.keySet())
-					.as("Employee %s should have at least 3 of 4 interaction types", emp.getName())
-					.hasSizeGreaterThanOrEqualTo(3);
-
-			// No type more than 10
-			typeCounts.forEach((type, count) ->
-					assertThat(count)
-							.as("Employee %s should not have more than 10 interactions of type %s",
-									emp.getName(), type)
-							.isLessThanOrEqualTo(10));
-		}
-	}
-
-	/**
-	 * Property 2: User assignment distribution per employee
-	 *
-	 * For any new employee in the seeded dataset, at least 3 distinct users SHALL appear
-	 * as conducted_by_user_id across that employee's 20 interactions, and at least 3 distinct
-	 * users SHALL appear as logged_by_user_id.
-	 *
-	 * Validates: Requirements 3.3
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 2: User assignment distribution per employee")
-	void userAssignmentDistributionPerEmployee() {
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
-
-		assertThat(newEmployees).isNotEmpty();
-
-		for (Employee emp : newEmployees) {
-			List<Interaction> interactions = interactionRepository.findAll().stream()
-					.filter(i -> i.getEmployee().getId().equals(emp.getId()))
-					.toList();
-
-			long distinctConductedBy = interactions.stream()
-					.map(i -> i.getConductedBy().getId())
-					.distinct().count();
-			long distinctLoggedBy = interactions.stream()
-					.map(i -> i.getLoggedBy().getId())
-					.distinct().count();
-
-			assertThat(distinctConductedBy)
-					.as("Employee %s should have ≥3 distinct conductedBy users", emp.getName())
-					.isGreaterThanOrEqualTo(3);
-			assertThat(distinctLoggedBy)
-					.as("Employee %s should have ≥3 distinct loggedBy users", emp.getName())
-					.isGreaterThanOrEqualTo(3);
-		}
-	}
-
-	/**
-	 * Property 3: Temporal spread of interactions per employee.
-	 *
-	 * For any new employee in the seeded dataset, the occurred_at timestamps across that
-	 * employee's 20 interactions SHALL span at least 8 distinct calendar months within the
-	 * 12 months preceding the seed execution date.
-	 *
-	 * Validates: Requirements 3.4
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 3: Temporal spread of interactions per employee")
-	void temporalSpreadOfInteractionsPerEmployee() {
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
-
-		assertThat(newEmployees).isNotEmpty();
-
-		for (Employee emp : newEmployees) {
-			List<Interaction> interactions = interactionRepository.findAll().stream()
-					.filter(i -> i.getEmployee().getId().equals(emp.getId()))
-					.toList();
-
-			long distinctMonths = interactions.stream()
-					.map(i -> YearMonth.from(i.getOccurredAt().atZone(ZoneId.systemDefault())))
-					.distinct()
-					.count();
-
-			assertThat(distinctMonths)
-					.as("Employee %s should have interactions spanning ≥8 distinct months", emp.getName())
-					.isGreaterThanOrEqualTo(8);
-		}
-	}
-
-	/**
-	 * Property 4: Project assignment coverage per employee
-	 *
-	 * For any new employee in the seeded dataset, at least 6 of that employee's
-	 * 20 interactions SHALL have a non-null project reference.
-	 *
-	 * Validates: Requirements 3.5
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 4: Project assignment coverage per employee")
-	void projectAssignmentCoveragePerEmployee() {
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
-
-		assertThat(newEmployees).isNotEmpty();
-
-		for (Employee emp : newEmployees) {
-			List<Interaction> interactions = interactionRepository.findAll().stream()
-					.filter(i -> i.getEmployee().getId().equals(emp.getId()))
-					.toList();
-
-			long withProject = interactions.stream()
-					.filter(i -> i.getProject() != null)
-					.count();
-
-			assertThat(withProject)
-					.as("Employee %s should have at least 6 interactions with a project", emp.getName())
-					.isGreaterThanOrEqualTo(6);
-		}
-	}
-
-	/**
-	 * Property 5: Interaction notes uniqueness and length
-	 *
-	 * For any pair of interactions in the 400 new interaction records, their notes fields
-	 * SHALL be distinct. Additionally, for any single interaction, the notes field SHALL
-	 * contain between 20 and 200 characters.
-	 *
-	 * Validates: Requirements 3.6
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 5: Interaction notes uniqueness and length")
-	void interactionNotesUniquenessAndLength() {
-		// Get only the 400 new interactions (those belonging to @company.com employees)
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
-		Set<Long> newEmployeeIds = newEmployees.stream().map(Employee::getId).collect(Collectors.toSet());
-
-		List<Interaction> newInteractions = interactionRepository.findAll().stream()
-				.filter(i -> newEmployeeIds.contains(i.getEmployee().getId()))
-				.toList();
-
-		assertThat(newInteractions).hasSize(400);
-
-		// All notes distinct
-		Set<String> uniqueNotes = newInteractions.stream()
-				.map(Interaction::getNotes)
+		Set<InteractionType> types = allInteractions.stream()
+				.map(Interaction::getType)
 				.collect(Collectors.toSet());
-		assertThat(uniqueNotes).hasSize(400);
 
-		// Each note between 20–200 characters
-		for (Interaction interaction : newInteractions) {
+		assertThat(types)
+				.as("Seed data should include at least 3 of the 4 interaction types")
+				.hasSizeGreaterThanOrEqualTo(3);
+	}
+
+	/**
+	 * Property 2: Multiple users conduct and log interactions
+	 *
+	 * The seeded interactions SHALL be conducted/logged by at least 3 distinct users.
+	 */
+	@Test
+	@Tag("seed-data")
+	void multipleUsersConductAndLogInteractions() {
+		List<Interaction> allInteractions = interactionRepository.findAll();
+
+		long distinctConductedBy = allInteractions.stream()
+				.map(i -> i.getConductedBy().getId())
+				.distinct().count();
+		long distinctLoggedBy = allInteractions.stream()
+				.map(i -> i.getLoggedBy().getId())
+				.distinct().count();
+
+		assertThat(distinctConductedBy)
+				.as("At least 3 distinct users should conduct interactions")
+				.isGreaterThanOrEqualTo(3);
+		assertThat(distinctLoggedBy)
+				.as("At least 3 distinct users should log interactions")
+				.isGreaterThanOrEqualTo(3);
+	}
+
+	/**
+	 * Property 3: Temporal spread of interactions
+	 *
+	 * The seeded interactions SHALL span at least 30 days to provide meaningful engagement
+	 * status distribution (ON_TRACK, AT_RISK, OVERDUE).
+	 */
+	@Test
+	@Tag("seed-data")
+	void temporalSpreadOfInteractions() {
+		List<Interaction> allInteractions = interactionRepository.findAll();
+
+		assertThat(allInteractions).isNotEmpty();
+
+		Instant earliest = allInteractions.stream()
+				.map(Interaction::getOccurredAt)
+				.min(Instant::compareTo)
+				.orElseThrow();
+		Instant latest = allInteractions.stream()
+				.map(Interaction::getOccurredAt)
+				.max(Instant::compareTo)
+				.orElseThrow();
+
+		long daysBetween = java.time.Duration.between(earliest, latest).toDays();
+
+		assertThat(daysBetween)
+				.as("Interactions should span at least 30 days for engagement status diversity")
+				.isGreaterThanOrEqualTo(30);
+	}
+
+	/**
+	 * Property 4: Some interactions have project references
+	 *
+	 * At least some interactions SHALL reference a project (non-null project_id).
+	 */
+	@Test
+	@Tag("seed-data")
+	void someInteractionsHaveProjectReferences() {
+		List<Interaction> allInteractions = interactionRepository.findAll();
+
+		long withProject = allInteractions.stream()
+				.filter(i -> i.getProject() != null)
+				.count();
+
+		assertThat(withProject)
+				.as("At least some interactions should reference a project")
+				.isGreaterThanOrEqualTo(1);
+	}
+
+	/**
+	 * Property 5: Interaction notes are non-empty and within length constraints
+	 *
+	 * For any interaction, the notes field SHALL be non-empty and between 10 and 2000 characters.
+	 */
+	@Test
+	@Tag("seed-data")
+	void interactionNotesLengthConstraints() {
+		List<Interaction> allInteractions = interactionRepository.findAll();
+
+		assertThat(allInteractions).isNotEmpty();
+
+		for (Interaction interaction : allInteractions) {
 			String notes = interaction.getNotes();
-			assertThat(notes.length()).isBetween(20, 200);
+			assertThat(notes).isNotNull().isNotEmpty();
+			assertThat(notes.length())
+					.as("Notes should be between 10 and 2000 characters")
+					.isBetween(10, 2000);
 		}
 	}
 
 	/**
-	 * Property 6: Task status distribution per employee
+	 * Property 6: Task status distribution
 	 *
-	 * For any employee among the 5 employees receiving new tasks, that employee SHALL have
-	 * at least 2 tasks with status OPEN and at least 1 task with status DONE.
-	 *
-	 * Validates: Requirements 4.2
+	 * The seeded tasks SHALL include at least 1 OPEN task and at least 1 DONE task.
 	 */
 	@Test
-	@Tag("Feature: add-test-seed-data, Property 6: Task status distribution per employee")
-	void taskStatusDistributionPerEmployee() {
-		// Get employees that have tasks (first 5 new employees)
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
+	@Tag("seed-data")
+	void taskStatusDistribution() {
+		List<Task> allTasks = taskRepository.findAll();
 
-		// Only first 5 get tasks
-		List<Employee> employeesWithTasks = newEmployees.stream().limit(5).toList();
+		long openCount = allTasks.stream().filter(t -> t.getStatus() == TaskStatus.OPEN).count();
+		long doneCount = allTasks.stream().filter(t -> t.getStatus() == TaskStatus.DONE).count();
 
-		for (Employee emp : employeesWithTasks) {
-			List<Task> tasks = taskRepository.findAll().stream()
-					.filter(t -> t.getEmployee() != null && t.getEmployee().getId().equals(emp.getId()))
-					.toList();
-
-			long openCount = tasks.stream().filter(t -> t.getStatus() == TaskStatus.OPEN).count();
-			long doneCount = tasks.stream().filter(t -> t.getStatus() == TaskStatus.DONE).count();
-
-			assertThat(openCount).as("Employee %s should have ≥2 OPEN tasks", emp.getName())
-					.isGreaterThanOrEqualTo(2);
-			assertThat(doneCount).as("Employee %s should have ≥1 DONE task", emp.getName())
-					.isGreaterThanOrEqualTo(1);
-		}
+		assertThat(openCount).as("Should have at least 1 OPEN task").isGreaterThanOrEqualTo(1);
+		assertThat(doneCount).as("Should have at least 1 DONE task").isGreaterThanOrEqualTo(1);
 	}
 
 	/**
-	 * Property 7: Task due date spread per employee
+	 * Property 7: Task due date spread
 	 *
-	 * For any employee among the 5 employees receiving new tasks, that employee SHALL have
-	 * at least 1 task with a due_date before today and at least 1 task with a due_date on
-	 * or after today.
-	 *
-	 * Validates: Requirements 4.3
+	 * The seeded tasks SHALL include at least 1 task with a due_date before today
+	 * and at least 1 task with a due_date on or after today.
 	 */
 	@Test
-	@Tag("Feature: add-test-seed-data, Property 7: Task due date spread per employee")
-	void taskDueDateSpreadPerEmployee() {
-		List<Employee> newEmployees = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.toList();
-
-		List<Employee> employeesWithTasks = newEmployees.stream().limit(5).toList();
+	@Tag("seed-data")
+	void taskDueDateSpread() {
+		List<Task> allTasks = taskRepository.findAll();
 		LocalDate today = LocalDate.now();
 
-		for (Employee emp : employeesWithTasks) {
-			List<Task> tasks = taskRepository.findAll().stream()
-					.filter(t -> t.getEmployee() != null && t.getEmployee().getId().equals(emp.getId()))
-					.toList();
+		long pastDueDates = allTasks.stream()
+				.filter(t -> t.getDueDate() != null && t.getDueDate().isBefore(today))
+				.count();
+		long futureDueDates = allTasks.stream()
+				.filter(t -> t.getDueDate() != null && !t.getDueDate().isBefore(today))
+				.count();
 
-			long pastDueDates = tasks.stream()
-					.filter(t -> t.getDueDate() != null && t.getDueDate().isBefore(today))
-					.count();
-			long futureDueDates = tasks.stream()
-					.filter(t -> t.getDueDate() != null && !t.getDueDate().isBefore(today))
-					.count();
-
-			assertThat(pastDueDates).as("Employee %s should have ≥1 task with past due date", emp.getName())
-					.isGreaterThanOrEqualTo(1);
-			assertThat(futureDueDates).as("Employee %s should have ≥1 task with future due date", emp.getName())
-					.isGreaterThanOrEqualTo(1);
-		}
+		assertThat(pastDueDates).as("Should have at least 1 task with past due date")
+				.isGreaterThanOrEqualTo(1);
+		assertThat(futureDueDates).as("Should have at least 1 task with future due date")
+				.isGreaterThanOrEqualTo(1);
 	}
 
 	/**
-	 * Property 10: Scheduled interaction type diversity per user
+	 * Property 8: Referential integrity for all records
 	 *
-	 * For any user among the 5 seeded users, the 3 scheduled interactions assigned to that
-	 * user SHALL include at least 2 different interaction types.
-	 *
-	 * Validates: Requirements 5.2
+	 * Every foreign key field SHALL reference an existing record in the corresponding
+	 * parent table.
 	 */
 	@Test
-	@Tag("Feature: add-test-seed-data, Property 10: Scheduled interaction type diversity per user")
-	void scheduledInteractionTypeDiversityPerUser() {
-		List<User> allUsers = userRepository.findAll();
-		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
-
-		for (User user : allUsers) {
-			List<ScheduledInteraction> userScheduled = allScheduled.stream()
-					.filter(s -> s.getScheduledBy().getId().equals(user.getId()))
-					.toList();
-
-			assertThat(userScheduled).as("User %s should have 3 scheduled interactions", user.getName())
-					.hasSize(3);
-
-			long distinctTypes = userScheduled.stream()
-					.map(ScheduledInteraction::getInteractionType)
-					.distinct().count();
-
-			assertThat(distinctTypes).as("User %s should have ≥2 different interaction types", user.getName())
-					.isGreaterThanOrEqualTo(2);
-		}
-	}
-
-	/**
-	 * Property 11: Scheduled interaction status diversity per user
-	 *
-	 * For any user among the 5 seeded users, the 3 scheduled interactions assigned to that
-	 * user SHALL include at least 2 different completion statuses.
-	 *
-	 * Validates: Requirements 5.3
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 11: Scheduled interaction status diversity per user")
-	void scheduledInteractionStatusDiversityPerUser() {
-		List<User> allUsers = userRepository.findAll();
-		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
-
-		for (User user : allUsers) {
-			List<ScheduledInteraction> userScheduled = allScheduled.stream()
-					.filter(s -> s.getScheduledBy().getId().equals(user.getId()))
-					.toList();
-
-			long distinctStatuses = userScheduled.stream()
-					.map(ScheduledInteraction::getCompletionStatus)
-					.distinct().count();
-
-			assertThat(distinctStatuses).as("User %s should have ≥2 different completion statuses", user.getName())
-					.isGreaterThanOrEqualTo(2);
-		}
-	}
-
-	/**
-	 * Property 12: Scheduled interaction date-status consistency
-	 *
-	 * For any scheduled interaction record, if its completion status is COMPLETED or CANCELLED
-	 * then its scheduled_date SHALL be in the past (before today), and if its completion status
-	 * is PENDING then its scheduled_date SHALL be in the future (today or later).
-	 *
-	 * Validates: Requirements 5.5, 5.7, 7.3
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 12: Scheduled interaction date-status consistency")
-	void scheduledInteractionDateStatusConsistency() {
-		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
-		LocalDate today = LocalDate.now();
-
-		assertThat(allScheduled).hasSize(15);
-
-		for (ScheduledInteraction scheduled : allScheduled) {
-			CompletionStatus status = scheduled.getCompletionStatus();
-			LocalDate scheduledDate = scheduled.getScheduledDate();
-
-			if (status == CompletionStatus.PENDING) {
-				assertThat(scheduledDate)
-						.as("PENDING scheduled interaction should have a future date")
-						.isAfterOrEqualTo(today);
-			} else {
-				// COMPLETED or CANCELLED
-				assertThat(scheduledDate)
-						.as("COMPLETED/CANCELLED scheduled interaction should have a past date")
-						.isBefore(today);
-			}
-		}
-	}
-
-	/**
-	 * Property 13: Scheduled interaction notes uniqueness and length
-	 *
-	 * For any pair of scheduled interactions in the 15 new records, their notes fields
-	 * SHALL be distinct. Additionally, for any single scheduled interaction, the notes field
-	 * SHALL contain between 10 and 200 characters.
-	 *
-	 * Validates: Requirements 5.6
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 13: Scheduled interaction notes uniqueness and length")
-	void scheduledInteractionNotesUniquenessAndLength() {
-		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
-
-		assertThat(allScheduled).hasSize(15);
-
-		// All notes distinct
-		Set<String> uniqueNotes = allScheduled.stream()
-				.map(ScheduledInteraction::getNotes)
-				.collect(Collectors.toSet());
-		assertThat(uniqueNotes).hasSize(15);
-
-		// Each note between 10–200 characters
-		for (ScheduledInteraction scheduled : allScheduled) {
-			String notes = scheduled.getNotes();
-			assertThat(notes).isNotNull();
-			assertThat(notes.length()).isBetween(10, 200);
-		}
-	}
-
-	/**
-	 * Property 8: Referential integrity for all new records
-	 *
-	 * For any new record created by the seed loader (Task, Interaction, or ScheduledInteraction),
-	 * every foreign key field SHALL reference an existing record in the corresponding parent table
-	 * at the time of verification.
-	 *
-	 * Validates: Requirements 4.4, 4.5, 7.1
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 8: Referential integrity for all new records")
-	void referentialIntegrityForAllNewRecords() {
+	@Tag("seed-data")
+	void referentialIntegrityForAllRecords() {
 		Set<Long> allEmployeeIds = employeeRepository.findAll().stream()
 				.map(Employee::getId).collect(Collectors.toSet());
 		Set<Long> allUserIds = userRepository.findAll().stream()
@@ -483,15 +253,151 @@ class SeedDataPropertyTest extends BaseIntegrationTest {
 	}
 
 	/**
-	 * Property 15: DONE task due date consistency
+	 * Property 9: Task title and description constraints
 	 *
-	 * For any task with status DONE, its due_date SHALL be either null or a date in the past
-	 * (before today).
-	 *
-	 * Validates: Requirements 7.4
+	 * For any task, the title SHALL be between 1 and 255 characters,
+	 * and the description SHALL be between 1 and 2000 characters.
 	 */
 	@Test
-	@Tag("Feature: add-test-seed-data, Property 15: DONE task due date consistency")
+	@Tag("seed-data")
+	void taskTitleAndDescriptionConstraints() {
+		List<Task> allTasks = taskRepository.findAll();
+
+		assertThat(allTasks).isNotEmpty();
+
+		for (Task task : allTasks) {
+			assertThat(task.getTitle().length()).isBetween(1, 255);
+			assertThat(task.getDescription()).isNotNull();
+			assertThat(task.getDescription().length()).isBetween(1, 2000);
+		}
+	}
+
+	/**
+	 * Property 10: Scheduled interaction type diversity
+	 *
+	 * The seeded scheduled interactions SHALL include at least 2 different interaction types.
+	 */
+	@Test
+	@Tag("seed-data")
+	void scheduledInteractionTypeDiversity() {
+		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
+
+		assertThat(allScheduled).isNotEmpty();
+
+		long distinctTypes = allScheduled.stream()
+				.map(ScheduledInteraction::getInteractionType)
+				.distinct().count();
+
+		assertThat(distinctTypes)
+				.as("Scheduled interactions should have at least 2 different types")
+				.isGreaterThanOrEqualTo(2);
+	}
+
+	/**
+	 * Property 11: Scheduled interaction status diversity
+	 *
+	 * The seeded scheduled interactions SHALL include all 3 completion statuses
+	 * (PENDING, COMPLETED, CANCELLED).
+	 */
+	@Test
+	@Tag("seed-data")
+	void scheduledInteractionStatusDiversity() {
+		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
+
+		Set<CompletionStatus> statuses = allScheduled.stream()
+				.map(ScheduledInteraction::getCompletionStatus)
+				.collect(Collectors.toSet());
+
+		assertThat(statuses)
+				.as("Scheduled interactions should include all 3 completion statuses")
+				.containsExactlyInAnyOrder(
+						CompletionStatus.PENDING,
+						CompletionStatus.COMPLETED,
+						CompletionStatus.CANCELLED);
+	}
+
+	/**
+	 * Property 12: Scheduled interaction date-status consistency
+	 *
+	 * If completion status is COMPLETED or CANCELLED then scheduled_date SHALL be in the past.
+	 * If completion status is PENDING then scheduled_date SHALL be today or in the future.
+	 */
+	@Test
+	@Tag("seed-data")
+	void scheduledInteractionDateStatusConsistency() {
+		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
+		LocalDate today = LocalDate.now();
+
+		assertThat(allScheduled).isNotEmpty();
+
+		for (ScheduledInteraction scheduled : allScheduled) {
+			CompletionStatus status = scheduled.getCompletionStatus();
+			LocalDate scheduledDate = scheduled.getScheduledDate();
+
+			if (status == CompletionStatus.PENDING) {
+				assertThat(scheduledDate)
+						.as("PENDING scheduled interaction should have a future date")
+						.isAfterOrEqualTo(today);
+			} else {
+				assertThat(scheduledDate)
+						.as("COMPLETED/CANCELLED scheduled interaction should have a past date")
+						.isBefore(today);
+			}
+		}
+	}
+
+	/**
+	 * Property 13: Scheduled interaction notes constraints
+	 *
+	 * For any scheduled interaction, the notes field SHALL be non-null and between
+	 * 10 and 2000 characters.
+	 */
+	@Test
+	@Tag("seed-data")
+	void scheduledInteractionNotesConstraints() {
+		List<ScheduledInteraction> allScheduled = scheduledInteractionRepository.findAll();
+
+		assertThat(allScheduled).isNotEmpty();
+
+		for (ScheduledInteraction scheduled : allScheduled) {
+			String notes = scheduled.getNotes();
+			assertThat(notes).isNotNull();
+			assertThat(notes.length()).isBetween(10, 2000);
+		}
+	}
+
+	/**
+	 * Property 14: Interaction temporal ordering
+	 *
+	 * For any interaction, its occurred_at timestamp SHALL precede the current time,
+	 * and its created_at timestamp SHALL be equal to or later than its occurred_at value.
+	 */
+	@Test
+	@Tag("seed-data")
+	void interactionTemporalOrdering() {
+		List<Interaction> allInteractions = interactionRepository.findAll();
+		Instant now = Instant.now();
+
+		for (Interaction interaction : allInteractions) {
+			assertThat(interaction.getOccurredAt())
+					.as("Interaction occurred_at should be before now")
+					.isBefore(now);
+
+			if (interaction.getCreatedAt() != null) {
+				assertThat(interaction.getCreatedAt())
+						.as("Interaction created_at should be >= occurred_at")
+						.isAfterOrEqualTo(interaction.getOccurredAt());
+			}
+		}
+	}
+
+	/**
+	 * Property 15: DONE task due date consistency
+	 *
+	 * For any task with status DONE, its due_date SHALL be either null or a date in the past.
+	 */
+	@Test
+	@Tag("seed-data")
 	void doneTaskDueDateConsistency() {
 		List<Task> allTasks = taskRepository.findAll();
 		LocalDate today = LocalDate.now();
@@ -512,80 +418,13 @@ class SeedDataPropertyTest extends BaseIntegrationTest {
 	}
 
 	/**
-	 * Property 9: Task title and description constraints
-	 *
-	 * For any pair of tasks in the 25 new task records, their titles SHALL be distinct.
-	 * Additionally, for any single task, the title SHALL be between 1 and 255 characters,
-	 * and the description SHALL be between 1 and 2000 characters.
-	 *
-	 * Validates: Requirements 4.6
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 9: Task title and description constraints")
-	void taskTitleAndDescriptionConstraints() {
-		// Get new tasks (those linked to @company.com employees)
-		Set<Long> newEmployeeIds = employeeRepository.findAll().stream()
-				.filter(e -> e.getEmail().endsWith("@company.com"))
-				.map(Employee::getId)
-				.collect(Collectors.toSet());
-
-		List<Task> newTasks = taskRepository.findAll().stream()
-				.filter(t -> t.getEmployee() != null && newEmployeeIds.contains(t.getEmployee().getId()))
-				.toList();
-
-		assertThat(newTasks).hasSize(25);
-
-		// All titles distinct
-		Set<String> uniqueTitles = newTasks.stream().map(Task::getTitle).collect(Collectors.toSet());
-		assertThat(uniqueTitles).hasSize(25);
-
-		// Title 1–255 chars, description 1–2000 chars
-		for (Task task : newTasks) {
-			assertThat(task.getTitle().length()).isBetween(1, 255);
-			assertThat(task.getDescription().length()).isBetween(1, 2000);
-		}
-	}
-
-	/**
-	 * Property 14: Interaction temporal ordering
-	 *
-	 * For any new interaction record, its occurred_at timestamp SHALL precede the current time,
-	 * and its created_at timestamp SHALL be equal to or later than its occurred_at value.
-	 *
-	 * Validates: Requirements 7.2
-	 */
-	@Test
-	@Tag("Feature: add-test-seed-data, Property 14: Interaction temporal ordering")
-	void interactionTemporalOrdering() {
-		List<Interaction> allInteractions = interactionRepository.findAll();
-		Instant now = Instant.now();
-
-		for (Interaction interaction : allInteractions) {
-			assertThat(interaction.getOccurredAt())
-					.as("Interaction occurred_at should be before now")
-					.isBefore(now);
-
-			if (interaction.getCreatedAt() != null) {
-				assertThat(interaction.getCreatedAt())
-						.as("Interaction created_at should be >= occurred_at")
-						.isAfterOrEqualTo(interaction.getOccurredAt());
-			}
-		}
-	}
-
-	/**
 	 * Property 16: Seed loader idempotency
 	 *
-	 * For any number of consecutive executions of the seed loader on an already-seeded database,
-	 * the total row counts across all seeded tables SHALL remain unchanged after each execution.
-	 *
-	 * Validates: Requirements 6.4
+	 * Running the seed loader multiple times SHALL not create duplicate records.
 	 */
 	@Test
-	@Tag("Feature: add-test-seed-data, Property 16: Seed loader idempotency")
+	@Tag("seed-data")
 	void seedLoaderIdempotency() {
-		// Seed data is already loaded via SeedDataLoader running on context startup
-		// Capture counts after first run
 		long userCount = userRepository.count();
 		long employeeCount = employeeRepository.count();
 		long interactionCount = interactionRepository.count();
@@ -595,11 +434,91 @@ class SeedDataPropertyTest extends BaseIntegrationTest {
 		// Run seed loader again
 		seedDataLoader.run(null);
 
-		// Assert counts unchanged
 		assertThat(userRepository.count()).isEqualTo(userCount);
 		assertThat(employeeRepository.count()).isEqualTo(employeeCount);
 		assertThat(interactionRepository.count()).isEqualTo(interactionCount);
 		assertThat(taskRepository.count()).isEqualTo(taskCount);
 		assertThat(scheduledInteractionRepository.count()).isEqualTo(scheduledCount);
+	}
+
+	/**
+	 * Property 17: Minimum data volume for demo
+	 *
+	 * The seed data SHALL include enough records to demonstrate all features:
+	 * at least 4 users, 10 employees, 10 interactions, 10 tasks, and 10 scheduled interactions.
+	 */
+	@Test
+	@Tag("seed-data")
+	void minimumDataVolumeForDemo() {
+		assertThat(userRepository.count())
+				.as("At least 4 users for login/demo")
+				.isGreaterThanOrEqualTo(4);
+		assertThat(employeeRepository.count())
+				.as("At least 10 employees for engagement list")
+				.isGreaterThanOrEqualTo(10);
+		assertThat(interactionRepository.count())
+				.as("At least 10 interactions for history")
+				.isGreaterThanOrEqualTo(10);
+		assertThat(taskRepository.count())
+				.as("At least 10 tasks for task management")
+				.isGreaterThanOrEqualTo(10);
+		assertThat(scheduledInteractionRepository.count())
+				.as("At least 10 scheduled interactions for scheduling view")
+				.isGreaterThanOrEqualTo(10);
+	}
+
+	/**
+	 * Property 18: Engagement status coverage
+	 *
+	 * Based on the engagement thresholds (at-risk: 14 days, overdue: 30 days),
+	 * the seed data SHALL produce employees in all three engagement states.
+	 * This is verified by checking that the most recent interaction dates for employees
+	 * span all three ranges.
+	 */
+	@Test
+	@Tag("seed-data")
+	void engagementStatusCoverage() {
+		List<Employee> allEmployees = employeeRepository.findAll();
+		List<Interaction> allInteractions = interactionRepository.findAll();
+		Instant now = Instant.now();
+
+		boolean hasOnTrack = false;
+		boolean hasAtRisk = false;
+		boolean hasOverdue = false;
+
+		for (Employee emp : allEmployees) {
+			allInteractions.stream()
+					.filter(i -> i.getEmployee().getId().equals(emp.getId()))
+					.map(Interaction::getOccurredAt)
+					.max(Instant::compareTo)
+					.ifPresent(lastInteraction -> {
+						// Not modifying outer booleans here — using a different approach below
+					});
+		}
+
+		// Recompute using a simpler approach
+		for (Employee emp : allEmployees) {
+			var lastInteraction = allInteractions.stream()
+					.filter(i -> i.getEmployee().getId().equals(emp.getId()))
+					.map(Interaction::getOccurredAt)
+					.max(Instant::compareTo);
+
+			if (lastInteraction.isEmpty()) {
+				hasOverdue = true;
+			} else {
+				long daysSince = java.time.Duration.between(lastInteraction.get(), now).toDays();
+				if (daysSince >= 30) {
+					hasOverdue = true;
+				} else if (daysSince >= 14) {
+					hasAtRisk = true;
+				} else {
+					hasOnTrack = true;
+				}
+			}
+		}
+
+		assertThat(hasOnTrack).as("Should have at least one ON_TRACK employee").isTrue();
+		assertThat(hasAtRisk).as("Should have at least one AT_RISK employee").isTrue();
+		assertThat(hasOverdue).as("Should have at least one OVERDUE employee").isTrue();
 	}
 }

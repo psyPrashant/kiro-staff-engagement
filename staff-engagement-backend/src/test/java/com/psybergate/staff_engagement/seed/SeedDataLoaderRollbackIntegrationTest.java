@@ -22,14 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Strategy:
  * <ol>
  *   <li>The seed data is already loaded at context startup (the "local" profile is active).</li>
- *   <li>Record the current row counts across all tables.</li>
- *   <li>Delete the sentinel user (alice.johnson@psybergate.com) so the loader believes
- *       it needs to seed again.</li>
- *   <li>Pre-insert a user with email "dave.martinez@psybergate.com" (a new seed user email)
- *       causing a unique constraint violation when the loader attempts to create Dave.</li>
+ *   <li>Delete all existing data to start fresh.</li>
+ *   <li>Pre-insert a user with email "marcus.vanderberg@psybergate.com" (a seed user email)
+ *       causing a unique constraint violation when the loader attempts to create Marcus.</li>
  *   <li>Invoke the seed loader's {@code run()} method — the transaction should roll back.</li>
- *   <li>Verify that no partial data persists from the failed re-seed attempt:
- *       the sentinel user remains absent and no extra records were created.</li>
+ *   <li>Verify that no partial data persists from the failed re-seed attempt.</li>
  * </ol>
  * <p>
  * Validates: Requirements 1.4, 7.6
@@ -57,41 +54,24 @@ class SeedDataLoaderRollbackIntegrationTest extends BaseIntegrationTest {
 
 	@Test
 	void seedDataLoader_rollsBackOnConstraintViolation() {
-		// 1. Record counts after the initial successful seeding at startup
-		long usersBefore = userRepository.count();
-		long employeesBefore = employeeRepository.count();
-		long interactionsBefore = interactionRepository.count();
-		long tasksBefore = taskRepository.count();
-		long scheduledBefore = scheduledInteractionRepository.count();
-
-		// 2. Delete the sentinel user so the loader thinks data needs to be seeded
-		User sentinel = userRepository.findByEmail("alice.johnson@psybergate.com")
-				.orElseThrow(() -> new IllegalStateException("Sentinel user not found"));
-		// We need to delete interactions/tasks that reference this user first
-		// to avoid FK violations on the delete. Instead, let's just delete the user
-		// directly if possible, or use a simpler approach:
-		// Actually, let's take a different approach - delete all seed data,
-		// then insert only the conflicting record.
-
-		// Simpler approach: delete all data to start fresh, then insert conflict
+		// 1. Delete all data to start fresh
 		scheduledInteractionRepository.deleteAll();
 		taskRepository.deleteAll();
 		interactionRepository.deleteAll();
 		employeeRepository.deleteAll();
 		userRepository.deleteAll();
 
-		// 3. Pre-insert a conflicting user with "dave.martinez@psybergate.com"
-		// This email is used by the seed loader for one of its new users.
-		// The seed loader first creates Alice, Bob, Carol (original users),
-		// then calls createNewUsers() which creates Dave Martinez.
-		// The unique email constraint will cause an uncaught DataIntegrityViolationException.
+		// 2. Pre-insert a conflicting user with "marcus.vanderberg@psybergate.com"
+		// This email is used by the seed loader for one of its users.
+		// The seed loader first creates Alice, then Marcus — the unique email
+		// constraint will cause an uncaught DataIntegrityViolationException.
 		User conflictingUser = new User();
 		conflictingUser.setName("Conflict User");
-		conflictingUser.setEmail("dave.martinez@psybergate.com");
+		conflictingUser.setEmail("marcus.vanderberg@psybergate.com");
 		conflictingUser.setPasswordHash("dummy-hash");
 		userRepository.saveAndFlush(conflictingUser);
 
-		// 4. Invoke the seed loader — should fail and roll back
+		// 3. Invoke the seed loader — should fail and roll back
 		try {
 			seedDataLoader.run(new ApplicationArguments() {
 				@Override
@@ -106,11 +86,10 @@ class SeedDataLoaderRollbackIntegrationTest extends BaseIntegrationTest {
 				public java.util.List<String> getNonOptionArgs() { return java.util.List.of(); }
 			});
 		} catch (Exception e) {
-			// Expected: DataIntegrityViolationException (or a wrapper) from the
-			// unique constraint violation on dave.martinez@psybergate.com
+			// Expected: DataIntegrityViolationException from the unique constraint violation
 		}
 
-		// 5. Verify no partial data persists — only the pre-inserted conflicting user
+		// 4. Verify no partial data persists — only the pre-inserted conflicting user
 		// should remain. The seed loader's transactional boundary ensures all-or-nothing.
 		assertThat(userRepository.count())
 				.as("Only the pre-inserted conflict user should exist (transaction rolled back)")

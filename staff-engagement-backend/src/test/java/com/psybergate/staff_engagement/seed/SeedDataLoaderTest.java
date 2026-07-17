@@ -63,14 +63,11 @@ class SeedDataLoaderTest {
 
 	@Test
 	void run_whenSeedDataAlreadyPresent_skipsInsertionAndCallsNoSave() {
-		// Arrange: findByEmail returns an existing user → seed data already present
 		when(userRepository.findByEmail("alice.johnson@psybergate.com"))
 				.thenReturn(Optional.of(new User()));
 
-		// Act
 		seedDataLoader.run(applicationArguments);
 
-		// Assert: no save() calls on any repository
 		verify(userRepository, never()).save(any(User.class));
 		verify(companyRepository, never()).save(any(Company.class));
 		verify(employeeRepository, never()).save(any(Employee.class));
@@ -82,21 +79,16 @@ class SeedDataLoaderTest {
 
 	@Test
 	void run_whenSeedDataNotPresent_insertsInCorrectForeignKeyOrder() {
-		// Arrange: findByEmail returns empty → seed data not present
 		when(userRepository.findByEmail("alice.johnson@psybergate.com"))
 				.thenReturn(Optional.empty());
 
-		// Stub passwordEncoder to return a fake hash
 		when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$fakehashvalue");
 
-		// Stub save() to return the argument back (entities need to be returned for FK references)
 		when(userRepository.save(any(User.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 		when(companyRepository.save(any(Company.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 		when(employeeRepository.save(any(Employee.class)))
-				.thenAnswer(invocation -> invocation.getArgument(0));
-		when(employeeRepository.saveAndFlush(any(Employee.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 		when(projectRepository.save(any(Project.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
@@ -107,38 +99,33 @@ class SeedDataLoaderTest {
 		when(scheduledInteractionRepository.save(any(ScheduledInteraction.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 
-		// Act
 		seedDataLoader.run(applicationArguments);
 
-		// Assert: verify that all repository types are called (FK order is respected)
-		// Original seed: 3 users + 2 new users = 5 users
-		verify(userRepository, times(5)).save(any(User.class));
-		// 2 companies
-		verify(companyRepository, times(2)).save(any(Company.class));
-		// 5 original employees (save) + 20 new employees (saveAndFlush)
-		verify(employeeRepository, times(5)).save(any(Employee.class));
-		verify(employeeRepository, times(20)).saveAndFlush(any(Employee.class));
-		// 3 projects
-		verify(projectRepository, times(3)).save(any(Project.class));
-		// 4 original + 400 new = 404 interactions
-		verify(interactionRepository, times(404)).save(any(Interaction.class));
-		// 3 original + 25 new = 28 tasks
-		verify(taskRepository, times(28)).save(any(Task.class));
-		// 15 scheduled interactions (3 per user × 5 users)
-		verify(scheduledInteractionRepository, times(15)).save(any(ScheduledInteraction.class));
+		// Verify all entity types are saved (FK order is respected)
+		// 4 users
+		verify(userRepository, times(4)).save(any(User.class));
+		// 4 companies
+		verify(companyRepository, times(4)).save(any(Company.class));
+		// 13 employees
+		verify(employeeRepository, times(13)).save(any(Employee.class));
+		// 6 projects
+		verify(projectRepository, times(6)).save(any(Project.class));
+		// 20 interactions
+		verify(interactionRepository, times(20)).save(any(Interaction.class));
+		// 17 tasks
+		verify(taskRepository, times(17)).save(any(Task.class));
+		// 26 scheduled interactions
+		verify(scheduledInteractionRepository, times(26)).save(any(ScheduledInteraction.class));
 	}
 
 	@Test
 	void run_idempotency_noSaveCallsWhenSeedDataAlreadyPresent() {
-		// Arrange: simulate second execution where seed data exists
 		when(userRepository.findByEmail("alice.johnson@psybergate.com"))
 				.thenReturn(Optional.of(new User()));
 
-		// Act: run twice to simulate re-execution
 		seedDataLoader.run(applicationArguments);
 		seedDataLoader.run(applicationArguments);
 
-		// Assert: findByEmail called twice (once per run), but never any save
 		verify(userRepository, times(2)).findByEmail("alice.johnson@psybergate.com");
 		verify(userRepository, never()).save(any(User.class));
 		verify(companyRepository, never()).save(any(Company.class));
