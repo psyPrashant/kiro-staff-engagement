@@ -1,23 +1,27 @@
 package com.psybergate.staff_engagement.seed;
 
-import com.psybergate.staff_engagement.client.Company;
-import com.psybergate.staff_engagement.client.CompanyRepository;
-import com.psybergate.staff_engagement.client.Project;
-import com.psybergate.staff_engagement.client.ProjectRepository;
-import com.psybergate.staff_engagement.employee.Employee;
-import com.psybergate.staff_engagement.employee.EmployeeRepository;
-import com.psybergate.staff_engagement.interaction.Interaction;
-import com.psybergate.staff_engagement.interaction.InteractionRepository;
-import com.psybergate.staff_engagement.interaction.InteractionType;
-import com.psybergate.staff_engagement.scheduling.CompletionStatus;
-import com.psybergate.staff_engagement.scheduling.ScheduledInteraction;
-import com.psybergate.staff_engagement.scheduling.ScheduledInteractionRepository;
-import com.psybergate.staff_engagement.task.Task;
-import com.psybergate.staff_engagement.task.TaskRepository;
-import com.psybergate.staff_engagement.task.TaskStatus;
-import com.psybergate.staff_engagement.user.User;
-import com.psybergate.staff_engagement.user.UserRepository;
+import com.psybergate.staff_engagement.client.domain.Company;
+import com.psybergate.staff_engagement.client.domain.CompanyRepository;
+import com.psybergate.staff_engagement.client.domain.Project;
+import com.psybergate.staff_engagement.client.domain.ProjectRepository;
+import com.psybergate.staff_engagement.employee.domain.Employee;
+import com.psybergate.staff_engagement.employee.domain.EmployeeRepository;
+import com.psybergate.staff_engagement.interaction.domain.Interaction;
+import com.psybergate.staff_engagement.interaction.domain.InteractionRepository;
+import com.psybergate.staff_engagement.interaction.domain.InteractionType;
+import com.psybergate.staff_engagement.scheduling.domain.CompletionStatus;
+import com.psybergate.staff_engagement.scheduling.domain.ScheduledInteraction;
+import com.psybergate.staff_engagement.scheduling.domain.ScheduledInteractionRepository;
+import com.psybergate.staff_engagement.task.domain.Task;
+import com.psybergate.staff_engagement.task.domain.TaskRepository;
+import com.psybergate.staff_engagement.task.domain.TaskStatus;
+import com.psybergate.staff_engagement.user.domain.User;
+import com.psybergate.staff_engagement.user.domain.UserRepository;
 import jakarta.transaction.Transactional;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -25,11 +29,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Component
 @Profile({"local", "dev"})

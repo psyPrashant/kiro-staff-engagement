@@ -1,7 +1,6 @@
 package com.psybergate.staff_engagement.engagement.dto;
 
-import com.psybergate.staff_engagement.engagement.EngagementStatus;
-
+import com.psybergate.staff_engagement.engagement.domain.EngagementStatus;
 import java.time.LocalDate;
 
 public record EngagementMatrixEntry(

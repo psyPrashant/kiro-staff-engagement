@@ -1,6 +1,6 @@
 package com.psybergate.staff_engagement.task.dto;
 
-import com.psybergate.staff_engagement.task.TaskStatus;
+import com.psybergate.staff_engagement.task.domain.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
