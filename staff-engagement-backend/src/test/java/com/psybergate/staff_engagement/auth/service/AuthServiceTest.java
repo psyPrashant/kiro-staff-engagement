@@ -12,6 +12,7 @@ import com.psybergate.staff_engagement.user.domain.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -44,6 +46,18 @@ class AuthServiceTest {
 	@BeforeEach
 	void setUp() {
 		lenient().when(httpServletRequest.getSession(true)).thenReturn(httpSession);
+	}
+
+	/**
+	 * {@code AuthServiceImpl.login} populates the {@link SecurityContextHolder}, which is
+	 * backed by a ThreadLocal shared with every test that runs afterwards on this thread.
+	 * Left in place, the mocked Authentication leaks into subsequent MockMvc tests --
+	 * spring-security-test applies whatever the holder contains to the request -- and a
+	 * non-anonymous, unauthenticated token makes Spring Security answer 403 instead of 401.
+	 */
+	@AfterEach
+	void clearSecurityContext() {
+		SecurityContextHolder.clearContext();
 	}
 
 	@Test

@@ -6,7 +6,11 @@ import com.jayway.jsonpath.JsonPath;
 import com.psybergate.staff_engagement.interaction.domain.Interaction;
 import com.psybergate.staff_engagement.support.BaseIntegrationTest;
 import com.psybergate.staff_engagement.task.domain.Task;
+import com.psybergate.staff_engagement.task.domain.TaskRepository;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +27,34 @@ class TaskIntegrationTest extends BaseIntegrationTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	@Autowired
+	private TaskRepository taskRepository;
+
 	private String sessionCookie;
+
+	private Set<Long> preExistingTaskIds;
+
+	/**
+	 * These tests drive a real HTTP port, so the writes happen on the server's own
+	 * transaction and {@code @Transactional} on the test would not roll them back.
+	 * The tasks are removed explicitly instead: several are created without a
+	 * description -- which the domain allows -- and leaving them behind breaks any
+	 * later test that asserts over the whole task table.
+	 */
+	@AfterEach
+	void removeTasksCreatedByThisTest() {
+		List<Task> created = taskRepository.findAll().stream()
+				.filter(task -> !preExistingTaskIds.contains(task.getId()))
+				.toList();
+		taskRepository.deleteAll(created);
+	}
+
+	@BeforeEach
+	void snapshotExistingTasks() {
+		preExistingTaskIds = taskRepository.findAll().stream()
+				.map(Task::getId)
+				.collect(Collectors.toSet());
+	}
 
 	@BeforeEach
 	void authenticateAndGetCookie() {
