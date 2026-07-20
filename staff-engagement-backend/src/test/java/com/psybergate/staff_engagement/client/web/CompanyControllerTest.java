@@ -1,0 +1,80 @@
+package com.psybergate.staff_engagement.client.web;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import com.psybergate.staff_engagement.client.domain.Company;
+import com.psybergate.staff_engagement.client.service.ClientService;
+import com.psybergate.staff_engagement.client.dto.CreateCompanyRequest;
+import com.psybergate.staff_engagement.client.service.ClientService;
+import java.time.Instant;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+@WebMvcTest(CompanyController.class)
+@WithMockUser
+class CompanyControllerTest {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockitoBean
+	private ClientService clientService;
+
+	@Test
+	void getCompanies_returnsOkWithJsonArray() throws Exception {
+		Company company1 = new Company();
+		company1.setId(1L);
+		company1.setName("Acme Corp");
+		company1.setCreatedAt(Instant.now());
+
+		Company company2 = new Company();
+		company2.setId(2L);
+		company2.setName("Globex Inc");
+		company2.setCreatedAt(Instant.now());
+
+		org.mockito.Mockito.when(clientService.listCompanies()).thenReturn(List.of(company1, company2));
+
+		mockMvc.perform(get("/api/companies"))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$.length()").value(2))
+				.andExpect(jsonPath("$[0].name").value("Acme Corp"))
+				.andExpect(jsonPath("$[1].name").value("Globex Inc"));
+	}
+
+	@Test
+	void createCompany_validRequest_returns201WithCreatedCompany() throws Exception {
+		Company created = new Company();
+		created.setId(3L);
+		created.setName("Initech");
+		created.setCreatedAt(Instant.now());
+
+		when(clientService.createCompany(new CreateCompanyRequest("Initech"))).thenReturn(created);
+
+		String requestBody = """
+				{
+					"name": "Initech"
+				}
+				""";
+
+		mockMvc.perform(post("/api/companies")
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody))
+				.andExpect(status().isCreated())
+				.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$.id").value(3))
+				.andExpect(jsonPath("$.name").value("Initech"));
+	}
+}

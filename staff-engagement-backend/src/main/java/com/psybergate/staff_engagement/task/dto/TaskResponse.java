@@ -1,6 +1,6 @@
 package com.psybergate.staff_engagement.task.dto;
 
-import com.psybergate.staff_engagement.task.Task;
+import com.psybergate.staff_engagement.task.domain.Task;
 import java.time.Instant;
 import java.time.LocalDate;
 

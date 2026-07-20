@@ -1,0 +1,38 @@
+package com.psybergate.staff_engagement.auth.web;
+
+import com.psybergate.staff_engagement.auth.dto.LoginRequest;
+import com.psybergate.staff_engagement.auth.dto.LoginResponse;
+import com.psybergate.staff_engagement.auth.service.AuthService;
+import com.psybergate.staff_engagement.user.domain.User;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+	private final AuthService authService;
+	private final CurrentUserResolver currentUserResolver;
+
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> login(
+			@Valid @RequestBody LoginRequest request,
+			HttpServletRequest httpRequest) {
+		LoginResponse response = authService.login(request, httpRequest);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<LoginResponse> me() {
+		User user = currentUserResolver.resolve();
+		return ResponseEntity.ok(new LoginResponse(user.getId(), user.getName(), user.getEmail()));
+	}
+}

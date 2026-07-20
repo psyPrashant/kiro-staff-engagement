@@ -11,24 +11,27 @@
 	<groupId>com.psybergate</groupId>
 	<artifactId>staff-engagement</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>staff-engagement-backend</name>
+	<description>Staff engagement tracking API — modular monolith over Spring Boot</description>
+
 	<properties>
 		<java.version>21</java.version>
+
+		<!-- Dependency versions not managed by spring-boot-starter-parent -->
+		<springdoc.version>2.8.16</springdoc.version>
+		<jqwik.version>1.10.1</jqwik.version>
+
+		<!-- Build plugin versions -->
+		<jacoco.version>0.8.15</jacoco.version>
+		<pitest.version>1.25.7</pitest.version>
+		<pitest-junit5.version>1.2.2</pitest-junit5.version>
+
+		<!-- Coverage gates enforced by jacoco:check -->
+		<jacoco.line.coverage>0.90</jacoco.line.coverage>
+		<jacoco.branch.coverage>0.80</jacoco.branch.coverage>
+		<pitest.mutation.threshold>70</pitest.mutation.threshold>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -55,7 +58,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.8</version>
+			<version>${springdoc.version}</version>
 		</dependency>
 
 		<dependency>
@@ -78,6 +81,7 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -106,7 +110,7 @@
 		<dependency>
 			<groupId>net.jqwik</groupId>
 			<artifactId>jqwik</artifactId>
-			<version>1.9.2</version>
+			<version>${jqwik.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -164,7 +168,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.13</version>
+				<version>${jacoco.version}</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -188,12 +192,12 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.90</minimum>
+											<minimum>${jacoco.line.coverage}</minimum>
 										</limit>
 										<limit>
 											<counter>BRANCH</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.80</minimum>
+											<minimum>${jacoco.branch.coverage}</minimum>
 										</limit>
 									</limits>
 								</rule>
@@ -213,36 +217,42 @@
 					<plugin>
 						<groupId>org.pitest</groupId>
 						<artifactId>pitest-maven</artifactId>
-						<version>1.19.6</version>
+						<version>${pitest.version}</version>
 						<dependencies>
 							<dependency>
 								<groupId>org.pitest</groupId>
 								<artifactId>pitest-junit5-plugin</artifactId>
-								<version>1.2.2</version>
+								<version>${pitest-junit5.version}</version>
 							</dependency>
 						</dependencies>
 						<configuration>
 							<targetClasses>
 								<param>com.psybergate.staff_engagement.*</param>
 							</targetClasses>
+							<!-- Mutating these yields no signal: they hold no branching logic. -->
 							<excludedClasses>
 								<param>com.psybergate.staff_engagement.StaffEngagementApplication</param>
 								<param>com.psybergate.staff_engagement.*.dto.*</param>
+								<param>com.psybergate.staff_engagement.*.config.*</param>
+								<param>com.psybergate.staff_engagement.common.config.*</param>
 								<param>com.psybergate.staff_engagement.*Dto</param>
 								<param>com.psybergate.staff_engagement.*Request</param>
 								<param>com.psybergate.staff_engagement.*Response</param>
 								<param>com.psybergate.staff_engagement.*Config</param>
+								<param>com.psybergate.staff_engagement.*Properties</param>
 								<param>com.psybergate.staff_engagement.*Exception</param>
 							</excludedClasses>
+							<!-- Container-backed tests are too slow to run per mutant. -->
 							<excludedTestClasses>
 								<param>com.psybergate.staff_engagement.*IntegrationTest</param>
+								<param>com.psybergate.staff_engagement.*.integration.*</param>
 								<param>com.psybergate.staff_engagement.*Tests</param>
-								<param>com.psybergate.staff_engagement.scheduling.NextScheduledBatchConsistencyPropertyTest</param>
-								<param>com.psybergate.staff_engagement.scheduling.NextScheduledQueryPropertyTest</param>
-								<param>com.psybergate.staff_engagement.scheduling.ScheduledInteractionPersistencePropertyTest</param>
+								<param>com.psybergate.staff_engagement.scheduling.property.NextScheduledBatchConsistencyPropertyTest</param>
+								<param>com.psybergate.staff_engagement.scheduling.property.NextScheduledQueryPropertyTest</param>
+								<param>com.psybergate.staff_engagement.scheduling.property.ScheduledInteractionPersistencePropertyTest</param>
 							</excludedTestClasses>
 							<failWhenNoMutations>false</failWhenNoMutations>
-							<mutationThreshold>70</mutationThreshold>
+							<mutationThreshold>${pitest.mutation.threshold}</mutationThreshold>
 						</configuration>
 						<executions>
 							<execution>

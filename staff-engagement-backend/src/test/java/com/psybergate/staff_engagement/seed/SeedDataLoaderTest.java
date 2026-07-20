@@ -1,19 +1,24 @@
 package com.psybergate.staff_engagement.seed;
 
-import com.psybergate.staff_engagement.client.Company;
-import com.psybergate.staff_engagement.client.CompanyRepository;
-import com.psybergate.staff_engagement.client.Project;
-import com.psybergate.staff_engagement.client.ProjectRepository;
-import com.psybergate.staff_engagement.employee.Employee;
-import com.psybergate.staff_engagement.employee.EmployeeRepository;
-import com.psybergate.staff_engagement.interaction.Interaction;
-import com.psybergate.staff_engagement.interaction.InteractionRepository;
-import com.psybergate.staff_engagement.scheduling.ScheduledInteraction;
-import com.psybergate.staff_engagement.scheduling.ScheduledInteractionRepository;
-import com.psybergate.staff_engagement.task.Task;
-import com.psybergate.staff_engagement.task.TaskRepository;
-import com.psybergate.staff_engagement.user.User;
-import com.psybergate.staff_engagement.user.UserRepository;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+import com.psybergate.staff_engagement.client.domain.Company;
+import com.psybergate.staff_engagement.client.domain.CompanyRepository;
+import com.psybergate.staff_engagement.client.domain.Project;
+import com.psybergate.staff_engagement.client.domain.ProjectRepository;
+import com.psybergate.staff_engagement.employee.domain.Employee;
+import com.psybergate.staff_engagement.employee.domain.EmployeeRepository;
+import com.psybergate.staff_engagement.interaction.domain.Interaction;
+import com.psybergate.staff_engagement.interaction.domain.InteractionRepository;
+import com.psybergate.staff_engagement.scheduling.domain.ScheduledInteraction;
+import com.psybergate.staff_engagement.scheduling.domain.ScheduledInteractionRepository;
+import com.psybergate.staff_engagement.task.domain.Task;
+import com.psybergate.staff_engagement.task.domain.TaskRepository;
+import com.psybergate.staff_engagement.user.domain.User;
+import com.psybergate.staff_engagement.user.domain.UserRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,12 +26,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SeedDataLoaderTest {

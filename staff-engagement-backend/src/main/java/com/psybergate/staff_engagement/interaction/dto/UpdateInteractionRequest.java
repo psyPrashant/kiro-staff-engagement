@@ -1,6 +1,6 @@
 package com.psybergate.staff_engagement.interaction.dto;
 
-import com.psybergate.staff_engagement.interaction.InteractionType;
+import com.psybergate.staff_engagement.interaction.domain.InteractionType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
